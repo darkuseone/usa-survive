@@ -1,0 +1,9 @@
+{"voice": "../episodes/ep08_bulb/out/voice.wav", "key": "D",
+ "music": [{"type": "groove", "from": "pop+0.3", "to": "y24-0.1"}, {"type": "tension", "from": "y24-0.05", "to": "fine+0.6"}, {"type": "pluck", "from": "liver-0.6", "to": "newph+1.6"},
+           {"type": "stop", "at": "newph+1.8"}, {"type": "endsting", "at": "sub-0.1"}, {"type": "groove", "from": "sub+0.4", "to": "loop+0.4", "g": 0.07}],
+ "stings": ["y24-0.05", "lab-0.05", "liver-0.05", "apple-0.6"],
+ "sfx": [["hum", 0, "pop"], ["slam", "pop", 0.7], ["buzzer", "pop+0.02", 0.3], ["paper", "y24", 0.4], ["pop", "cartel", 0.3], ["slam", "k1000", 0.5], ["slam", "k1000+0.6", 0.5],
+         ["ticks", "lab", "fine"], ["slam", "fine", 0.6], ["bell", "y1901", 0.2], ["slam", "bln", 0.5], ["pop", "newph", 0.4],
+         ["slam", "mat", 0.8], ["pop", "sub", 0.3], ["click", "loop", 0.6], ["hum", "loop", "loop+0.6"]],
+ "bleep": [["mat-0.03", "mat+0.45"]],
+ "levels": {"music": 0.36, "fx": 0.4}}

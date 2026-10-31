@@ -1,0 +1,11 @@
+{"voice": "../episodes/ep04_subs/out/voice.wav", "key": "A",
+ "music": [{"type": "groove", "from": 0, "to": "s17-3.3"}, {"type": "pluck", "from": "s17-3.2", "to": "cancel-0.4"}, {"type": "tension", "from": "cancel-0.35", "to": "y25-0.1"},
+           {"type": "groove", "from": "y25", "to": "app+1.8"}, {"type": "stop", "at": "app+2.1"}, {"type": "endsting", "at": "sub-0.1"}, {"type": "groove", "from": "sub+0.4", "to": "loop+0.5", "g": 0.07}],
+ "stings": ["trial-0.1", "s17-3.2", "s86-2.6", "cancel-0.35", "iliad-0.15", "y25-0.3", "tip1-0.3", "app-0.05"],
+ "sfx": [["blip", "charge-0.1", 0.5], ["blip", "charge+0.35", 0.5], ["blip", "charge+0.7", 0.5], ["thud", "charge", 0.4], ["pop", "trial", 0.4], ["whoosh", "small", 0.4],
+         ["slam", "s17", 0.5], ["pop", "s10", 0.35], ["riser", "s86", "s219"], ["slam", "s219", 0.6],
+         ["click", "cancel-0.3", 0.5], ["click", "cancel+0.02", 0.5], ["click", "cancel+0.34", 0.5], ["click", "cancel+0.66", 0.5], ["click", "cancel+0.98", 0.5], ["click", "cancel+1.3", 0.5],
+         ["slam", "ten", 0.5], ["slam", "bln", 0.6], ["pop", "tip1-0.1", 0.35], ["pop", "tip2-0.1", 0.35], ["pop", "tip3-0.1", 0.35], ["bell", "app", 0.15],
+         ["slam", "mat", 0.8], ["pop", "sub", 0.3], ["blip", "loop", 0.6], ["thud", "loop", 0.3]],
+ "bleep": [["mat-0.03", "mat+0.75"]],
+ "levels": {"music": 0.28, "fx": 0.36}}

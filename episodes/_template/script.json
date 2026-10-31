@@ -1,0 +1,8 @@
+{"title": "What If …?", "lang": "en", "model": "eleven_v4", "fps": 24, "head": 0.3, "tail": 1.5, "gap": 0.15,
+ "tempo": {"host": 1.0, "rookie": 1.0},
+ "voices": {"host": {"voice_id": "<id голоса из ElevenLabs>", "settings": {"stability": 0.4, "similarity_boost": 0.8, "style": 0.3, "speed": 1.0}},
+            "rookie": {"voice_id": "<id голоса из ElevenLabs>", "settings": {"stability": 0.38, "similarity_boost": 0.8, "style": 0.35, "speed": 1.0}}},
+ "lines": [
+  {"key": "a001", "speaker": "rookie", "text": "Okay. The sirens stopped. That's good, right?", "tts": "[nervous, whispering] Okay. The sirens stopped. That's good, right?", "after": 0.6, "gain": -3},
+  {"key": "a002", "speaker": "host", "text": "No. That's the part where you have about ten minutes.", "tts": "[deadpan, calm] No. That's the part where you have about ten minutes.", "after": 0.15}
+ ]}

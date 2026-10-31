@@ -1,0 +1,6 @@
+{"key": "A",
+ "music": [{"type": "night", "from": 0, "to": "card-0.1"}, {"type": "pluck", "from": "card", "to": "alarm-0.8"}, {"type": "stop", "at": "alarm-0.7"}, {"type": "tension", "from": "alarm", "to": 14}],
+ "stings": ["card"],
+ "sfx": [["hum", 0, "alarm"], ["geiger", "close", "card"], ["pop", "card+0.3", 0.4], ["pop", "card+0.65", 0.4], ["pop", "card+1.0", 0.4], ["slam", "card+1.4", 0.6],
+         ["siren", "alarm-0.2", 14], ["rumble", "alarm", "alarm+2.2"], ["slam", "alarm", 0.8]],
+ "levels": {"music": 0.3, "fx": 0.5}}

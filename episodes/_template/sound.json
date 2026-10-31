@@ -1,0 +1,5 @@
+{"voice": "episodes/<эп>/out/voice.wav", "key": "A",
+ "music": [{"type": "night", "from": 0, "to": "fact1-0.1"}, {"type": "pluck", "from": "fact1", "to": "fact1+6"}],
+ "stings": ["fact1"],
+ "sfx": [["hum", 0, "fact1"], ["slam", "fact1", 0.6]],
+ "levels": {"music": 0.2, "fx": 0.35}}

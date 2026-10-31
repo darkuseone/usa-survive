@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script src="gsap.min.js"></script>
+<style>@font-face{font-family:'Hand';src:url('Caveat.ttf');font-weight:100 900}@font-face{font-family:'Osw';src:url('Oswald600.ttf');font-weight:100 900}
+html,body{margin:0;background:#000}#root{position:relative;width:__W__px;height:__H__px;overflow:hidden}canvas{position:absolute;left:0;top:0}
+.ff{position:absolute;left:-999px;font:20px Hand}.f2{position:absolute;left:-999px;font:600 20px Osw}</style></head><body>
+<div class="ff">Aa Яя</div><div class="f2">AA ЯЯ</div>
+<div id="root" data-composition-id="root" data-width="__W__" data-height="__H__" data-start="0" data-duration="__DUR__"><canvas id="c" width="__W__" height="__H__"></canvas></div>
+<script src="data.js"></script><script src="engine.js"></script><script src="face.js"></script><script src="props.js"></script><script src="common.js"></script>__LIBS____SCRIPTS__
+<script>
+const hud = document.createElement('canvas'); hud.width = W; hud.height = H;
+let lastFr = -1;
+function draw(tRaw) {
+  const fr = Math.round(Math.min(T0 + tRaw, DUR - 1e-3) * 24), t = fr / 24;   // T0 — начало части (рендер длинного ролика по частям); движение — каждый кадр 24 fps, «кипение» на двойках
+  if (fr === lastFr) return; lastFr = fr; FRAME = Math.floor(fr / 2);
+  ctx = ink.getContext('2d'); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H); S = 1; SS.length = 0;
+  frame(t);
+  out.globalAlpha = 1; out.globalCompositeOperation = 'source-over'; out.drawImage(paper, 0, 0); out.drawImage(ink, 0, 0);
+  if (typeof post === 'function') post(t, out);
+  const hc = hud.getContext('2d'); hc.setTransform(1, 0, 0, 1, 0, 0); hc.clearRect(0, 0, W, H);
+  const prev = ctx; ctx = hc; S = 1; SS.length = 0; if (typeof hudFrame === 'function') hudFrame(t); ctx = prev;
+  out.drawImage(hud, 0, 0);
+}
+const P = { t: 0 }; const tl = gsap.timeline({ paused: true });
+tl.to(P, { t: PART, duration: PART, ease: 'none', onUpdate: () => draw(P.t) }, 0);
+window.__timelines = { root: tl };
+Promise.all([document.fonts.load('700 100px Hand'), document.fonts.load('600 100px Osw')]).then(() => { lastFr = -1; draw(P.t); }); draw(0);
+</script></body></html>

@@ -1,0 +1,11 @@
+{"voice": "../episodes/ep03_rice/out/voice.wav", "key": "D",
+ "music": [{"type": "groove", "from": 0, "to": "apple-0.1"}, {"type": "pluck", "from": "apple", "to": "corr-0.1"}, {"type": "tension", "from": "corr", "to": "cmp-0.1"},
+           {"type": "pluck", "from": "cmp", "to": "tap-0.1"}, {"type": "groove", "from": "tap", "to": "buck+0.5"}, {"type": "stop", "at": "buck+0.55"},
+           {"type": "endsting", "at": "sub-0.1"}, {"type": "groove", "from": "sub+0.4", "to": "out+0.9", "g": 0.07}],
+ "stings": ["hunt", "apple-0.1", "particles-0.1", "corr-0.1", "cmp-0.1", "dazhe-0.05", "tap-0.05", "air-0.05", "charge-0.05", "fen-0.4"],
+ "sfx": [["buzzer", "died", 0.35], ["thud", "died", 0.5], ["ticks", "hunt", "all"], ["pop", "dont", 0.35], ["whoosh", "particles-0.1", 0.4], ["bubbles", "dive", 0.4],
+         ["pop", "rice", 0.35], ["slam", "last", 0.6], ["slam", "litter", 0.4], ["thud", "tap+0.17", 0.35], ["thud", "tap+0.52", 0.35], ["thud", "tap+0.87", 0.35], ["thud", "tap+1.22", 0.35],
+         ["whoosh", "air", 0.5], ["ticks", "charge", "fen-0.4"], ["slam", "charge", 0.35], ["slam", "day", 0.4], ["slam", "fen", 0.45], ["slam", "cotton", 0.45], ["bell", "service", 0.2],
+         ["pop", "buck", 0.4], ["slam", "mat", 0.8], ["pop", "sub", 0.3], ["meow", "out+0.6", 0.2]],
+ "bleep": [["mat-0.03", "mat+1.55"]],
+ "levels": {"music": 0.34, "fx": 0.33}}

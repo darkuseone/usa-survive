@@ -1,0 +1,9 @@
+{
+  "name": "cartoon-claude-hf",
+  "private": true,
+  "description": "Том и Никита — рисованные кодом Shorts (canvas + HyperFrames)",
+  "dependencies": {
+    "hyperframes": "0.8.154",
+    "puppeteer-core": "25.13.0"
+  }
+}

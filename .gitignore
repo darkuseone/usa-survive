@@ -1,0 +1,7 @@
+build/
+node_modules/
+.venv/
+tools/bin/
+__pycache__/
+out/*.mp4
+out/*.log

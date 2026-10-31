@@ -1,0 +1,9 @@
+{"voice": "../episodes/ep07_chicken/out/voice.wav", "key": "G",
+ "music": [{"type": "groove", "from": 0, "to": "p60-0.3"}, {"type": "tension", "from": "p60-0.25", "to": "tip1-0.35"}, {"type": "pluck", "from": "tip1-0.3", "to": "hands+0.7"},
+           {"type": "stop", "at": "hands+0.9"}, {"type": "endsting", "at": "sub-0.1"}, {"type": "groove", "from": "sub+0.4", "to": "loop+0.4", "g": 0.07}],
+ "stings": ["spray-0.05", "p60-0.25", "p26-2.0", "wash-1.0", "tip1-0.3", "p31-0.08"],
+ "sfx": [["bubbles", 0, 0.3], ["bubbles", 1.0, 0.25], ["buzzer", "spray", 0.3], ["slam", "p60", 0.5], ["slam", "p26", 0.5], ["whoosh", "splash", 0.5],
+         ["pop", "wash", 0.3], ["slam", "seventh", 0.5], ["pop", "tip1-0.1", 0.35], ["pop", "tip2-0.1", 0.35], ["pop", "tip3-0.1", 0.35],
+         ["slam", "mat", 0.8], ["slam", "p31", 0.5], ["pop", "sub", 0.3], ["bubbles", "soap", 0.3]],
+ "bleep": [["mat-0.03", "mat+0.45"]],
+ "levels": {"music": 0.28, "fx": 0.36}}

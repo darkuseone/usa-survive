@@ -1,0 +1,13 @@
+{"voice": "../episodes/ep09_terpet/out/voice.wav", "key": "C",
+ "music": [{"type": "groove", "from": 0.2, "to": "zoo-0.1", "g": 0.07}, {"type": "pluck", "from": "zoo", "to": "people-0.1"}, {"type": "tension", "from": "loss-0.05", "to": "kahn+0.6"},
+           {"type": "pluck", "from": "plan-0.6", "to": "p37+0.8"}, {"type": "night", "from": "fifty-0.05", "to": "act"}, {"type": "groove", "from": "call-0.1", "to": "second+0.8"},
+           {"type": "stop", "at": "second+0.9"}, {"type": "endsting", "at": "sub-0.1"}, {"type": "groove", "from": "sub+0.4", "to": "loop+0.6", "g": 0.06}],
+ "stings": ["jump-1.0", "loss-0.05", "plan-0.6", "fifty-0.05", "call-0.05"],
+ "sfx": [["drips", 0, ["jump-1.0", 0.6]], ["slam", "gaveup", 0.4], ["slam", "jump", 0.6], ["bubbles", "zoo+0.3", 0.35], ["whoosh", "out-0.1", 0.5], ["pop", "out+0.3", 0.4],
+         ["drips", "people-0.05", ["loss-0.05", 0.6]], ["thud", "twice", 0.6], ["slam", "twice+0.05", 0.4], ["paper", "kahn-0.1", 0.4], ["drips", "scary-0.05", ["plan-0.6", 0.5]],
+         ["click", "plan", 0.5], ["paper", "exit-0.1", 0.5], ["slam", "paper", 0.5], ["pop", "p86", 0.4], ["pop", "p37", 0.35], ["drips", "worse-1.7", ["fifty-0.05", 0.5]],
+         ["paper", "fifty", 0.3], ["slam", "y16", 0.7], ["slam", "def", 0.5], ["drips", "act-0.05", ["call-0.05", 0.5]], ["blip", "call", 0.4], ["blip", "call+0.4", 0.4], ["blip", "call+0.8", 0.4],
+         ["pop", "brain", 0.4], ["bell", "dep", 0.3], ["drips", "second-0.6", ["mat-0.05", 0.7]], ["pop", "second", 0.5], ["slam", "mat", 0.8], ["whoosh", "frog2-0.05", 0.4],
+         ["drips", "sub-0.2", ["loop+1", 0.6]], ["pop", "sub", 0.3]],
+ "bleep": [["mat-0.03", "mat+0.5"]],
+ "levels": {"music": 0.15, "fx": 0.25}}
