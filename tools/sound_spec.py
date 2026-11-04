@@ -104,6 +104,14 @@ def main(ep):
             continue
         if name == 'hum': FX.add(hum(at(g) - t0, 0.12), t0); continue
         if name == 'riser': FX.add(riser(at(g) - t0, 0.35), t0); continue
+        if name.startswith('wav:'):                                                       # файл эпизода: ["wav:sfx/rain.wav", от, громк.] или ["wav:…", от, [до, громк.]]
+            x = load(HF / 'episodes' / ep / name[4:])
+            if x is None: print('  !! нет файла', name); continue
+            gg = g
+            if isinstance(g, list):
+                gg = g[1]; n1 = max(1, int((at(g[0]) - t0) * SR)); x = x[:n1].copy(); f = min(len(x) // 3, int(0.4 * SR))
+                if f > 0: x[:f] *= np.linspace(0, 1, f); x[-f:] *= np.linspace(1, 0, f)
+            FX.add(x, t0, gg); continue
         if name in FILES: x = FILES[name]; FX.add(x, t0, g) if x is not None else None; continue
         FX.add(LIB[name](g), t0)
     n = int(DUR * SR); v = np.zeros(n); v[:min(n, len(V))] = V[:n]; vk = os.environ.get('BLEEP') == '1'

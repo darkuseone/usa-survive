@@ -1,0 +1,13 @@
+{"voice": "episodes/t01_gas/out/voice.wav", "key": "D",
+ "music": [{"type": "night", "from": 0, "to": "a3"}, {"type": "stop", "at": "a3-0.25"}, {"type": "tension", "from": "a3", "to": "day"}, {"type": "night", "from": "day", "to": 17.2}, {"type": "endsting", "at": "twenty+0.9"}],
+ "sfx": [["wav:sfx/amb_rain.wav", 0, ["crash+0.3", 0.55]], ["wav:sfx/amb_drone.wav", 0, [17.2, 0.5]], ["wav:sfx/amb_buzz.wav", "alone-0.1", ["crash", 0.18]],
+         ["whoosh", "lights", 0.35],
+         ["wav:sfx/es_revswell.wav", "chime-0.75", 0.45], ["wav:sfx/amb_chime.wav", "chime", 0.75], ["wav:sfx/es_bell.wav", "chime+0.05", 0.4], ["door", "chime", 0.5],
+         ["wav:sfx/es_flick1.wav", "whatever-0.1", 0.55], ["wav:sfx/es_thump.wav", "whatever-0.15", 0.6], ["wav:sfx/amb_groan1.wav", "whatever+0.45", 0.8], ["paper", "drop+0.5", 0.5], ["thud", "drop+0.55", 0.35],
+         ["wav:sfx/amb_steps.wav", "walked+0.45", 0.55], ["wav:sfx/es_flick2.wav", "walked+0.7", 0.45], ["wav:sfx/amb_groan2.wav", "gas+0.15", 0.85],
+         ["wav:sfx/amb_steps.wav", "a3", ["button-0.25", 0.5]],
+         ["wav:sfx/es_latch.wav", "hit-0.03", 0.8], ["slam", "hit", 1.0], ["wav:sfx/es_subdrop.wav", "hit", 0.8], ["slam", "close", 0.6], ["wav:sfx/es_glass1.wav", "close+0.05", 0.5],
+         ["siren", "hit+0.15", "day+2.5"], ["wav:sfx/es_riser.wav", "steel-0.35", 0.5], ["wav:sfx/amb_rattle.wav", "steel", 0.9], ["wav:sfx/es_metal.wav", "crash", 1.0], ["rumble", "crash", "crash+1.6"],
+         ["wav:sfx/es_deep.wav", "day", 0.8], ["wav:sfx/amb_heart.wav", "a4+0.2", 0.7],
+         ["wav:sfx/es_metal.wav", "bang1", 0.45], ["wav:sfx/es_glass2.wav", "bang1", 0.5], ["wav:sfx/es_metal.wav", "bang2", 0.4], ["wav:sfx/es_metal.wav", "bang3", 0.55], ["wav:sfx/amb_groan1.wav", "bang2-0.3", 0.35]],
+ "levels": {"music": 0.135, "fx": 0.26}}
