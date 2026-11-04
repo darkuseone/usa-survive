@@ -52,6 +52,7 @@ function personBody(o) {
   if (top === 'jacket') [-1, 1].forEach(sd => piece([[sd * 4, 90], [sd * 56, 88], [sd * 40, 140]], PC.topD, { seed: 78 + sd, lw: 2.2 }));   // воротник
   const sw = Math.sin(step(o.t ?? 0) * 1.4) * 3;
   if (top === 'hoodie') [-1, 1].forEach(sd => { stroke([[sd * 16, 104], [sd * 18 + sw, 160], [sd * 17 + sw, 196]], '#f4f1ea', 4); rectP(sd * 17 + sw - 5, 194, 10, 18, '#f4f1ea', { lw: 1.6, seed: 73 + sd }); });
+  if (o.vest) personVest(o.vest);
   if ((o.belly ?? 0) > 0) { const g = ctx.createRadialGradient(0, 260, 5, 0, 260, 120); g.addColorStop(0, hexA('#9cff6a', 0.55 * o.belly)); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(-130, 140, 260, 240);
     const ph = step(o.t ?? 0) * 3; for (let i = 0; i < 3; i++) { const a = ph + i * 2.1; stroke([[Math.cos(a) * 40 - 14, 250 + Math.sin(a) * 30], [Math.cos(a) * 40, 240 + Math.sin(a) * 30], [Math.cos(a) * 40 + 14, 250 + Math.sin(a) * 30]], '#2d6b16', 4, { a: o.belly }); } }
 }
@@ -150,6 +151,13 @@ function hairdo(kind, o) {
     [[[90, -96], [122, -100], [104, -74]], [[-88, -92], [-118, -94], [-100, -68]], [[-20, -146], [-6, -160], [10, -146]]].forEach((tp, q) => piece(tp, PC.hair, { seed: 124 + q, step: 8 }));
     piece(hair, PC.hair, { seed: 120, step: 12, edge: 1.2, shade: () => { piece([[-70, -120], [-10, -140], [40, -134], [10, -112], [-40, -104]], PC.hairL, { seed: 122, line: false, a: 0.8 }); [[-80, -110, -40, -80], [-20, -130, 10, -96], [40, -128, 60, -90], [90, -100, 100, -70]].forEach(v => stroke([[v[0], v[1]], [v[2], v[3]]], PC.hairL, 5)); } });
     return; }
+  if (kind === 'beanie') {                                           // вязаная шапка с отворотом (Joe)
+    const c = o.capCol || '#2f5961', cd = mix(c, '#000000', 0.22);
+    [-1, 1].forEach(sd => piece([[sd * 96, -40], [sd * 110, -40], [sd * 106, 10], [sd * 94, 6]], PC.hair, { seed: 134 + sd, lw: 1.8 }));   // виски
+    piece(spline([[-106, -40], [-100, -104], [-56, -146], [0, -156], [56, -146], [100, -104], [106, -40]], true, 6).concat([[106, -40], [-106, -40]]), c, { seed: 136, step: 14, shade: () => {
+      for (let x = -90; x <= 90; x += 22) stroke([[x * 0.9, -146 + Math.abs(x) * 0.25], [x, -60]], cd, 3, { a: 0.7 }); } });
+    piece([[-114, -66], [114, -66], [112, -26], [-112, -26]], mix(c, '#ffffff', 0.06), { seed: 137, step: 12, lw: 2.4, shade: () => { for (let x = -104; x <= 104; x += 13) stroke([[x, -62], [x, -30]], cd, 2.4, { a: 0.6 }); } });
+    return; }
   if (kind === 'cap' || kind === 'helmet') {
     const c = o.capCol || (kind === 'helmet' ? '#6b7a3a' : '#c8402c'), cd = mix(c, '#000000', 0.25);
     piece(spline([[-104, -28], [-100, -96], [-50, -138], [0, -146], [50, -138], [100, -96], [104, -28]], true, 6).concat([[104, -28], [-104, -28]]), c, { seed: 132, step: 14, shade: () => { stroke([[0, -144], [0, -34]], cd, 4); } });
@@ -160,4 +168,47 @@ function hairdo(kind, o) {
   // short: аккуратная короткая стрижка с пробором
   piece(spline([[-104, -6], [-108, -70], [-70, -124], [-10, -140], [56, -132], [100, -96], [108, -40], [104, -6], [92, -40], [70, -78], [20, -88], [-30, -82], [-80, -60], [-94, -30]], true, 6), PC.hair, { seed: 135, step: 12, edge: 1.0,
     shade: () => { stroke([[-30, -128], [-10, -90]], PC.hairL, 5); stroke([[20, -132], [50, -100]], PC.hairL, 4); } });
+}
+
+/* светоотражающая жилетка поверх верха: две полы, серебристые полосы, лямки через плечи (фирменная деталь Joe) */
+function personVest(col) {
+  const cd = mix(col, '#000000', 0.2), sil = '#e9ebe6';
+  [-1, 1].forEach(sd => {
+    const pts = [[sd * 30, 96], [sd * 74, 102], [sd * 98, 196], [sd * 104, 330], [sd * 26, 330], [sd * 24, 200]];
+    piece(pts, col, { seed: 140 + sd, step: 16, shade: () => {
+      piece([[sd * 60, 96], [sd * 110, 200], [sd * 110, 340], [sd * 80, 340]], cd, { line: false, a: sd > 0 ? 0.5 : 0.25, seed: 142 + sd });
+      [236, 286].forEach((y, q) => piece([[sd * 10, y], [sd * 116, y - 2], [sd * 116, y + 18], [sd * 10, y + 18]], sil, { seed: 144 + sd + q * 3, step: 12, lw: 1.6, shade: () => { stroke([[sd * 14, y + 6], [sd * 112, y + 4]], '#ffffff', 3, { a: 0.8 }); } }));
+      piece([[sd * 40, 92], [sd * 62, 94], [sd * 58, 236], [sd * 38, 236]], sil, { seed: 150 + sd, step: 12, lw: 1.6 });
+    } });
+  });
+  rectP(-32, 168, 22, 34, '#f4f1ea', { seed: 152, lw: 1.6 }); stroke([[-28, 178], [-14, 178]], '#3d5c8f', 3); stroke([[-28, 188], [-16, 188]], '#9a958a', 2);   // бейджик
+}
+
+/* ================================================================= ГЕРОИ КАНАЛА «Paper Survivors» */
+/* Joe — «каждый»: серое худи, оранжевая светоотражающая жилетка (узнаётся по цвету на обложке), бини цвета морской волны, щетина.
+   Аксессуары (скотч, фонарик) — после joe() в том же layer, в точке кисти. */
+const JOE = { pal: { top: '#7b828c', topD: '#5d636c', hair: '#5a3a26', hairL: '#7a5238', pants: '#3d4f6e', shoe: '#e9e4d8', skin: '#f2cfb4', skinD: '#dfae92', stub: '#7a5a48' },
+  hair: 'beanie', capCol: '#2f6a6e', top: 'hoodie', vest: '#f2731c', stubble: 1 };
+function joe(o = {}) { person({ ...JOE, ...o, pal: { ...JOE.pal, ...(o.pal || {}) } }); }
+
+/* зомби: серо-зелёная кожа, рваная футболка, тусклые глаза; руки вперёд-в стороны; ноги шаркают (run на малой амплитуде через t/2) */
+const ZPAL = [
+  { skin: '#93b86a', skinD: '#76994f', hair: '#3a362c', hairL: '#4c473a', top: '#6e5a48', topD: '#4f4033', pants: '#45485a', shoe: '#5a5048', stub: '#5c6650' },
+  { skin: '#a6c278', skinD: '#87a35c', hair: '#6a5a40', hairL: '#7c6a4c', top: '#5d6e7c', topD: '#45535e', pants: '#3e3a36', shoe: '#4a443c', stub: '#5c6650' },
+  { skin: '#88b07a', skinD: '#6c915e', hair: '#26221c', hairL: '#3a342a', top: '#8a3e34', topD: '#6a2e26', pants: '#2f3646', shoe: '#3a3632', stub: '#5c6650' }];
+function zombie(o = {}) {
+  const v = o.v ?? 0, sway = Math.sin(step(o.t ?? 0, 8) * 2.2 + v) * 0.05;
+  person({ pal: ZPAL[v % ZPAL.length], hair: ['shaggy', 'bald', 'short'][v % 3], top: 'tee', mood: 'dread', lid: 0.38, lk: [0, 0.3],
+    arms: { l: [-150, 130, 'open'], r: [150, 110, 'open'] }, legs: 'stand', tilt: 0.12 + sway, lean: sway * 0.6, ...o, t: (o.t ?? 0) * 0.5 });
+  zombieMarks(o);
+}
+/* приметы зомби поверх person(): тёмные круги у глаз, шов-царапина, рваный подол и дыры на одежде (та же геометрия, что у person) */
+function zombieMarks(o) {
+  const s = o.s ?? 1, tl = (o.tilt ?? 0.12);
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); push(0, 0, 1, o.lean || 0);
+  piece([[-104, 318], [-80, 300], [-60, 334], [-34, 304], [-8, 338], [20, 306], [44, 336], [70, 302], [104, 318], [104, 340], [-104, 340]], '#2a2420', { raw: true, line: false, a: 0.55 });   // рваный подол
+  ellP(-40, 220, 18, 12, '#3a2e26', { seed: 700, line: false, a: 0.6 }); ellP(50, 170, 12, 16, '#3a2e26', { seed: 701, line: false, a: 0.6 });
+  push(0, 0, 1, tl); [-1, 1].forEach(sd => ellP(sd * 28, -4, 36, 42, '#3c4a2c', { seed: 702 + sd, line: false, a: 0.35, tex: false }));
+  stroke([[40, -80], [70, -50]], '#5a2a22', 4); for (let q = 0; q < 3; q++) stroke([[44 + q * 9, -58 - q * 9], [56 + q * 9, -70 - q * 9]], '#5a2a22', 3);
+  pop(); pop(); pop();
 }

@@ -1,0 +1,5 @@
+{"voice": "episodes/t01_gas/out/voice.wav", "key": "D",
+ "music": [{"type": "night", "from": 0, "to": "slam-0.1"}, {"type": "stop", "at": "slam-0.25"}, {"type": "tension", "from": "slam", "to": "day+3"}, {"type": "endsting", "at": "twenty+0.6"}],
+ "sfx": [["hum", 0, "slam"], ["bell", "chime", 0.7], ["door", "chime+0.05", 0.6], ["whoosh", "gas-0.4", 0.4], ["slam", "slam+0.12", 1.0], ["thud", "slam+0.12", 0.8],
+         ["siren", "slam+0.2", "day+3"], ["riser", "steel-0.2", "crash"], ["rumble", "crash", "crash+1.6"], ["slam", "crash", 0.9], ["thud", "twenty+0.3", 0.7], ["paper", "day-0.1", 0.5]],
+ "levels": {"music": 0.16, "fx": 0.24}}
