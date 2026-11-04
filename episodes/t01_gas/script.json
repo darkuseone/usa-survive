@@ -1,6 +1,6 @@
 {"title": "Paper Survivors — test: Gas Station, Night 1", "lang": "en", "model": "eleven_v4", "fps": 24, "head": 0.3, "tail": 1.2, "gap": 0.15,
  "tempo": {"nar": 1.0},
- "voices": {"nar": {"voice_id": "dPah2VEoifKnZT37774q", "settings": {"stability": 0.45, "similarity_boost": 0.8, "style": 0.3, "speed": 1.0}}},
+ "voices": {"nar": {"voice_id": "16sLehIBT5yDCW6ZNKGj", "settings": {"stability": 0.42, "similarity_boost": 0.8, "style": 0.35, "speed": 1.0}}},
  "lines": [
   {"key": "a001", "speaker": "nar", "text": "It's 3:07 a.m. You're alone on the night shift at a highway gas station.", "tts": "[calm, low] It's three oh seven a.m. You're alone on the night shift at a highway gas station.", "after": 0.25},
   {"key": "a002", "speaker": "nar", "text": "Then the door chime rings... and whatever just walked in is not here for gas.", "tts": "[tense, slow] Then the door chime rings... [pause] and whatever just walked in... is not here for gas.", "after": 0.2},

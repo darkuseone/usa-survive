@@ -24,3 +24,13 @@ function mouth(x, y, w, m, o = {}) {
   ctx.save(); ctx.clip(path); if (open > 0.25 && !o.noTeeth) { ctx.fillStyle = '#fbf7ef'; ctx.fillRect(x - hw, y - 12, hw * 2, 13); }
   ctx.fillStyle = '#d4606f'; ctx.beginPath(); ctx.ellipse(x, y + d, hw * 0.6, d * 0.35, 0, 0, 6.3); ctx.fill(); ctx.restore();
 }
+
+/* рот-крик (ужас): верх выгнут дугой, уголки вниз, верхние зубы, тёмная глотка, язык внизу. k 0..1 — насколько открыт */
+function screamMouth(x, y, w, k = 1) {
+  const hw = w * 0.42, d = 26 + 46 * k, up = 10 + 8 * k;
+  const P = spline([[x - hw, y + 8], [x - hw * 0.55, y - up * 0.7], [x, y - up], [x + hw * 0.55, y - up * 0.7], [x + hw, y + 8], [x + hw * 0.7, y + d * 0.8], [x, y + d], [x - hw * 0.7, y + d * 0.8]], true, 6);
+  const path = piece(P, '#2a0e0e', { raw: true, lw: 3 });
+  ctx.save(); ctx.clip(path); ctx.fillStyle = '#fbf7ef'; ctx.fillRect(x - hw, y - up - 4, hw * 2, 15);
+  ctx.fillStyle = '#c4505f'; ctx.beginPath(); ctx.ellipse(x, y + d + 2, hw * 0.55, d * 0.28, 0, 0, 6.3); ctx.fill(); ctx.restore();
+  stroke([[x - hw - 4, y + 14], [x - hw - 10, y + 24]], '#1c1512', 3); stroke([[x + hw + 4, y + 14], [x + hw + 10, y + 24]], '#1c1512', 3);   // складки уголков вниз
+}

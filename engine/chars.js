@@ -13,7 +13,7 @@ function person(o) {
   const t = o.t ?? 0, s = o.s ?? 1;
   push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1);
   push(0, 0, 1, o.lean || 0);
-  const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personBody(o); pop();
+  const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personArms(o, 'back'); personBody(o); pop();
   const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52); push(jh[0], jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
   personArms(o);
   pop(); pop();
@@ -41,7 +41,7 @@ function personBody(o) {
   const top = o.top || 'hoodie';
   rectP(-22, 84, 44, 30, PC.skinD, { seed: 69, lw: 2 });
   if (top === 'hoodie') piece(spline([[-70, 92], [0, 80], [70, 92], [62, 120], [-62, 120]], true, 6), PC.topD, { seed: 70 });
-  const body = [[-80, 104], [-52, 92], [52, 92], [80, 104], [100, 200], [104, 330], [-104, 330], [-100, 200]];
+  const body = spline([[-50, 90], [50, 90], [82, 100], [96, 124], [100, 200], [104, 330], [-104, 330], [-100, 200], [-96, 124], [-82, 100]], true, 5);   // скруглённые плечи
   piece(body, PC.top, { seed: 71, step: 18, shade: () => {
     piece([[40, 92], [104, 200], [104, 330], [60, 330]], PC.topD, { seed: 75, line: false, a: 0.45 });
     stroke([[-104, 318], [104, 318]], PC.topD, 5);
@@ -68,10 +68,10 @@ function glassAt(cx, cy, rg, f, o = {}) {
   stroke([[-gw + 9, -gh / 2 + 10], [-gw + 14, gh / 2 - 12]], '#ffffff', 5, { a: 0.65 });
   pop();
 }
-function personArms(o) {
+function personArms(o, pass = 'front') {
   const A = o.arms || {}, dr = o.drink ?? 0;
   [['l', -1], ['r', 1]].forEach(([k, sd]) => {
-    let a = A[k] || [sd * 112, 300, 'open']; let [hx, hy, pose] = a; const sh = [sd * 80, 112];
+    let a = A[k] || [sd * 112, 300, 'open']; let [hx, hy, pose] = a; const sh = [sd * 70, 122];
     let gl = null;
     if (pose === 'glass') {
       if (k === 'r' && dr > 0) {                                     // питьё: стакан к губам, наклон, голова запрокинута
@@ -85,7 +85,11 @@ function personArms(o) {
       } else gl = [hx + sd * 6, hy - 46, 0];
     }
     const el = [lerp(sh[0], hx, 0.5) + sd * 30, lerp(sh[1], hy, 0.5) + 22];
-    const tb = tube([sh, el, [hx, hy]], 50, 42); piece(tb.pts, PC.top, { raw: true, seed: 80 + sd, lw: 2.6 });
+    const tb = tube([sh, el, [hx, hy]], 50, 42);
+    if (pass === 'back') { piece(tb.pts, PC.top, { raw: true, seed: 80 + sd, lw: 2.6 }); return; }    // плечо крепится за туловищем — без углов
+    const fa = tube([el, [lerp(el[0], hx, 0.5), lerp(el[1], hy, 0.5)], [hx, hy]], 47, 42); piece(fa.pts, PC.top, { raw: true, seed: 84 + sd, lw: 2.6 });
+    dot(el[0], el[1], 5, mix(PC.top, '#000000', 0.35), 0.8);                                            // «гвоздик»-шарнир локтя, как у бумажной куклы
+
     if (gl) glassAt(gl[0], gl[1], gl[2], o.glass ?? 0.7, { licked: o.licked });
     const c0 = tb.axis[tb.axis.length - 3], ang = Math.atan2(hy - c0[1], hx - c0[0]);
     push(hx, hy, 1, ang - Math.PI / 2);
@@ -136,6 +140,7 @@ function personHead(o) {
   const m = o.m || { open: 0, round: 0 };
   if (mood === 'eww' && m.open < 0.06) { mouth(0, 64, 54, { open: 0.35, round: 0 }, { noTeeth: true }); piece(spline([[-8, 76], [10, 76], [8, 100], [-6, 100]], true, 5), '#e07a8a', { raw: true, lw: 2.2 }); }
   else if (mood === 'dread' && m.open < 0.06) mouth(0, 64, 46, { open: 0.0 }, { smile: -0.9 });
+  else if (o.scream) screamMouth(0, 62, 64, o.scream);
   else mouth(0, 62, 58, m, { smile: o.smile ?? (mood === 'dumb' ? 0.8 : 0), smirk: o.smirkN ?? 0 });
     hairdo(o.hair || 'short', o);
   if (o.beard) piece(spline([[-92, 30], [-70, 96], [-30, 128], [0, 134], [30, 128], [70, 96], [92, 30], [70, 70], [30, 92], [0, 88], [-30, 92], [-70, 70]], true, 6), PC.hair, { seed: 130, step: 10, edge: 1.1 });

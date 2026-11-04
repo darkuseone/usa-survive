@@ -19,7 +19,9 @@ function outside(t, o = {}) {                                // ночь за с
   if (o.car) { push(1180, 760, 1); piece([[-230, 0], [-210, -80], [-120, -130], [110, -130], [190, -80], [240, -10], [240, 30], [-230, 30]], '#5a6b80', { seed: 220 });
     piece([[-100, -118], [90, -118], [160, -76], [-180, -76]], '#9fb4c8', { seed: 221, lw: 2 }); ellP(-140, 30, 44, 44, '#1c1512', { seed: 222 }); ellP(150, 30, 44, 44, '#1c1512', { seed: 223 });
     if (o.carOpen) piece([[-60, -76], [-150, -150], [-150, 10], [-60, 20]], '#4d5d70', { seed: 224, lw: 2.4 }); pop(); }
+  if (o.car) { const hz = Math.floor(t * 1.6) % 2 === 0; [[960, 700], [1400, 700]].forEach(([x, y]) => ellP(x, y, 14, 9, hz ? '#ffb030' : '#6a4a20', { seed: 225, lw: 1.6, tex: false })); }
   (o.zoms || []).forEach(z => layer(() => zombie({ t, ...z }), { sx: 4, sy: 6, sb: 8 }));
+  rainOut(t, GL.y0, 880, o.rainA ?? 1);
   rectP(-200, GL.y0 - 20, 2320, 1000, 'rgba(20,28,60,0.22)', { raw: true, line: false, tex: false });                    // ночной воздух
 }
 
@@ -82,9 +84,9 @@ function store(t, o = {}) {                                  // вся деко�
 }
 
 function calendar(k, t) {                                    // листок «DAY 1» на скотче, приклеен к жалюзи
-  const p = popK(t, k, 0.3); if (p <= 0) return; push(1250, 420, p, 0.05); card(0, 0, 300, 340, 0, 330, '#fbfaf6');
+  const p = popK(t, k, 0.3); if (p <= 0) return; push(1420, 440, p, 0.05); card(0, 0, 300, 340, 0, 330, '#fbfaf6');
   rectP(-150, -170, 300, 70, '#c8241c', { seed: 331, lw: 2 }); txt('NOVEMBER', 0, -134, 36, { font: 'Inter Black', col: '#fbfaf6' });
-  txt('1', 0, 30, 170, { font: 'Oswald', weight: 600, col: '#1c1512' }); pop(); tape(1250, 250, 120, -0.06, 332);
+  txt('1', 0, 30, 170, { font: 'Oswald', weight: 600, col: '#1c1512' }); pop(); tape(1420, 270, 120, -0.06, 332);
 }
 
 function storeLight(o = {}) {                                // свет: люминесцентные лампы, мигание, тревога
@@ -113,4 +115,71 @@ function lockBtn(t, c) {                                     // вставка: 
   blobP([[-34, -16], [34, -16], [38, 22], [0, 38], [-38, 22]], JOE.pal.skin, { seed: 348, lw: 2.6 }); for (let q = 0; q < 3; q++) stroke([[-18 + q * 18, 18], [-18 + q * 18, 32]], JOE.pal.skinD, 2.6);
   blobP([[30, -6], [48, 4], [44, 22], [28, 16]], JOE.pal.skin, { seed: 349, lw: 2.4 }); pop();
   if (t > hit && t < hit + 0.25) glowAdd(960, 600, 500, 'rgba(255,80,60,1)', 0.6 * (1 - (t - hit) / 0.25));
+}
+
+function rainOut(t, y0, y1, a = 1) {                         // косой дождь на улице: штрихи меняются на «двойках» + брызги на асфальте
+  const r = rng(hsh(Math.floor(step(t, 12) * 12), 77));
+  for (let i = 0; i < 140; i++) { const x = r() * 2300 - 200, y = y0 + r() * (y1 - y0), L = 26 + r() * 30; stroke([[x, y], [x - L * 0.25, y + L]], '#b8c8e8', 2, { a: 0.35 * a, smooth: false }); }
+  for (let i = 0; i < 26; i++) { const x = r() * 1920, y = 700 + r() * 170; stroke([[x - 8, y], [x, y - 7], [x + 8, y]], '#c8d4ee', 2, { a: 0.4 * a }); }
+}
+function glassDrops(t) {                                     // капли стекают по витрине
+  for (let i = 0; i < 26; i++) { const r = rng(900 + i), x = r() * 1920, sp = 40 + r() * 70, y = GL.y0 + ((t * sp + r() * 800) % (GL.y1 - GL.y0));
+    stroke([[x, y - 30 - r() * 30], [x + 1, y]], 'rgba(220,235,255,0.25)', 3); dot(x + 1, y + 2, 4, '#e8f2ff', 0.45); }
+}
+function dust(t, cx, cy, rw, rh, n = 30) {                   // пылинки в свете ламп
+  for (let i = 0; i < n; i++) { const r = rng(950 + i), ph = step(t, 12) * (0.2 + r() * 0.3);
+    dot(cx + (r() - 0.5) * rw + Math.sin(ph + i) * 30, cy + (r() - 0.5) * rh + Math.cos(ph * 0.7 + i) * 20, 1.5 + r() * 2, '#fff6dc', 0.35); }
+}
+function boxP(x, y, s = 1) {                                 // картонная коробка со снеками у ног
+  push(x, y, s); rectP(-90, -110, 180, 110, '#b98a52', { seed: 960, lw: 2.4, shade: () => { stroke([[-90, -70], [90, -70]], '#9a6e3a', 3); } });
+  piece([[-90, -110], [-60, -150], [10, -128], [-6, -110]], '#c99a62', { seed: 961, lw: 2 }); piece([[90, -110], [64, -146], [0, -124], [8, -110]], '#a77c46', { seed: 962, lw: 2 });
+  for (let i = 0; i < 3; i++) blobP([[-60 + i * 46, -100], [-24 + i * 46, -100], [-26 + i * 46, -150], [-58 + i * 46, -150]], ['#f2c230', '#d8342c', '#3d7fc4'][i], { seed: 963 + i, lw: 1.8 });
+  pop();
+}
+function crate(x, y) {                                       // упаковка бутылок воды — Joe на неё оседает (верх y − 220)
+  rectP(x - 175, y - 220, 350, 220, '#3d6fa4', { seed: 970, lw: 2.6, shade: () => { for (let i = 0; i < 6; i++) ellP(x - 140 + i * 56, y - 190, 22, 14, '#9fd0f0', { seed: 971 + i, lw: 1.4, tex: false }); stroke([[x - 175, y - 150], [x + 175, y - 150]], '#2d5684', 5); } });
+  txt('WATER', x - 110, y - 60, 40, { font: 'Inter Black', col: '#e8f2ff' });
+}
+
+/* ==== снаружи: общий план заправки ночью под дождём ==== */
+function exterior(t, o = {}) {
+  rectP(-200, -200, 2320, 900, '#18203a', { seed: 400, line: false, step: 90, shade: () => { const r = rng(401); for (let i = 0; i < 50; i++) dot(r() * 1920, r() * 400, 1.5 + r() * 2, '#8a96c0', 0.4); } });
+  piece([[-200, 560], [200, 500], [520, 540], [900, 480], [1300, 530], [1700, 470], [2120, 520], [2120, 700], [-200, 700]], '#0f1526', { seed: 402 });
+  // столб-ценник
+  rectP(1640, 160, 30, 520, '#2a2e36', { seed: 403, lw: 2 }); rectP(1540, 120, 230, 190, '#f3ecd8', { seed: 404, lw: 2.6, shade: () => { rectP(1540, 120, 230, 60, '#c8342c', { seed: 405, line: false }); } });
+  txt('GAS', 1655, 152, 44, { font: 'Inter Black', col: '#fbfaf6' }); txt('$3.49', 1655, 240, 66, { font: 'Oswald', weight: 600, col: '#1c1512' });
+  // магазин: стена, витрина со светом, Joe внутри
+  rectP(260, 330, 1100, 400, '#b9a98a', { seed: 406, lw: 2.8 }); rectP(260, 300, 1100, 50, '#c8342c', { seed: 407, lw: 2.4 }); txt('HWY 40 FUEL & FOOD', 810, 326, 34, { font: 'Inter Black', col: '#fbfaf6' });
+  rectP(320, 400, 980, 300, '#f6f2d8', { seed: 408, lw: 2.4, tex: false, shade: () => { for (let x = 320; x < 1300; x += 245) rectP(x, 400, 10, 300, '#6a6e74', { raw: true, line: false });
+    for (let i = 0; i < 4; i++) rectP(350 + i * 70, 560, 56, 140, ['#d8342c', '#3d7fc4', '#f2c230', '#46b86a'][i], { seed: 409 + i, lw: 1.4 }); } });
+  layer(() => joe({ x: 640, y: 520, s: 0.34, t, flip: true, mood: 'sleepy', arms: { l: [-150, 300, 'open'], r: [200, 150, 'fist'] } }), { sx: 3, sy: 4, sb: 5 });
+  push(1140, 470, 1, 0.02); rectP(-110, -36, 220, 72, 'rgba(10,10,20,0.7)', { seed: 414, lw: 2 }); txt('OPEN 24/7', 0, 3, 38, { font: 'Oswald', weight: 600, col: Math.sin(step(t, 24) * 9) > -0.8 ? '#ff5a7a' : '#5a2a3a' }); pop();
+  // навес на столбах, колонки, машина
+  [200, 1440].forEach((x, i) => rectP(x, 210, 40, 560, '#d9d4c4', { seed: 415 + i, lw: 2.4 }));
+  rectP(100, 150, 1500, 80, '#e7e3d6', { seed: 417, lw: 2.8, shade: () => { rectP(100, 196, 1500, 34, '#c8342c', { seed: 418, line: false }); } });
+  for (let x = 220; x < 1600; x += 230) ellP(x, 236, 46, 10, '#fff6cf', { seed: 419 + x, lw: 1.6, tex: false });
+  [[560, '3'], [1180, '4']].forEach(([x, n], i) => { rectP(x - 60, 590, 120, 200, '#c8342c', { seed: 420 + i, lw: 2.6, shade: () => { rectP(x - 60, 590, 120, 40, '#f3ecd8', { seed: 422 + i, line: false }); } });
+    rectP(x - 38, 650, 76, 50, '#1c2330', { seed: 424 + i, lw: 2 }); txt(n, x, 676, 34, { font: 'Oswald', weight: 600, col: '#7dffb0' }); });
+  push(1350, 860, 1); piece([[-260, 0], [-236, -90], [-130, -150], [120, -150], [210, -90], [270, -10], [270, 34], [-260, 34]], '#5a6b80', { seed: 426 });
+  piece([[-112, -136], [100, -136], [176, -86], [-200, -86]], '#9fb4c8', { seed: 427, lw: 2 }); ellP(-160, 34, 50, 50, '#1c1512', { seed: 428 }); ellP(170, 34, 50, 50, '#1c1512', { seed: 429 });
+  const hz = Math.floor(t * 1.6) % 2 === 0; ellP(-250, -40, 16, 10, hz ? '#ffb030' : '#6a4a20', { seed: 430, lw: 1.6, tex: false }); ellP(262, -40, 16, 10, hz ? '#ffb030' : '#6a4a20', { seed: 431, lw: 1.6, tex: false }); pop();
+  rectP(-200, 760, 2320, 400, '#30343e', { seed: 432, line: false, step: 70, shade: () => { for (let i = 0; i < 8; i++) ellP(200 + i * 230, 900 + (i % 2) * 60, 120, 14, '#4a5068', { seed: 433 + i, line: false, a: 0.6, tex: false }); } });   // асфальт и лужи
+  // фигура на краю света
+  if (o.zom) layer(() => zombie({ x: 120, y: 700, s: 0.5, t, v: 1, legs: 'run' }), { sx: 3, sy: 4, sb: 5 });
+  rainOut(t, -200, 1100, 1.3);
+}
+function extLight(t) {
+  lightmap('#5a5e74', () => { radial(860, 300, 1100, 'rgba(255,248,220,1)', 0.75); radial(810, 560, 700, 'rgba(240,250,255,1)', 0.6); radial(1140, 470, 260, 'rgba(255,90,130,1)', 0.4);
+    const hz = Math.floor(t * 1.6) % 2 === 0; if (hz) { radial(1100, 820, 180, 'rgba(255,170,40,1)', 0.6); radial(1612, 820, 180, 'rgba(255,170,40,1)', 0.6); } });
+  for (let x = 220; x < 1600; x += 230) glowAdd(x, 240, 90, 'rgba(255,240,200,1)', 0.35);
+}
+
+/* счётчик дней: бумажная бирка на скотче в правом верхнем углу (экранные координаты) */
+function dayTag(t, n, o = {}) {
+  const k = o.stamp != null ? popK(t, o.stamp, 0.35) : 1;
+  push(W - 190, 128, 1, 0.05); card(0, 0, 250, 170, 0, 980, '#f3ecd8'); txt('DAY', -62, -50, 34, { font: 'Inter Black', col: '#c8241c' });
+  push(28, 18, 0.6 + 0.4 * k); txt(String(n), 0, 0, 120, { font: 'Oswald', weight: 600, col: '#1c1512' }); pop();
+  txt(o.clock || '03:07 AM', -40, 62, 26, { font: "'Courier 10 Pitch'", weight: 700, col: '#3a3530' });
+  if (o.stamp != null && t > o.stamp) { const q = clamp((t - o.stamp) / 0.4); ellP(28, 18, 70 * (0.6 + 0.4 * q), 62 * (0.6 + 0.4 * q), 'rgba(0,0,0,0)', { raw: true, tex: false, lw: 6, lc: '#c8241c', a: q }); }
+  pop(); tape(W - 290, 52, 120, -0.5, 981); tape(W - 80, 60, 110, 0.6, 982);
 }
