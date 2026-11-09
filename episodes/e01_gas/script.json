@@ -1,0 +1,558 @@
+{
+ "title": "Zombie Outbreak: 30 Days Locked Inside a Gas Station",
+ "lang": "en",
+ "model": "eleven_v4",
+ "fps": 24,
+ "head": 0.4,
+ "tail": 6.0,
+ "gap": 0.15,
+ "tempo": {
+  "nar": 1.0
+ },
+ "voices": {
+  "nar": {
+   "voice_id": "C1npRmjB19a6yNkEucvx",
+   "settings": {
+    "stability": 0.42,
+    "similarity_boost": 0.8,
+    "style": 0.35,
+    "speed": 0.98
+   }
+  }
+ },
+ "lines": [
+  {
+   "key": "c0_01",
+   "speaker": "nar",
+   "text": "It's 3:07 a.m. You're alone on the night shift at a highway gas station.",
+   "tts": "[calm, low] It's three oh seven A M. You're alone on the night shift at a highway gas station.",
+   "after": 0.3
+  },
+  {
+   "key": "c0_02",
+   "speaker": "nar",
+   "text": "Then the door chime rings... and whatever just walked in is not here for gas.",
+   "tts": "[tense, slow] Then the door chime rings... [pause] and whatever just walked in... is not here for gas.",
+   "after": 0.2
+  },
+  {
+   "key": "c0_03",
+   "speaker": "nar",
+   "text": "You slam the lockdown button. Steel shutters crash down.",
+   "tts": "[urgent] You slam the lockdown button. Steel shutters crash down.",
+   "after": 0.4
+  },
+  {
+   "key": "c0_04",
+   "speaker": "nar",
+   "text": "Day one. Twenty-nine to go.",
+   "tts": "[quiet, ominous] Day one. Twenty-nine to go.",
+   "after": 0.6
+  },
+  {
+   "key": "c0_05",
+   "speaker": "nar",
+   "text": "You have one small store, one steel shutter, and thousands of gallons of fuel under your feet that every survivor in this county is about to want.",
+   "tts": "[measured] You have one small store... one steel shutter... and thousands of gallons of fuel under your feet, that every survivor in this county is about to want.",
+   "after": 0.3
+  },
+  {
+   "key": "c0_06",
+   "speaker": "nar",
+   "text": "To reach Day 30, you'll have to solve five problems. And one of them nearly kills you on Day 19.",
+   "tts": "[low, foreboding] To reach day thirty, you'll have to solve five problems. And one of them... nearly kills you on day nineteen.",
+   "after": 5.0
+  },
+  {
+   "key": "c1_01",
+   "speaker": "nar",
+   "text": "Day one. The adrenaline wears off around sunrise, and your hands start shaking.",
+   "tts": "[quiet] Day one. The adrenaline wears off around sunrise... and your hands start shaking.",
+   "after": 0.3
+  },
+  {
+   "key": "c1_02",
+   "speaker": "nar",
+   "text": "Problem one: you don't actually know what you have. So before anything clever, you count.",
+   "tts": "[calm, focused] Problem one: you don't actually know what you have. So before anything clever... you count.",
+   "after": 0.25
+  },
+  {
+   "key": "c1_03",
+   "speaker": "nar",
+   "text": "Six cases of bottled water. Four hundred bags of chips. Two hot dog rollers. One first aid kit. And a coffee machine that won't save your life, but might save your mind.",
+   "tts": "[matter-of-fact] Six cases of bottled water. Four hundred bags of chips. Two hot dog rollers. One first aid kit. [wry] And a coffee machine that won't save your life... but might save your mind.",
+   "after": 0.3
+  },
+  {
+   "key": "c1_04",
+   "speaker": "nar",
+   "text": "Water is the real clock. FEMA says plan on one gallon per person, per day.",
+   "tts": "[serious] Water is the real clock. FEMA says plan on one gallon per person, per day.",
+   "after": 0.2
+  },
+  {
+   "key": "c1_05",
+   "speaker": "nar",
+   "text": "Six cases is about nineteen gallons. Nineteen days. Remember that number.",
+   "tts": "[slow, pointed] Six cases is about nineteen gallons. Nineteen days. [pause] Remember that number.",
+   "after": 0.5
+  },
+  {
+   "key": "c1_06",
+   "speaker": "nar",
+   "text": "Then you notice the second problem. The sign outside still glows: OPEN 24/7. In a dead town, that sign is a dinner bell.",
+   "tts": "[tense] Then you notice the second problem. The sign outside still glows. Open, twenty-four seven. In a dead town... that sign is a dinner bell.",
+   "after": 0.3
+  },
+  {
+   "key": "c1_07",
+   "speaker": "nar",
+   "text": "You pull the breaker. The sign dies. And somewhere in the dark, something stops walking toward you.",
+   "tts": "[whispering] You pull the breaker. The sign dies. And somewhere in the dark... something stops walking toward you.",
+   "after": 0.3,
+   "gain": -2
+  },
+  {
+   "key": "c1_07b",
+   "speaker": "nar",
+   "text": "Then you drag every shelf you can lift against the back door. The shutter covers the front. Nothing covers the back.",
+   "tts": "[determined, low] Then you drag every shelf you can lift against the back door. The shutter covers the front. Nothing covers the back.",
+   "after": 0.3
+  },
+  {
+   "key": "c1_08",
+   "speaker": "nar",
+   "text": "New rule of the night shift: no lights, no noise, and nobody comes in.",
+   "tts": "[firm, low] New rule of the night shift. No lights. No noise. And nobody comes in.",
+   "after": 3.5
+  },
+  {
+   "key": "c2_01",
+   "speaker": "nar",
+   "text": "Day three. At 2:14 in the afternoon, the hum stops.",
+   "tts": "[calm] Day three. At two fourteen in the afternoon... the hum stops.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_02",
+   "speaker": "nar",
+   "text": "The fridges. The lights. The ice machine. The grid is gone, and it isn't coming back.",
+   "tts": "[ominous] The fridges. The lights. The ice machine. The grid is gone... and it isn't coming back.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_02b",
+   "speaker": "nar",
+   "text": "Inside, it's suddenly so quiet you can hear your own heartbeat.",
+   "tts": "[whispering] Inside, it's suddenly so quiet... you can hear your own heartbeat.",
+   "after": 0.3,
+   "gain": -2
+  },
+  {
+   "key": "c2_03",
+   "speaker": "nar",
+   "text": "Problem three: your food just started a countdown. Food safety officials say a closed fridge keeps food safe for about four hours. A full freezer, about forty-eight.",
+   "tts": "[focused] Problem three: your food just started a countdown. Food safety officials say a closed fridge keeps food safe for about four hours. A full freezer... about forty eight.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_04",
+   "speaker": "nar",
+   "text": "So you eat in order. Hot dogs and milk first. Sandwiches next. Chips and canned food, last.",
+   "tts": "[matter-of-fact] So you eat in order. Hot dogs and milk first. Sandwiches next. Chips and canned food... last.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_04b",
+   "speaker": "nar",
+   "text": "On aisle three you find a camping lantern and forty-eight batteries. Light, but only the kind that never leaves the building.",
+   "tts": "[calm] On aisle three, you find a camping lantern... and forty eight batteries. Light. But only the kind that never leaves the building.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_05",
+   "speaker": "nar",
+   "text": "And you find the strongest room in the building: the walk-in cooler behind the drink doors. Thick walls. One door. No windows.",
+   "tts": "[impressed, low] And you find the strongest room in the building. The walk in cooler, behind the drink doors. Thick walls. One door. No windows.",
+   "after": 0.3
+  },
+  {
+   "key": "c2_06",
+   "speaker": "nar",
+   "text": "You don't know it yet, but that room is going to save your life.",
+   "tts": "[quiet, foreboding] You don't know it yet... but that room is going to save your life.",
+   "after": 0.5
+  },
+  {
+   "key": "c2_07",
+   "speaker": "nar",
+   "text": "That night, you hear them for the first time. Not one. Dozens.",
+   "tts": "[whispering] That night, you hear them for the first time. Not one. [pause] Dozens.",
+   "after": 3.5,
+   "gain": -2
+  },
+  {
+   "key": "c3_01",
+   "speaker": "nar",
+   "text": "Day seven. 4:40 a.m. A car alarm starts screaming in the parking lot.",
+   "tts": "[tense] Day seven. Four forty A M. A car alarm starts screaming in the parking lot.",
+   "after": 0.3
+  },
+  {
+   "key": "c3_02",
+   "speaker": "nar",
+   "text": "You didn't set it off. Something walked into it. And everything within a mile just heard the dinner bell again.",
+   "tts": "[tense, low] You didn't set it off. Something walked into it. And everything within a mile... just heard the dinner bell again.",
+   "after": 0.3
+  },
+  {
+   "key": "c3_03",
+   "speaker": "nar",
+   "text": "By sunrise, there are forty of them pressed against your shutter.",
+   "tts": "[slow, dread] By sunrise, there are forty of them... pressed against your shutter.",
+   "after": 0.4
+  },
+  {
+   "key": "c3_03b",
+   "speaker": "nar",
+   "text": "Forty bodies. Six thousand pounds of weight against one sheet of steel. The shutter bends. One bolt pops. Then another.",
+   "tts": "[tense, building] Forty bodies. Six thousand pounds of weight, against one sheet of steel. The shutter bends. One bolt pops. [pause] Then another.",
+   "after": 0.3
+  },
+  {
+   "key": "c3_04",
+   "speaker": "nar",
+   "text": "This is where most people make their first mistake. They panic. They make noise. They try to run.",
+   "tts": "[serious] This is where most people make their first mistake. They panic. They make noise. They try to run.",
+   "after": 0.3
+  },
+  {
+   "key": "c3_05",
+   "speaker": "nar",
+   "text": "You do the opposite. Shoes off. Lights off. You crawl behind the counter, and you don't move. For eleven hours.",
+   "tts": "[whispering, intense] You do the opposite. Shoes off. Lights off. You crawl behind the counter... and you don't move. For eleven hours.",
+   "after": 0.4,
+   "gain": -2
+  },
+  {
+   "key": "c3_06",
+   "speaker": "nar",
+   "text": "Rule of the night shift: silence is the only weapon that never runs out.",
+   "tts": "[firm, low] Rule of the night shift. Silence is the only weapon that never runs out.",
+   "after": 0.4
+  },
+  {
+   "key": "c3_07",
+   "speaker": "nar",
+   "text": "By nightfall they drift away, one by one. And then, on the night of Day 12, someone knocks. Not a scratch. A knock. Three times.",
+   "tts": "[calm, then tense] By nightfall, they drift away, one by one. [pause] And then, on the night of day twelve... someone knocks. Not a scratch. A knock. [whispering] Three times.",
+   "after": 3.5
+  },
+  {
+   "key": "c4_01",
+   "speaker": "nar",
+   "text": "Every highway gas station has a night window: a steel drawer for passing cigarettes to customers after midnight.",
+   "tts": "[measured] Every highway gas station has a night window. A steel drawer, for passing cigarettes to customers after midnight.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_01b",
+   "speaker": "nar",
+   "text": "The knock comes again. You crawl to the window, and you slide the drawer open one inch.",
+   "tts": "[whispering] The knock comes again. You crawl to the window... and you slide the drawer open... one inch.",
+   "after": 0.3,
+   "gain": -2
+  },
+  {
+   "key": "c4_02",
+   "speaker": "nar",
+   "text": "Tonight, a voice comes through it. A woman. Trucker jacket. Hands up. 'Please. I'm not bitten.'",
+   "tts": "[tense] Tonight, a voice comes through it. A woman. Trucker jacket. Hands up. [desperate whisper] Please. I'm not bitten.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_03",
+   "speaker": "nar",
+   "text": "Her name is Dee. Her truck jackknifed a mile down the highway. And she has news.",
+   "tts": "[calm] Her name is Dee. Her truck jackknifed a mile down the highway. And she has news.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_04",
+   "speaker": "nar",
+   "text": "The radio says the National Guard will run an evacuation point at the county stadium. Eighteen days from now. Six miles away.",
+   "tts": "[hopeful, careful] The radio says the National Guard will run an evacuation point at the county stadium. Eighteen days from now. Six miles away.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_05",
+   "speaker": "nar",
+   "text": "Problem four isn't zombies. It's people. Open the door, and you get a partner... or someone who takes everything you have.",
+   "tts": "[serious, tense] Problem four isn't zombies. It's people. Open the door, and you get a partner... or someone who takes everything you have.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_06",
+   "speaker": "nar",
+   "text": "What would you do? Think about it. Because you don't open the door.",
+   "tts": "[low, direct] What would you do? [pause] Think about it. Because you don't open the door.",
+   "after": 0.4
+  },
+  {
+   "key": "c4_07",
+   "speaker": "nar",
+   "text": "You slide two bottles of water through the drawer instead. She nods... and walks back into the rain.",
+   "tts": "[soft] You slide two bottles of water through the drawer instead. She nods... and walks back into the rain.",
+   "after": 0.3
+  },
+  {
+   "key": "c4_08",
+   "speaker": "nar",
+   "text": "You'll see her again. And next time, she won't be alone.",
+   "tts": "[ominous] You'll see her again. And next time... she won't be alone.",
+   "after": 3.5
+  },
+  {
+   "key": "c45_01",
+   "speaker": "nar",
+   "text": "Day fifteen. Boredom is its own kind of danger. So you give your brain a job. You watch them.",
+   "tts": "[calm] Day fifteen. Boredom is its own kind of danger. So you give your brain a job. [pause] You watch them.",
+   "after": 0.3
+  },
+  {
+   "key": "c45_02",
+   "speaker": "nar",
+   "text": "Through a crack in the shutter, with a notebook from the register, you write down everything they do.",
+   "tts": "[quiet] Through a crack in the shutter, with a notebook from the register... you write down everything they do.",
+   "after": 0.3
+  },
+  {
+   "key": "c45_03",
+   "speaker": "nar",
+   "text": "They don't see well in the dark. They follow sound for miles. And every evening at six, about twenty of them drift down the highway like a tide.",
+   "tts": "[low, observant] They don't see well in the dark. They follow sound for miles. And every evening at six, about twenty of them drift down the highway... like a tide.",
+   "after": 0.3
+  },
+  {
+   "key": "c45_04",
+   "speaker": "nar",
+   "text": "Patterns are survival. If you know when they come, you know when you can move.",
+   "tts": "[calm, confident] Patterns are survival. If you know when they come... you know when you can move.",
+   "after": 0.3
+  },
+  {
+   "key": "c45_05",
+   "speaker": "nar",
+   "text": "And you learn one more thing. The loudest sound always wins. Remember that, too.",
+   "tts": "[slow, pointed] And you learn one more thing. The loudest sound always wins. [pause] Remember that, too.",
+   "after": 3.5
+  },
+  {
+   "key": "c5_01",
+   "speaker": "nar",
+   "text": "Day nineteen. Remember that number? The last bottle is empty.",
+   "tts": "[quiet, tense] Day nineteen. Remember that number? [pause] The last bottle is empty.",
+   "after": 0.4
+  },
+  {
+   "key": "c5_02",
+   "speaker": "nar",
+   "text": "But you didn't skip the boring part of survival. FEMA lists a hidden water source in almost every building: the water heater.",
+   "tts": "[confident] But you didn't skip the boring part of survival. FEMA lists a hidden water source in almost every building. The water heater.",
+   "after": 0.3
+  },
+  {
+   "key": "c5_03",
+   "speaker": "nar",
+   "text": "Forty gallons, sitting in the back room. You open the drain valve. Clean water. Weeks more. You almost laugh.",
+   "tts": "[relieved] Forty gallons, sitting in the back room. You open the drain valve. Clean water. Weeks more. [soft laugh] You almost laugh.",
+   "after": 0.5
+  },
+  {
+   "key": "c5_04",
+   "speaker": "nar",
+   "text": "And that's the mistake. To reach the valve, you dragged the shelves away from the back door. You never put them back.",
+   "tts": "[dark, slow] And that's the mistake. To reach the valve, you dragged the shelves away from the back door. [pause] You never put them back.",
+   "after": 0.5
+  },
+  {
+   "key": "c5_05",
+   "speaker": "nar",
+   "text": "3 a.m. The back door clicks open. The latch was broken all along.",
+   "tts": "[whispering] Three A M. The back door clicks open. [pause] The latch was broken all along.",
+   "after": 0.4,
+   "gain": -2
+  },
+  {
+   "key": "c5_06",
+   "speaker": "nar",
+   "text": "There's one of them inside. Between you and everything you own.",
+   "tts": "[tense] There's one of them inside. Between you... and everything you own.",
+   "after": 0.3
+  },
+  {
+   "key": "c5_07",
+   "speaker": "nar",
+   "text": "You run for the strongest room you have. The walk-in cooler. You pull the door shut and hold it.",
+   "tts": "[urgent] You run for the strongest room you have. The walk in cooler. You pull the door shut... and hold it.",
+   "after": 0.3
+  },
+  {
+   "key": "c5_08",
+   "speaker": "nar",
+   "text": "Now you're sealed in the dark, your breath turning to fog, listening to it scratch at the door.",
+   "tts": "[whispering] Now you're sealed in the dark... your breath turning to fog... listening to it scratch at the door.",
+   "after": 0.5,
+   "gain": -2
+  },
+  {
+   "key": "c5_09",
+   "speaker": "nar",
+   "text": "On your belt is the cashier's handset. It's wired to the speakers outside, the ones that say 'pump four is ready.'",
+   "tts": "[tense, thinking] On your belt is the cashier's handset. It's wired to the speakers outside. The ones that say... pump four is ready.",
+   "after": 0.3
+  },
+  {
+   "key": "c5_10",
+   "speaker": "nar",
+   "text": "You press the button, and you bang it against the wall.",
+   "tts": "[determined] You press the button... and you bang it against the wall.",
+   "after": 0.4
+  },
+  {
+   "key": "c5_11",
+   "speaker": "nar",
+   "text": "It turns. It follows the sound, out the back door, into the rain. You sprint, slam the door, and bury it under every shelf you own.",
+   "tts": "[fast, intense] It turns. It follows the sound. Out the back door, into the rain. You sprint, slam the door... and bury it under every shelf you own.",
+   "after": 0.4
+  },
+  {
+   "key": "c5_12",
+   "speaker": "nar",
+   "text": "You survived your mistake. But you just told the whole county exactly where you are.",
+   "tts": "[slow, ominous] You survived your mistake. But you just told the whole county... exactly where you are.",
+   "after": 3.5
+  },
+  {
+   "key": "c6_01",
+   "speaker": "nar",
+   "text": "Day twenty-four. Headlights.",
+   "tts": "[tense] Day twenty four. [pause] Headlights.",
+   "after": 0.4
+  },
+  {
+   "key": "c6_02",
+   "speaker": "nar",
+   "text": "A pickup truck rolls in. Three men. Empty gas cans. And in the passenger seat... Dee.",
+   "tts": "[low] A pickup truck rolls in. Three men. Empty gas cans. And in the passenger seat... [pause] Dee.",
+   "after": 0.4
+  },
+  {
+   "key": "c6_03",
+   "speaker": "nar",
+   "text": "Problem five: the pumps are dead without power, and they think you know how to turn them on.",
+   "tts": "[serious] Problem five. The pumps are dead without power... and they think you know how to turn them on.",
+   "after": 0.3
+  },
+  {
+   "key": "c6_04",
+   "speaker": "nar",
+   "text": "They pound on the shutter. 'Open up, and nobody gets hurt.'",
+   "tts": "[tense] They pound on the shutter. [shouting, distant] Open up, and nobody gets hurt!",
+   "after": 0.3
+  },
+  {
+   "key": "c6_04b",
+   "speaker": "nar",
+   "text": "One of them jams a crowbar under the shutter. Metal screams. You watch the gap grow. Two inches. Four.",
+   "tts": "[tense, fast] One of them jams a crowbar under the shutter. Metal screams. You watch the gap grow. Two inches. Four.",
+   "after": 0.3
+  },
+  {
+   "key": "c6_05",
+   "speaker": "nar",
+   "text": "You don't answer. Rule of the night shift: nobody comes in.",
+   "tts": "[cold, calm] You don't answer. Rule of the night shift. Nobody comes in.",
+   "after": 0.4
+  },
+  {
+   "key": "c6_06",
+   "speaker": "nar",
+   "text": "And their noise does what noise always does. Forty shapes walk out of the trees, toward the loudest thing in the parking lot.",
+   "tts": "[building tension] And their noise does what noise always does. Forty shapes walk out of the trees... toward the loudest thing in the parking lot.",
+   "after": 0.3
+  },
+  {
+   "key": "c6_07",
+   "speaker": "nar",
+   "text": "Engines roar. Tires scream. And they're gone.",
+   "tts": "[fast] Engines roar. Tires scream. And they're gone.",
+   "after": 0.4
+  },
+  {
+   "key": "c6_08",
+   "speaker": "nar",
+   "text": "Dee looks back at your store through the rain. You'll never know if she was their prisoner... or their guide.",
+   "tts": "[quiet, haunting] Dee looks back at your store through the rain. You'll never know if she was their prisoner... or their guide.",
+   "after": 3.5
+  },
+  {
+   "key": "c7_01",
+   "speaker": "nar",
+   "text": "Day thirty. You scratch the last mark into the shutter. Thirty lines. Thirty mornings you were never supposed to see.",
+   "tts": "[quiet, emotional] Day thirty. You scratch the last mark into the shutter. Thirty lines. Thirty mornings you were never supposed to see.",
+   "after": 0.4
+  },
+  {
+   "key": "c7_02",
+   "speaker": "nar",
+   "text": "You counted before you acted. You killed the light. You stayed silent. You found the hidden water. And you never opened the door.",
+   "tts": "[steady, proud] You counted before you acted. You killed the light. You stayed silent. You found the hidden water. And you never opened the door.",
+   "after": 0.4
+  },
+  {
+   "key": "c7_03",
+   "speaker": "nar",
+   "text": "The evacuation is tomorrow. Six miles of highway, on foot, with everything you can carry.",
+   "tts": "[determined] The evacuation is tomorrow. Six miles of highway. On foot. With everything you can carry.",
+   "after": 0.4
+  },
+  {
+   "key": "c7_03b",
+   "speaker": "nar",
+   "text": "Before you go, you leave a note on the counter for whoever comes next. Count. Stay dark. Stay quiet. Don't open the door.",
+   "tts": "[soft, steady] Before you go, you leave a note on the counter, for whoever comes next. Count. Stay dark. Stay quiet. Don't open the door.",
+   "after": 0.3
+  },
+  {
+   "key": "c7_04",
+   "speaker": "nar",
+   "text": "You're packing your bag when, at exactly 3:07 a.m., the lights flicker on.",
+   "tts": "[tense, slow] You're packing your bag when, at exactly three oh seven A M... the lights flicker on.",
+   "after": 0.3
+  },
+  {
+   "key": "c7_05",
+   "speaker": "nar",
+   "text": "Every one of them. The sign outside glows again: OPEN 24/7. And the door chime rings.",
+   "tts": "[whispering, dread] Every one of them. The sign outside glows again. Open, twenty-four seven. [pause] And the door chime rings.",
+   "after": 0.4,
+   "gain": -1
+  },
+  {
+   "key": "c7_06",
+   "speaker": "nar",
+   "text": "Somebody turned the power back on. And somebody knows you're still in here.",
+   "tts": "[low, ominous] Somebody turned the power back on. And somebody knows you're still in here.",
+   "after": 0.8
+  },
+  {
+   "key": "c7_07",
+   "speaker": "nar",
+   "text": "Would you have opened the window for Dee? Tell me in the comments. And subscribe, because Day 31 starts right now.",
+   "tts": "[direct, calm] Would you have opened the window for Dee? Tell me in the comments. And subscribe... because day thirty one starts right now.",
+   "after": 0.3
+  }
+ ]
+}

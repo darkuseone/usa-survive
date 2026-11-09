@@ -43,6 +43,7 @@
 - `mouthAt(who, t)`
 - `blinkAt(t, seed)`
 - `mouth(x, y, w, m, o = {})`
+- `screamMouth(x, y, w, k = 1)`
 
 ## engine/props.js
 - `lightmap(amb, fn)`
@@ -81,7 +82,7 @@
 - `personLegs(o)`
 - `personBody(o)`
 - `glassAt(cx, cy, rg, f, o = {})`
-- `personArms(o)`
+- `personArms(o, pass = 'front')`
 - `hand(pose, sd, o)`
 - `personHead(o)`
 - `hairdo(kind, o)`
@@ -89,6 +90,9 @@
 - `joe(o = {})`
 - `zombie(o = {})`
 - `zombieMarks(o)`
+- `dee(o = {})`
+- `raider(o = {})`
+- `zSil(x, y, s, t, seed = 0, col = '#3a4636')`
 
 # Декорации и вставки эпизодов (копировать и менять, а не писать с нуля)
 
@@ -112,6 +116,14 @@
 - `calendar(k, t)` — листок «DAY 1» на скотче, приклеен к жалюзи
 - `storeLight(o = {})` — свет: люминесцентные лампы, мигание, тревога
 - `lockBtn(t, c)` — вставка: удар кулаком по кнопке LOCKDOWN
+- `rainOut(t, y0, y1, a = 1)` — косой дождь на улице: штрихи меняются на «двойках» + брызги на асфальте
+- `glassDrops(t)` — капли стекают по витрине
+- `dust(t, cx, cy, rw, rh, n = 30)` — пылинки в свете ламп
+- `boxP(x, y, s = 1)` — картонная коробка со снеками у ног
+- `crate(x, y)` — упаковка бутылок воды — Joe на неё оседает (верх y − 220)
+- `exterior(t, o = {})`
+- `extLight(t)`
+- `dayTag(t, n, o = {})`
 
 ## reference/tom-nikita/episodes/ep03/set.js — Эп. 3 «Телефон в рис?» — декорация (кухня днём) и вставки-коллажи.
 - `grains(x, y, n, spread, seed, col = '#f6f1e2', sz = 1)` — рисинки-вырезки

@@ -217,3 +217,31 @@ function zombieMarks(o) {
   stroke([[40, -80], [70, -50]], '#5a2a22', 4); for (let q = 0; q < 3; q++) stroke([[44 + q * 9, -58 - q * 9], [56 + q * 9, -70 - q * 9]], '#5a2a22', 3);
   pop(); pop(); pop();
 }
+
+/* Ди — дальнобойщица (второстепенная героиня серии «заправка»): кепка дальнобойщика, хвост, клетчатая рубашка, без щетины */
+const DEE = { pal: { top: '#a8402e', topD: '#7e2c20', hair: '#3a2418', hairL: '#5a3a26', pants: '#34405a', shoe: '#5a4a3a', skin: '#e8b896', skinD: '#cf9a78' }, hair: 'cap', capCol: '#2f5d8a', top: 'jacket' };
+function dee(o = {}) {
+  const s = o.s ?? 1, sd = o.flip ? -1 : 1;
+  push(o.x, o.y, s, o.rot || 0, sd); piece(spline([[60, -40], [128, -10], [138, 80], [118, 150], [96, 90], [84, 20]], true, 6), DEE.pal.hair, { seed: 990, step: 12, edge: 1.2 }); pop();   // хвост за головой
+  person({ ...DEE, ...o, pal: { ...DEE.pal, ...(o.pal || {}) } });
+  push(o.x, o.y, s, o.rot || 0, sd); push(0, 0, 1, o.lean || 0); push(0, 0, 1, o.tilt || 0);
+  [-1, 1].forEach(q => stroke([[q * 18, -44], [q * 34, -50]], '#1c1512', 3));                                  // ресницы-штрихи
+  pop(); pop(); pop();
+}
+/* мародёр: тёмная куртка, бандана на лице */
+function raider(o = {}) {
+  const s = o.s ?? 1; person({ pal: { top: '#3a3d42', topD: '#2a2c30', hair: '#2a2420', pants: '#2c2f36', shoe: '#2a2622', skin: '#d9a888', skinD: '#b8866a' }, hair: o.hair || 'buzz', top: 'jacket', mood: 'angry', ...o });
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); push(0, 0, 1, o.lean || 0); push(0, 0, 1, o.tilt || 0);
+  piece([[-96, 30], [96, 30], [84, 96], [40, 122], [0, 128], [-40, 122], [-84, 96]], o.band || '#8a2a24', { seed: 995, step: 10, shade: () => { for (let i = 0; i < 6; i++) dot(-60 + i * 24, 70, 4, '#f3ecd8', 0.8); } });
+  pop(); pop(); pop();
+}
+/* силуэт зомби для толпы вдали: дёшево (6 деталей), качается на двойках */
+function zSil(x, y, s, t, seed = 0, col = '#3a4636') {
+  const r = rng(seed), sw = Math.sin(step(t, 8) * (1.5 + r()) + seed) * 0.08;
+  push(x, y, s, sw); piece([[-60, 0], [60, 0], [70, 220], [-70, 220]], col, { seed: 996 + seed % 7, line: false });
+  ellP(0, -50, 52, 60, col, { seed: 997 + seed % 5, line: false });
+  piece(tube([[50, 40], [120, 70], [170, 60 + r() * 30]], 26, 22).pts, col, { raw: true, line: false }); piece(tube([[-50, 40], [-110, 80], [-160, 90 + r() * 30]], 26, 22).pts, col, { raw: true, line: false });
+  piece([[-50, 210], [-10, 210], [-20, 380], [-56, 380]], col, { raw: true, line: false }); piece([[10, 210], [50, 210], [56, 380], [20, 380]], col, { raw: true, line: false });
+  if (r() > 0.5) { dot(-18, -54, 5, '#c8e6a0', 0.7); dot(18, -54, 5, '#c8e6a0', 0.7); }
+  pop();
+}
