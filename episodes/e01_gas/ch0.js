@@ -39,7 +39,7 @@ SHOTS.push([0, 'ext0'], [C0.alone - 0.1, 'wide0'], [C0.shift - 0.05, 'mid0'], [C
   [C0.store - 0.1, 'storeOut0', 'dip'], [C0.shutter - 0.1, 'shutClose0'], [C0.fuel - 0.1, 'tankIns', 'whip'], [WW('c0_05', /^every/i) - 0.1, 'countyIns'], [C0.five - 0.4, 'fiveIns', 'flash'], [C0.nearly - 0.1, 'flash19', 'flash'], [C0.title, 'title0', 'tear']);
 Object.assign(SH, {
   ext0(t, u) { const [cx, cy, z] = ck(t, [[0, 900, 560, 1.0], [C0.alone, 820, 520, 1.3]]); cam(cx, cy, z); exterior(t, { zom: true }); extLight(t); pop();
-    stamp('3:07 AM', t, 0.3, 420, 900, 110, 501); },
+    stamp('3:07 AM', t, 0.3, 420, 200, 110, 501); },
   wide0(t, u) { const [cx, cy, z] = ck(t, [[C0.alone - 0.1, 900, 560, 1.06], [C0.shift, 820, 590, 1.16]]); cam(cx, cy, z);
     const a = stackArm(t); scene0(t, { flip: true, lk: [0.8, 0.1], mood: 'sleepy', arms: { l: [-150, 300, 'open'], r: [...a.hand, 'fist'] }, bag: a.bag ? [a.hand[0] + 4, a.hand[1] - 40] : null, tilt: Math.sin(step(t, 6)) * 0.02 }, { box: true, car: true }); pop(); },
   mid0(t, u) { const look = t > C0.lights + 0.2; cam(JP.x - 20, JP.y + 140, 1.9 + u * 0.04); const a = stackArm(t), hold = look ? [180, 150] : a.hand;

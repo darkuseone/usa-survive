@@ -13,13 +13,18 @@ function bellIns(t, c) { bg('#2a2c34', 2910); const sw = Math.sin(step(t, 24) * 
 SHOTS.push([C7.s - 0.1, 'c7tally', 'dip'], [C7.rec - 0.1, 'recapIns', 'whip'], [C7.map - 0.1, 'map2Ins'], [C7.note - 0.1, 'noteIns', 'whip'], [C7.pack - 0.1, 'c7pack', 'dip'],
   [C7.sign - 0.1, 'c7sign', 'flash'], [C7.chime - 0.4, 'c7bell'], [C7.knows - 0.1, 'c7joe'], [C7.end, 'end', 'tear']);
 Object.assign(SH, {
-  c7tally(t, u) { tallyIns(t, C7.scratch); },
+  c7tally(t, u) { tallyIns(t, C7.scratch); const k = clamp((t - C7.scratch - 0.2) / 0.5), hx = 300 + (5 * 110 - 10 + 86 * k) * 1.6 + 30, hy = 320 + (54 - 38 * k) * 1.6;
+    push(hx, hy, 2.2, -0.6); piece(tube([[0, 300], [0, 120], [0, 10]], 58, 52).pts, JOE.pal.top, { raw: true, lw: 2.4 }); blobP([[-30, -10], [30, -10], [34, 26], [0, 38], [-34, 26]], JOE.pal.skin, { seed: 2905, lw: 2.4 });
+    piece([[-6, -10], [6, -10], [4, -60], [-4, -60]], '#c9ccd1', { raw: true, lw: 1.6 }); ellP(0, -10, 14, 10, '#d9a12b', { seed: 2906, lw: 1.6 }); pop(); },
   recapIns(t, u) { recap(t, C7.recM); },
   map2Ins(t, u) { mapIns(t, C7.map - 0.5); },
   noteIns(t, u) { recap(t, C7.noteM, 'for whoever comes next —', true); },
-  c7pack(t, u) { const on = t > C7.lights, fl = on && t < C7.lights + 0.7; const jo = { P: { x: 980 }, mood: on ? 'shock' : 'dread', lid: on ? 0 : 0.2, lk: on ? [0, -0.8] : [0.5, 0.6], sweat: on ? 1 : 0, arms: on ? { l: [-180, 170, 'open'], r: [180, 150, 'open'] } : { l: [-120, 260 + jit(t, 20), 'fist'], r: [130, 260, 'fist'] }, pack: true };
+  c7pack(t, u) { const on = t > C7.lights, fl = on && t < C7.lights + 0.7, p = (step(t, 12) % 1.4) / 1.4, it = Math.floor(step(t, 12) / 1.4) % 3;
+    const hand = kf(p, [[0, [230, 120]], [0.35, [240, 60]], [0.7, [60, 280]], [1, [230, 120]]]);
+    const jo = { P: { x: 980 }, mood: on ? 'shock' : 'dread', lid: on ? 0 : 0.2, lk: on ? [0, -0.8] : [0.5, 0.6], sweat: on ? 1 : 0, arms: on ? { l: [-180, 170, 'open'], r: [180, 150, 'open'] } : { l: [-120, 260, 'fist'], r: [...hand, 'fist'] }, pack: true,
+      bottle: !on && it === 0 && p < 0.7, bag: !on && it === 1 && p < 0.7 ? [hand[0], hand[1] - 40] : null };
     if (!on) SD(t, [980, 600, 1.4], { slits: 0.2, amb: '#5a5e74', lantern: [1200, 900], tally: 30, j: jo }, () => lanternP(1200, 1000, 0.9));
-    else SL(t, [980, 600, 1.4 + (t - C7.lights) * 0.05], { lit: fl ? (Math.sin(step(t, 24) * 37) > 0 ? 1 : 0.2) : 1, tally: 30, j: jo }); },
+    else SL(t, [980, 600, 1.4 + (t - C7.lights) * 0.05], { lit: fl ? (0.6 + 0.4 * Math.sin(step(t, 12) * 5)) : 1, tally: 30, j: jo }); },
   c7sign(t, u) { SE(t, [1140, 470, 1.8 + u * 0.04], { shut: true, signOff: false, tally: 30 }); },
   c7bell(t, u) { bellIns(t, C7.chime); },
   c7joe(t, u) { SL(t, [980, 470, 2.0 + u * 0.06], { lit: 1, tally: 30, j: { P: { x: 980 }, mood: 'dread', lid: 0, lk: t > C7.knowsW ? [0, 0] : [-0.8, -0.2], sweat: 1, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] }, pack: true } }); },

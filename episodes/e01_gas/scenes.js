@@ -41,6 +41,28 @@ function stamp(word, t, t0, x, y, size = 130, seed = 3000, rot = -0.04, bgs) { i
 
 // ---------- счётчик дней (поверх виньетки) и номер дня по времени
 const DAYS = [];                       // [[t, день, 'часы']]
-const NOTAG = /^(title|card|end|thumb|flash)/;
+const NOTAG = /^(thumb)/;
 function dayAt(t) { let d = [0, 1, '03:07 AM']; for (const x of DAYS) if (t >= x[0]) d = x; return d; }
-function hudFrame(t) { const i = shotAt(t), nm = SHOTS[i][1]; if (NOTAG.test(nm) || /Ins$/.test(nm)) return; const d = dayAt(t); dayTag(t, d[1], { clock: d[2], stamp: d[0] > 0 && t - d[0] < 1.2 ? d[0] + 0.15 : null }); }
+// субтитры по одному слову (как у образца, но в нашем стиле: плотный Oswald, белый с тёмной обводкой, ключевые — жёлтые)
+const SUBW = []; LINES.forEach(l => { const ws = l.words.filter(w => w.w !== '—'); ws.forEach((w, i) => SUBW.push({ w: w.w, s: w.s, e: i + 1 < ws.length ? ws[i + 1].s : l.end + 0.12 })); });
+const HOT = /^(day|days|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|eighteen|nineteen|twenty|thirty|forty|forty-eight|thousand|thousands|\d.*|fema|never|nobody|silence|mistake|problem|dee|loudest|knock|knocks|dozens|empty|alone)$/i;
+function subWord(t) {
+  let lo = 0, hi = SUBW.length - 1, k = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (SUBW[m].s - 0.03 <= t) { k = m; lo = m + 1; } else hi = m - 1; }
+  if (k < 0 || t > SUBW[k].e) return; const w = SUBW[k].w.replace(/[.,!?…:;"“”]/g, '').toUpperCase(); if (!w) return;
+  const p = clamp((t - SUBW[k].s + 0.03) / 0.09), sc = 0.82 + 0.18 * eo(p), hot = HOT.test(w.replace(/'S$/, ''));
+  push(W / 2, H - 132, sc); ctx.save(); ctx.font = `600 72px 'Osw'`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 18; ctx.lineWidth = 12; ctx.strokeStyle = '#141010'; ctx.strokeText(w, 0, 0); ctx.shadowBlur = 0;
+  ctx.fillStyle = hot ? '#ffd21f' : '#fbf8f0'; ctx.fillText(w, 0, 0); ctx.restore(); pop();
+}
+function hudFrame(t) { const i = shotAt(t), nm = SHOTS[i][1]; if (NOTAG.test(nm)) return; const d = dayAt(t);
+  dayTag(t, d[1], { clock: d[2], stamp: d[0] > 0 && t - d[0] < 1.2 ? d[0] + 0.15 : null }); subWord(t); }
+// цветокоррекция как на обложке + мягкое свечение + плёночное зерно + виньетка
+const GRAIN = (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 512; const g = c.getContext('2d'), im = g.createImageData(512, 512), r = rng(4242);
+  for (let i = 0; i < im.data.length; i += 4) { const v = 128 + (r() - 0.5) * 90; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } g.putImageData(im, 0, 0); return c; })();
+function post(t, o) {
+  o.save(); o.filter = 'saturate(1.18) contrast(1.06) brightness(1.03)'; o.drawImage(o.canvas, 0, 0); o.restore();
+  o.save(); o.globalCompositeOperation = 'screen'; o.globalAlpha = 0.16; o.filter = 'blur(16px) brightness(0.9)'; o.drawImage(o.canvas, 0, 0); o.restore();
+  o.save(); o.globalCompositeOperation = 'overlay'; o.globalAlpha = 0.07; const fr = Math.floor(t * 12), gx = -(hsh(fr) % 256), gy = -(hsh(fr, 7) % 256);
+  for (let x = gx; x < W; x += 512) for (let y = gy; y < H; y += 512) o.drawImage(GRAIN, x, y); o.restore();
+  const v = o.createRadialGradient(W / 2, H * 0.48, H * 0.38, W / 2, H * 0.5, H * 0.85); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.38)'); o.save(); o.fillStyle = v; o.fillRect(0, 0, W, H); o.restore();
+}

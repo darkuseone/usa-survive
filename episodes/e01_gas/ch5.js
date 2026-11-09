@@ -34,8 +34,10 @@ Object.assign(SH, {
   c5bottle(t, u) { bottleIns(t, C5.s); },
   c5think(t, u) { SD(t, [980, 490, 1.8 + u * 0.03], { slits: 0.2, amb: '#5a5e74', lantern: [1180, 700], crate: 980, j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: '', lk: [0.5, -0.8], smile: 0.2, arms: { l: [-90, 180, 'fist'], r: [90, 170, 'fist'] } } }); },
   heaterIns(t, u) { heaterFact(t, C5.fema); },
-  c5drain(t, u) { const k = clamp((t - C5.open) / 2.5), la = t > C5.laugh - 0.2; SB(t, [820, 640, 1.4], { bulb: 0, lantern: [960, 900], blocked: 0, drain: k,
-    j: { P: { x: 900 }, flip: true, lk: [0.6, 0.6], mood: '', smile: la ? 0.9 : 0.2, arms: { l: [-150, 300, 'open'], r: [190, 300, 'fist'] } } }, () => lanternP(960, 1000, 0.9)); },
+  c5drain(t, u) { const k = clamp((t - C5.open) / 2.5), la = t > C5.laugh - 0.2, turn = t < C5.open + 0.6 ? Math.sin(step(t, 12) * 7) * 30 : 0;
+    SB(t, [800, 680, 1.45], { bulb: 0, lantern: [960, 900], blocked: 0, drain: k,
+      j: { P: { x: 880, y: 1000 - 220 - 345 * 0.95 + 40 }, legs: 'sit', flip: true, lk: [0.6, 0.7], mood: '', smile: la ? 0.9 : 0.2, arms: { l: [-120, 260, 'fist'], r: [180 + turn * 0.3, 330 + turn, 'fist'] } } },
+      () => { lanternP(1000, 1000, 0.9); if (k > 0.3) bottle(720, 940, 0.9, 0, (k - 0.3) / 0.7); }); },
   c5mistake(t, u) { const k = sm(clamp((t - C5.drag) / 2)), sx = lerp(1230, 1780, k); SB(t, [1300, 600, 1.12], { bulb: 0.6, blocked: 1 - k, amb: '#6a5e70',
     j: k < 1 ? { P: { x: sx + 230 }, lean: 0.2, legs: 'run', mood: '', lk: [-0.8, 0], arms: { l: [-150, 150, 'fist'], r: [120, 160, 'fist'] }, flip: true } : null });
     if (t > C5.never) { cam(1300, 600, 1.12); ellP(1230, 660, 220, 360, 'rgba(0,0,0,0)', { raw: true, tex: false, lw: 10, lc: '#e0201a', a: clamp((t - C5.never) / 0.3) }); pop(); stamp('MISTAKE', t, C5.never + 0.2, 420, 190, 130, 2740); } },

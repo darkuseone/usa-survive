@@ -27,8 +27,8 @@ function personLegs(o) {
       blobP([[sd * 18, 512], [sd * 96, 510], [sd * 106, 540], [sd * 14, 546]], PC.shoe, { seed: 168 + sd }); stroke([[sd * 14, 538], [sd * 104, 536]], '#c9c4b8', 4); });
     return;
   }
-  const run = o.legs === 'run', ph = Math.sin(step(o.t ?? 0) * 18);
-  [-1, 1].forEach(sd => { const sw = run ? ph * sd * 40 : 0;
+  const run = o.legs === 'run' || o.legs === 'walk', ph = Math.sin(step(o.t ?? 0) * (o.gait ?? (o.legs === 'walk' ? 9 : 18)));
+  [-1, 1].forEach(sd => { const sw = run ? ph * sd * (o.stride ?? (o.legs === 'walk' ? 26 : 40)) : 0;
     piece([[sd * 10, 318], [sd * 62, 318], [sd * 58 + sw, 486], [sd * 16 + sw, 486]], PC.pants, { seed: 60 + sd, step: 20, shade: () => {
       stroke([[sd * 36, 330], [sd * 37 + sw * 0.6, 470]], mix(PC.pants, '#ffffff', 0.25), 2.4, { a: 0.7 }); } });
     piece([[sd * 14 + sw, 466], [sd * 60 + sw, 466], [sd * 60 + sw, 486], [sd * 14 + sw, 486]], mix(PC.pants, '#000000', 0.18), { seed: 64 + sd, step: 10, lw: 2 });
@@ -71,7 +71,8 @@ function glassAt(cx, cy, rg, f, o = {}) {
 function personArms(o, pass = 'front') {
   const A = o.arms || {}, dr = o.drink ?? 0;
   [['l', -1], ['r', 1]].forEach(([k, sd]) => {
-    let a = A[k] || [sd * 112, 300, 'open']; let [hx, hy, pose] = a; const sh = [sd * 70, 122];
+    const gw = (o.legs === 'walk' || o.legs === 'run') ? Math.sin(step(o.t ?? 0) * (o.gait ?? (o.legs === 'walk' ? 9 : 18))) * sd * (o.legs === 'walk' ? 26 : 40) : 0;
+    let a = A[k] || [sd * 112 - gw, 296, 'open']; let [hx, hy, pose] = a; const sh = [sd * 70, 122];
     let gl = null;
     if (pose === 'glass') {
       if (k === 'r' && dr > 0) {                                     // питьё: стакан к губам, наклон, голова запрокинута
@@ -194,7 +195,10 @@ function personVest(col) {
    Аксессуары (скотч, фонарик) — после joe() в том же layer, в точке кисти. */
 const JOE = { pal: { top: '#7b828c', topD: '#5d636c', hair: '#5a3a26', hairL: '#7a5238', pants: '#3d4f6e', shoe: '#e9e4d8', skin: '#f2cfb4', skinD: '#dfae92', stub: '#7a5a48' },
   hair: 'beanie', capCol: '#2f6a6e', top: 'hoodie', vest: '#f2731c', stubble: 1 };
-function joe(o = {}) { person({ ...JOE, ...o, pal: { ...JOE.pal, ...(o.pal || {}) } }); }
+function idleOf(o, seed = 0) { const t = step(o.t ?? 0, 12), mv = o.legs === 'walk' || o.legs === 'run';
+  return { bob: (o.bob ?? 0) + (mv ? -Math.abs(Math.sin(t * (o.legs === 'walk' ? 9 : 18))) * 8 : Math.sin(t * 2.3 + seed) * 2.6),
+    tilt: (o.tilt ?? 0) + Math.sin(t * 0.9 + seed) * 0.035, lean: (o.lean ?? 0) + (mv ? 0 : Math.sin(t * 0.6 + seed) * 0.015) }; }
+function joe(o = {}) { person({ ...JOE, ...o, ...(o.still ? {} : idleOf(o)), pal: { ...JOE.pal, ...(o.pal || {}) } }); }
 
 /* зомби: серо-зелёная кожа, рваная футболка, тусклые глаза; руки вперёд-в стороны; ноги шаркают (run на малой амплитуде через t/2) */
 const ZPAL = [
@@ -236,7 +240,22 @@ function raider(o = {}) {
   pop(); pop(); pop();
 }
 /* силуэт зомби для толпы вдали: дёшево (6 деталей), качается на двойках */
-function zSil(x, y, s, t, seed = 0, col = '#3a4636') {
+function zSil(x, y, s, t, seed = 0, col = '#3a4636') { if (/^rgba/.test(col)) return zShadow(x, y, s, t, seed, col); return zMini(x, y, s, t, seed); }
+/* зомби для толпы: та же геометрия, что у силуэта (голова −50, ноги до 380), но в цвете — кожа, рваная одежда, глаза, шаг на двойках */
+function zMini(x, y, s, t, seed = 0) {
+  const r = rng(seed * 7 + 3), P = ZPAL[seed % ZPAL.length], sw = Math.sin(step(t, 8) * (1.4 + r()) + seed) * 0.07, ph = Math.sin(step(t, 8) * 2.2 + seed), skin = mix(P.skin, '#c8f08a', 0.25);
+  push(x, y, s, sw);
+  [-1, 1].forEach(sd => piece([[sd * 10, 200], [sd * 52, 200], [sd * 50 + ph * sd * 18, 380], [sd * 16 + ph * sd * 18, 380]], P.pants, { seed: 980 + sd, step: 20, lw: 2.2 }));
+  piece(tube([[50, 50], [120, 80 + ph * 10], [175, 70 + r() * 30]], 28, 24).pts, P.top, { raw: true, lw: 2.2 }); ellP(182, 74 + r() * 30, 20, 18, skin, { seed: 981, lw: 2 });
+  piece([[-62, 30], [62, 30], [72, 228], [40, 210], [10, 236], [-24, 212], [-56, 234], [-72, 228]], P.top, { seed: 982, step: 18, lw: 2.4, shade: () => { piece([[20, 30], [72, 228], [40, 210]], P.topD, { raw: true, line: false, a: 0.6 }); ellP(-20, 140, 12, 16, '#2a2420', { seed: 983, line: false, a: 0.6 }); } });
+  piece(tube([[-50, 50], [-115, 90 - ph * 10], [-170, 96 + r() * 26]], 28, 24).pts, P.top, { raw: true, lw: 2.2 }); ellP(-176, 98 + r() * 26, 20, 18, skin, { seed: 984, lw: 2 });
+  push(0, -50, 1, 0.15 + sw); ellP(0, 0, 54, 60, skin, { seed: 985, lw: 2.4, shade: () => { ellP(14, 20, 30, 20, mix(skin, '#000000', 0.15), { line: false, a: 0.6 }); } });
+  piece([[-54, -16], [-40, -58], [0, -66], [40, -58], [54, -20], [30, -40], [0, -44], [-30, -38]], P.hair, { seed: 986, lw: 1.8 });
+  [-1, 1].forEach(sd => { ellP(sd * 20, -2, 15, 17, '#f4f2dc', { seed: 987 + sd, lw: 2, tex: false }); dot(sd * 20 + 2, 2, 4.5, '#1c1512'); ellP(sd * 20, -2, 19, 21, 'rgba(40,60,30,0.35)', { line: false, tex: false }); });
+  stroke([[-18, 32], [0, 26], [18, 34]], '#3a1414', 5); pop();
+  pop();
+}
+function zShadow(x, y, s, t, seed, col) {
   const r = rng(seed), sw = Math.sin(step(t, 8) * (1.5 + r()) + seed) * 0.08;
   push(x, y, s, sw); piece([[-60, 0], [60, 0], [70, 220], [-70, 220]], col, { seed: 996 + seed % 7, line: false });
   ellP(0, -50, 52, 60, col, { seed: 997 + seed % 5, line: false });

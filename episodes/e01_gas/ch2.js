@@ -21,8 +21,9 @@ function timerIns(t, c) { paperBg(2420); stamp('PROBLEM 3', t, c, W / 2, 170, 12
 SHOTS.push([C2.s - 0.1, 'c2hum', 'dip'], [C2.fr - 0.1, 'c2fridge'], [C2.grid - 0.1, 'c2grid'], [C2.quiet - 0.1, 'c2quiet'], [C2.p3 - 0.1, 'timerIns', 'whip'], [C2.food - 0.5, 'fridgeIns'],
   [C2.eat - 0.1, 'eatIns'], [C2.lan - 0.1, 'c2lantern', 'tear'], [C2.cool - 0.1, 'c2coolerIn'], [C2.save - 0.1, 'c2coolerDoor'], [C2.night - 0.1, 'c2night', 'dip'], [C2.card, 'card7', 'tear']);
 Object.assign(SH, {
-  c2hum(t, u) { const lit = t < C2.stops ? 1 : 0.0; SL(t, [1000, 580, 1.1 + u * 0.03], { lit, tally: 3, flick: t > C2.stops - 0.4 && t < C2.stops, crate: 760,
-    j: { P: { x: 1150 }, lk: t > C2.stops ? [0, -0.8] : [-0.5, 0.2], mood: t > C2.stops ? 'dread' : 'sleepy', arms: { l: [-150, 300, 'open'], r: [170, 120, 'fist'] }, bottle: true, bottleFill: 0.6 } }); },
+  c2hum(t, u) { const lit = t < C2.stops ? 1 : 0.0, dr = t < C2.stops - 0.3 ? sm(clamp((u - 0.3) / 0.8)) : 1 - sm(clamp((t - C2.stops + 0.3) / 0.5));
+    SL(t, [1000, 580, 1.1 + u * 0.03], { lit, tally: 3, flick: t > C2.stops - 0.4 && t < C2.stops, crate: 760,
+      j: { P: { x: 1150 }, lk: t > C2.stops ? [0, -0.8] : [-0.5, 0.2], lid: dr > 0.6 ? 0.8 : 0.1, mood: t > C2.stops ? 'dread' : '', tilt: -0.12 * dr, arms: { l: [-150, 300, 'open'], r: [lerp(170, 70, dr), lerp(120, 20, dr), 'fist'] }, bottle: true, bottleFill: 0.6 - 0.3 * dr, bottleRot: -2.2 * dr } }); },
   c2fridge(t, u) { coolerFront(t, t < C2.fr + 0.25 ? 1 : 0); },
   c2grid(t, u) { SE(t, [900, 480, 1.0 + u * 0.03], { shut: true, signOff: true, canopy: 0, amb: '#7c8296', rainA: 0.5, tally: 3 }); },
   c2quiet(t, u) { const b = Math.max(0, Math.sin(((t - C2.quiet) * 92 / 60) * Math.PI * 2)) ** 8; SD(t, [980, 450, 2.15 + b * 0.04 + u * 0.02], { slits: 0.5, amb: '#5e6478', crate: 980,
@@ -30,9 +31,12 @@ Object.assign(SH, {
   timerIns(t, u) { timerIns(t, C2.p3); },
   fridgeIns(t, u) { fridgeFact(t, C2.food - 0.4); },
   eatIns(t, u) { eatOrder(t, C2.eatM); },
-  c2lantern(t, u) { const on = clamp((t - C2.lanOn - 0.2) / 0.4); SD(t, [760, 560, 1.6 + u * 0.03], { slits: 0.4, lantern: on > 0 ? [760 + 170, 620] : null, lk: on,
-    j: { P: { x: 760 }, lk: [0.6, 0.3], mood: on > 0.5 ? '' : 'dread', smile: on * 0.4, arms: { l: [-150, 300, 'open'], r: [180, 130, 'fist'] }, lantern: true, lanternOn: on } }); },
-  c2coolerIn(t, u) { SQ(t, [900, 560, 1.15 + u * 0.03], { lantern: [1150, 600], j: { P: { x: 1000 }, lk: [-0.6, -0.3], mood: '', arms: { l: [-150, 300, 'open'], r: [180, 120, 'fist'] }, lantern: true } }, () => puffs(t, 1000, JP.y + 70)); },
+  c2lantern(t, u) { const on = clamp((t - C2.lanOn - 0.2) / 0.4), grab = clamp(u / 1.6), down = clamp((u - 1.6) / 0.8), has = u > 1.4;
+    SD(t, [760, 560, 1.6 + u * 0.03], { slits: 0.4, lantern: on > 0 ? [760 + 170, 620] : null, lk: on },
+      () => { if (!has) lanternP(540, 520, 0.9, 0); J(t, { P: { x: 760 }, flip: !has, lk: has ? [0.6, 0.3] : [0.9, -0.5], mood: on > 0.5 ? '' : 'dread', smile: on * 0.5,
+        arms: { l: [-150, 300, 'open'], r: has ? [lerp(220, 180, down), lerp(-20, 130, down), 'fist'] : [lerp(150, 230, grab), lerp(200, -20, grab), 'open'] }, lantern: has, lanternOn: on }); }); },
+  c2coolerIn(t, u) { const k = clamp(u / 3), x = lerp(1350, 1000, eo(k)), sw = Math.sin(step(t, 12) * 4) * 0.2;
+    SQ(t, [900, 560, 1.15 + u * 0.03], { lantern: [x + 150, 600], j: { P: { x }, flip: k < 1, legs: k < 1 ? 'walk' : 'stand', lk: k < 1 ? [0.6, -0.2] : [-0.7, -0.4], mood: '', arms: { l: [-150, 300, 'open'], r: [180, 120, 'fist'] }, lantern: true } }, () => puffs(t, x, JP.y + 70)); },
   c2coolerDoor(t, u) { SQ(t, [300, 560, 1.4 + u * 0.08], { amb: '#55607a', lantern: [900, 700] }); },
   c2night(t, u) { const n = t > C2.dozens ? 14 : 3; SD(t, [960, 560, 1.05 + u * 0.02], { slits: 0.5, amb: '#5a5e74', lantern: [980, 700], lk: 0.35, crate: 980,
     j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: 'shock', lid: 0, lk: [-0.4, -0.5], sweat: 1, arms: { l: [-90, 180, 'fist'], r: [90, 170, 'fist'] } } },

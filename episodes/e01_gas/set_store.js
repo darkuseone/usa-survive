@@ -19,7 +19,7 @@ function outside(t, o = {}) {                                // ночь за с
   if (o.car) { push(1180, 760, 1); piece([[-230, 0], [-210, -80], [-120, -130], [110, -130], [190, -80], [240, -10], [240, 30], [-230, 30]], '#5a6b80', { seed: 220 });
     piece([[-100, -118], [90, -118], [160, -76], [-180, -76]], '#9fb4c8', { seed: 221, lw: 2 }); ellP(-140, 30, 44, 44, '#1c1512', { seed: 222 }); ellP(150, 30, 44, 44, '#1c1512', { seed: 223 });
     if (o.carOpen) piece([[-60, -76], [-150, -150], [-150, 10], [-60, 20]], '#4d5d70', { seed: 224, lw: 2.4 }); pop(); }
-  if (o.car) { const hz = Math.floor(t * 1.6) % 2 === 0; [[960, 700], [1400, 700]].forEach(([x, y]) => ellP(x, y, 14, 9, hz ? '#ffb030' : '#6a4a20', { seed: 225, lw: 1.6, tex: false })); }
+  if (o.car) { const hz = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6); [[960, 700], [1400, 700]].forEach(([x, y]) => ellP(x, y, 14, 9, mix('#6a4a20', '#ffb030', hz), { seed: 225, lw: 1.6, tex: false })); }
   (o.zoms || []).forEach(z => layer(() => zombie({ t, ...z }), { sx: 4, sy: 6, sb: 8 }));
   rainOut(t, GL.y0, 880, o.rainA ?? 1);
   rectP(-200, GL.y0 - 20, 2320, 1000, 'rgba(20,28,60,0.22)', { raw: true, line: false, tex: false });                    // ночной воздух
@@ -80,6 +80,9 @@ function store(t, o = {}) {                                  // вся деко�
   [480, 1440].forEach((x, i) => rectP(x - 160, 0, 320, 26, (o.lit ?? 1) > 0.4 ? '#fbfcf2' : '#8a8e90', { seed: 312 + i, lw: 2, tex: false }));
   outside(t, o); glassWall(t, o); shutter(o.shut ?? 0, t);
   if (o.cal) calendar(o.cal, t);
+  push(300, 150, 1, 0.02); stroke([[-80, -150], [-80, -40]], '#3a3530', 3); stroke([[80, -150], [80, -40]], '#3a3530', 3); rectP(-150, -40, 300, 64, '#2f6a6e', { seed: 330, lw: 2.2 }); txt('COLD DRINKS →', 0, -7, 32, { font: 'Inter Black', col: '#fbfaf6' }); pop();
+  rectP(1160, 20, 140, 60, '#b9bcb2', { seed: 331, lw: 2, shade: () => { for (let i = 0; i < 6; i++) stroke([[1170, 30 + i * 9], [1290, 30 + i * 9]], '#8e949a', 3); } });
+  push(820, 1000); piece([[-48, 0], [-20, -150], [20, -150], [48, 0]], '#f2c230', { seed: 332, lw: 2.4 }); piece([[-14, -140], [14, -140], [6, -100], [-6, -100]], '#1c1512', { raw: true, line: false }); txt('CAUTION', 0, -70, 16, { font: 'Inter Black', col: '#1c1512' }); txt('WET FLOOR', 0, -46, 13, { font: 'Inter Black', col: '#1c1512' }); pop();
   rectP(-200, 1000, 2320, 300, '#d9d4c4', { seed: 320, line: false, step: 60, shade: () => { for (let x = -200; x < 2120; x += 120) for (let y = 1000; y < 1300; y += 120) if (((x + y) / 120) % 2 === 0) rectP(x, y, 120, 120, '#c4bfae', { raw: true, line: false, tex: false }); } });
 }
 
@@ -90,11 +93,11 @@ function calendar(k, t) {                                    // листок «D
 }
 
 function storeLight(o = {}) {                                // свет: люминесцентные лампы, мигание, тревога
-  const lit = o.lit ?? 1, red = o.red ?? 0, fl = o.flick ? (Math.sin(step(TT, 24) * 37) > 0.2 ? 1 : 0.35) : 1;
+  const lit = o.lit ?? 1, red = o.red ?? 0, fl = o.flick ? (0.8 + 0.2 * Math.sin(step(TT, 12) * 5.3) - (hsh(Math.floor(TT * 3)) % 5 === 0 ? 0.25 : 0)) : 1;
   lightmap(mix(mix('#5e6478', '#b4b8c8', lit * fl), '#7a3434', red), () => {
     radial(480, 60, 1000, 'rgba(240,248,255,1)', 0.55 * lit * fl); radial(1440, 60, 1000, 'rgba(240,248,255,1)', 0.55 * lit * fl);
     radial(1430, 330, 260, 'rgba(255,90,130,1)', o.neonOff ? 0 : 0.35);
-    if (red > 0) { const b = 0.55 + 0.45 * Math.abs(Math.sin(step(TT, 12) * 4)); radial(960, 80, 1400, 'rgba(255,70,50,1)', red * b); }
+    if (red > 0) { const b = 0.6 + 0.4 * Math.sin(TT * Math.PI * 1.2); radial(960, 80, 1400, 'rgba(255,70,50,1)', red * b); }
     if (o.fn) o.fn(); });
   if (!o.neonOff) glowAdd(1430, 333, 200, 'rgba(255,80,120,1)', 0.25);
   if (red > 0) glowAdd(960, 80, 300, 'rgba(255,60,40,1)', 0.4 * red);
@@ -144,6 +147,9 @@ function crate(x, y) {                                       // упаковка
 /* ==== снаружи: общий план заправки ночью под дождём ==== */
 function exterior(t, o = {}) {
   rectP(-200, -200, 2320, 900, '#18203a', { seed: 400, line: false, step: 90, shade: () => { const r = rng(401); for (let i = 0; i < 50; i++) dot(r() * 1920, r() * 400, 1.5 + r() * 2, '#8a96c0', 0.4); } });
+  [[-60, 0], [700, 1], [1980, 2]].forEach(([x, i]) => { rectP(x - 9, 160, 18, 420, '#141a2a', { seed: 440 + i, line: false }); rectP(x - 50, 180, 100, 10, '#141a2a', { raw: true, line: false }); });   // столбы и провода
+  stroke([[-60, 186], [320, 230], [700, 186]], '#141a2a', 3); stroke([[700, 186], [1340, 236], [1980, 186]], '#141a2a', 3); stroke([[-60, 200], [320, 246], [700, 200]], '#141a2a', 2); stroke([[700, 200], [1340, 250], [1980, 200]], '#141a2a', 2);
+  for (let i = 0; i < 9; i++) { const r = rng(450 + i), x = i * 240 - 100 + r() * 60, h = 160 + r() * 120; piece(spline([[x - 70, 580], [x - 50, 580 - h * 0.6], [x - 10, 580 - h], [x + 30, 580 - h * 0.7], [x + 70, 580]], true, 6), '#111727', { seed: 451 + i, line: false }); }
   piece([[-200, 560], [200, 500], [520, 540], [900, 480], [1300, 530], [1700, 470], [2120, 520], [2120, 700], [-200, 700]], '#0f1526', { seed: 402 });
   // столб-ценник
   rectP(1640, 160, 30, 520, '#2a2e36', { seed: 403, lw: 2 }); rectP(1540, 120, 230, 190, '#f3ecd8', { seed: 404, lw: 2.6, shade: () => { rectP(1540, 120, 230, 60, '#c8342c', { seed: 405, line: false }); } });
@@ -154,7 +160,7 @@ function exterior(t, o = {}) {
   else { rectP(320, 400, 980, 300, o.dark ? '#2a3040' : '#f6f2d8', { seed: 408, lw: 2.4, tex: false, shade: () => { for (let x = 320; x < 1300; x += 245) rectP(x, 400, 10, 300, '#6a6e74', { raw: true, line: false });
     for (let i = 0; i < 4; i++) rectP(350 + i * 70, 560, 56, 140, ['#d8342c', '#3d7fc4', '#f2c230', '#46b86a'][i], { seed: 409 + i, lw: 1.4 }); } });
     if (!o.noJoe) layer(() => joe({ x: 640, y: 520, s: 0.34, t, flip: true, mood: 'sleepy', arms: { l: [-150, 300, 'open'], r: [200, 150, 'fist'] } }), { sx: 3, sy: 4, sb: 5 }); }
-  push(1140, 470, 1, 0.02); rectP(-110, -36, 220, 72, 'rgba(10,10,20,0.7)', { seed: 414, lw: 2 }); txt('OPEN 24/7', 0, 3, 38, { font: 'Osw', weight: 600, col: !o.signOff && Math.sin(step(t, 24) * 9) > -0.8 ? '#ff5a7a' : '#4a2a32' }); pop();
+  push(1140, 470, 1, 0.02); rectP(-110, -36, 220, 72, 'rgba(10,10,20,0.7)', { seed: 414, lw: 2 }); txt('OPEN 24/7', 0, 3, 38, { font: 'Osw', weight: 600, col: !o.signOff ? mix('#ff5a7a', '#c84a64', 0.5 + 0.5 * Math.sin(t * 1.3) * (hsh(Math.floor(t * 2)) % 9 === 0 ? 1 : 0.15)) : '#4a2a32' }); pop();
   // навес на столбах, колонки, машина
   [200, 1440].forEach((x, i) => rectP(x, 210, 40, 560, '#d9d4c4', { seed: 415 + i, lw: 2.4 }));
   rectP(100, 150, 1500, 80, '#e7e3d6', { seed: 417, lw: 2.8, shade: () => { rectP(100, 196, 1500, 34, '#c8342c', { seed: 418, line: false }); } });
@@ -163,25 +169,37 @@ function exterior(t, o = {}) {
     rectP(x - 38, 650, 76, 50, '#1c2330', { seed: 424 + i, lw: 2 }); txt(n, x, 676, 34, { font: 'Osw', weight: 600, col: '#7dffb0' }); });
   push(1350, 860, 1); piece([[-260, 0], [-236, -90], [-130, -150], [120, -150], [210, -90], [270, -10], [270, 34], [-260, 34]], '#5a6b80', { seed: 426 });
   piece([[-112, -136], [100, -136], [176, -86], [-200, -86]], '#9fb4c8', { seed: 427, lw: 2 }); ellP(-160, 34, 50, 50, '#1c1512', { seed: 428 }); ellP(170, 34, 50, 50, '#1c1512', { seed: 429 });
-  const hz = Math.floor(t * 1.6) % 2 === 0; ellP(-250, -40, 16, 10, hz ? '#ffb030' : '#6a4a20', { seed: 430, lw: 1.6, tex: false }); ellP(262, -40, 16, 10, hz ? '#ffb030' : '#6a4a20', { seed: 431, lw: 1.6, tex: false }); pop();
+  const hz = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6); ellP(-250, -40, 16, 10, mix('#6a4a20', '#ffb030', hz), { seed: 430, lw: 1.6, tex: false }); ellP(262, -40, 16, 10, mix('#6a4a20', '#ffb030', hz), { seed: 431, lw: 1.6, tex: false }); pop();
   rectP(-200, 760, 2320, 400, '#30343e', { seed: 432, line: false, step: 70, shade: () => { for (let i = 0; i < 8; i++) ellP(200 + i * 230, 900 + (i % 2) * 60, 120, 14, '#4a5068', { seed: 433 + i, line: false, a: 0.6, tex: false }); } });   // асфальт и лужи
   // фигура на краю света
   if (o.zom) layer(() => zombie({ x: 120, y: 700, s: 0.5, t, v: 1, legs: 'run' }), { sx: 3, sy: 4, sb: 5 });
+  extDetails(t, o);
   if (o.extra) o.extra();
   rainOut(t, -200, 1100, o.rainA ?? 1.3);
 }
 function extLight(t, o = {}) {
   lightmap(o.amb || '#5a5e74', () => { radial(860, 300, 1100, 'rgba(255,248,220,1)', 0.75 * (o.canopy ?? 1)); radial(810, 560, 700, 'rgba(240,250,255,1)', o.shut || o.dark ? 0.15 : 0.6); radial(1140, 470, 260, 'rgba(255,90,130,1)', o.signOff ? 0 : 0.4); if (o.fn) o.fn();
-    const hz = Math.floor(t * 1.6) % 2 === 0; if (hz) { radial(1100, 820, 180, 'rgba(255,170,40,1)', 0.6); radial(1612, 820, 180, 'rgba(255,170,40,1)', 0.6); } });
+    const hz = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6); radial(1100, 820, 150, 'rgba(255,170,40,1)', 0.25 * hz); radial(1612, 820, 150, 'rgba(255,170,40,1)', 0.25 * hz); });
   for (let x = 220; x < 1600; x += 230) glowAdd(x, 240, 90, 'rgba(255,240,200,1)', 0.35);
 }
 
 /* счётчик дней: бумажная бирка на скотче в правом верхнем углу (экранные координаты) */
-function dayTag(t, n, o = {}) {
-  const k = o.stamp != null ? popK(t, o.stamp, 0.35) : 1;
-  push(W - 190, 128, 1, 0.05); card(0, 0, 250, 170, 0, 980, '#f3ecd8'); txt('DAY', -62, -50, 34, { font: 'Inter Black', col: '#c8241c' });
-  push(28, 18, 0.6 + 0.4 * k); txt(String(n), 0, 0, 120, { font: 'Osw', weight: 600, col: '#1c1512' }); pop();
-  txt(o.clock || '03:07 AM', -40, 62, 26, { font: "'Courier 10 Pitch'", weight: 700, col: '#3a3530' });
-  if (o.stamp != null && t > o.stamp) { const q = clamp((t - o.stamp) / 0.4); ellP(28, 18, 70 * (0.6 + 0.4 * q), 62 * (0.6 + 0.4 * q), 'rgba(0,0,0,0)', { raw: true, tex: false, lw: 6, lc: '#c8241c', a: q }); }
-  pop(); tape(W - 290, 52, 120, -0.5, 981); tape(W - 80, 60, 110, 0.6, 982);
+function dayTag(t, n, o = {}) {                               // счётчик дней: календарный листок на скотче, крупно, всегда в углу
+  const k = o.stamp != null ? popK(t, o.stamp, 0.35) : 1, x = W - 175, y = 138;
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8; push(x, y, 1, 0.04); piece([[-130, -105], [130, -105], [130, 105], [-130, 105]], '#fbf7ea', { seed: 980, step: 26, lw: 2 }); pop(); ctx.restore();
+  push(x, y, 1, 0.04); piece([[-130, -105], [130, -105], [130, -42], [-130, -42]], '#c8241c', { seed: 983, step: 26, lw: 2 });
+  txt('DAY', 0, -73, 46, { font: 'Inter Black', col: '#fbf7ea' });
+  push(0, 22, 0.6 + 0.4 * k); txt(String(n), 0, 0, 132, { font: 'Osw', weight: 600, col: '#1c1512' }); pop();
+  txt(o.clock || '03:07 AM', 0, 88, 24, { font: "'Courier 10 Pitch'", weight: 700, col: '#3a3530' });
+  if (o.stamp != null && t > o.stamp) { const q = clamp((t - o.stamp) / 0.4); ellP(0, 22, 92 * (0.6 + 0.4 * q), 70 * (0.6 + 0.4 * q), 'rgba(0,0,0,0)', { raw: true, tex: false, lw: 7, lc: '#c8241c', a: q }); }
+  pop(); tape(x - 120, y - 100, 120, -0.55, 981); tape(x + 118, y - 96, 110, 0.6, 982);
+}
+
+function extDetails(t, o = {}) {                             // ящик льда, баллоны, урна, лужи-отражения, мошкара
+  push(150, 760); rectP(-110, -170, 220, 170, '#e9edf2', { seed: 460, lw: 2.4, shade: () => { rectP(-110, -170, 220, 44, '#3d7fc4', { raw: true, line: false }); } }); txt('ICE', 0, -146, 34, { font: 'Inter Black', col: '#fbfaf6' }); for (let i = 0; i < 3; i++) stroke([[-90 + i * 70, -110], [-90 + i * 70, -16]], '#c9d0d8', 3); pop();
+  push(1520, 770); rectP(-90, -150, 180, 150, 'rgba(0,0,0,0)', { seed: 461, raw: true, lw: 3, lc: '#8e949a', tex: false }); for (let i = 0; i < 5; i++) stroke([[-90 + i * 45, -150], [-90 + i * 45, 0]], '#8e949a', 3);
+  for (let i = 0; i < 3; i++) { rectP(-70 + i * 50, -120, 38, 110, '#d8d4c8', { seed: 462 + i, lw: 1.6 }); ellP(-51 + i * 50, -120, 19, 8, '#d8d4c8', { seed: 465 + i, lw: 1.4 }); } txt('PROPANE', 0, -170, 24, { font: 'Inter Black', col: '#c8241c' }); pop();
+  push(880, 790); rectP(-34, -90, 68, 90, '#3a4a3a', { seed: 468, lw: 2 }); ellP(0, -90, 38, 10, '#2a3a2a', { seed: 469, lw: 1.6 }); pop();
+  for (let i = 0; i < 5; i++) { const x = 220 + i * 290, y = 900 + (i % 2) * 70; ellP(x, y, 130, 12, 'rgba(255,240,200,0.10)', { line: false, tex: false }); stroke([[x - 60, y], [x + 60, y]], '#fff6cf', 3, { a: 0.18 + 0.08 * Math.sin(t * 3 + i) }); }
+  if ((o.canopy ?? 1) > 0.5) for (let i = 0; i < 10; i++) { const r = rng(470 + i), lx = 220 + (i % 7) * 230, a = step(t, 12) * (2 + r() * 2) + i; dot(lx + Math.cos(a) * 30, 252 + Math.sin(a * 1.3) * 18, 2.4, '#fff6cf', 0.8); }
 }

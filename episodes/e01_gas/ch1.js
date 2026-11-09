@@ -18,8 +18,9 @@ Object.assign(SH, {
     j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: 'dread', lid: 0.2, lk: [0, 0.3], arms: { l: [-90 + jit(t, 5), 180, 'fist'], r: [90 + jit(t + 1, 5), 170, 'fist'] }, bob: jit(t, 2) } }); },
   c1hands(t, u) { SD(t, [980, 520, 1.9 + u * 0.03], { shafts: 1, slits: 0.9, amb: '#626884', crate: 980,
     j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: 'dread', lid: 0.1, lk: [0, 0.6], sweat: 1, arms: { l: [-60 + jit(t, 8), 120 + jit(t + 2, 6), 'open'], r: [60 + jit(t + 1, 8), 110 + jit(t + 3, 6), 'open'] } } }); },
-  c1count(t, u) { const x = lerp(560, 720, clamp(u / 5)); SD(t, [700, 600, 1.45], { shafts: 0.8, slits: 0.6, amb: '#626884', lantern: [x - 170, 640],
-    j: { P: { x }, flip: true, lk: [0.7, 0.1], mood: '', arms: { l: [-140, 150, 'fist'], r: [190, 170, 'fist'] }, clip: true, lantern: true } });
+  c1count(t, u) { const x = lerp(520, 760, clamp(u / 5)), wr = jit(t, 10);
+    SD(t, [700, 600, 1.45], { shafts: 0.8, slits: 0.6, amb: '#626884', lantern: [300, 470],
+      j: { P: { x }, flip: true, legs: u < 5 ? 'walk' : 'stand', lk: [0.7, 0.3], mood: '', arms: { l: [-150, 150, 'fist'], r: [70 + wr, 140 + jit(t + 1, 6), 'fist'] }, clip: true } }, () => lanternP(300, 520, 0.9));
     stamp('PROBLEM 1', t, C1.p1 + 0.1, 520, 180, 110, 2310); },
   invIns(t, u) { inventory(t, C1.inv, C1.invM); },
   waterIns(t, u) { waterFact(t, C1.water); },
@@ -27,11 +28,12 @@ Object.assign(SH, {
   c1sign(t, u) { SE(t, [1000, 480, 1.0 + u * 0.05], { shut: true, tally: 1, zom: false }); },
   c1signZ(t, u) { const k = clamp(u / 3); SE(t, [1140, 470, 1.9 + u * 0.03], { shut: true, extra: () => { for (let i = 0; i < 4; i++) zSil(1500 + i * 110 - k * 260, 640 + (i % 2) * 20, 0.34, t, i + 3); } });
     stamp('DINNER BELL', t, C1.dinner, W / 2, 180, 110, 2311); },
-  c1breaker(t, u) { const pull = t > C1.dies - 0.25; SB(t, [540, 400, 1.45], { bulb: pull ? 0.2 : 1, noDesk: true,
-    j: { P: { x: 620, y: 1000 - 508 * 0.95 }, flip: true, lk: [0.7, -0.6], mood: 'dread', arms: { l: [-150, 300, 'open'], r: [230, pull ? -110 : -170, 'fist'] } } }); },
+  c1breaker(t, u) { const wk = clamp(u / 1.4), reach = clamp((u - 1.4) / 0.6), pull = t > C1.dies - 0.25, x = lerp(860, 620, eo(wk));
+    SB(t, [560, 400, 1.45], { bulb: pull ? 0.2 : 1, noDesk: true,
+      j: { P: { x, y: 1000 - 508 * 0.95 }, flip: true, legs: wk < 1 ? 'walk' : 'stand', lk: [0.7, -0.6 * reach], mood: 'dread', arms: { l: [-150, 300, 'open'], r: wk < 1 ? undefined : [lerp(150, 230, reach), pull ? -110 : lerp(120, -170, reach), 'fist'] } } }); },
   c1signOff(t, u) { SE(t, [1140, 470, 1.9], { shut: true, signOff: true, canopy: 0.6, extra: () => { for (let i = 0; i < 4; i++) zSil(1240 + i * 110, 640 + (i % 2) * 20, 0.34, t * 0.2, i + 3); } }); },
-  c1shelf(t, u) { const k = sm(clamp(u / 3.6)), sx = lerp(1780, 1230, k);
-    SB(t, [1300, 600, 1.15], { blocked: k, j: { P: { x: sx + 230 }, flip: true, lean: -0.22, legs: u < 3.6 ? 'run' : 'stand', mood: 'angry', lk: [0.8, 0], arms: { l: [-120, 160, 'fist'], r: [150, 150, 'fist'] } } }); },
+  c1shelf(t, u) { const k = sm(clamp(u / 3.6)), sx = lerp(1780, 1230, k), push2 = Math.sin(step(t, 12) * 6) * 8;
+    SB(t, [1300, 600, 1.15], { blocked: k, j: { P: { x: sx + 230 }, flip: true, lean: -0.25, legs: u < 3.6 ? 'walk' : 'stand', gait: 6, stride: 30, mood: 'angry', sweat: 1, lk: [0.8, 0], arms: { l: [-120, 160 + push2, 'fist'], r: [150, 150 - push2, 'fist'] } } }); },
   c1rule(t, u) { rulesSign(t, C1.ruleM, 3); },
   card3(t, u) { chapterCard(t, C1.card + 0.05, 3, 'THE HUM STOPS'); }
 });

@@ -10,20 +10,22 @@ function boltsAt(t) { [[300, 960], [1620, 960]].forEach(([x, y], i) => { const t
   if (k <= 0) { ellP(x, y, 16, 16, '#5c6168', { seed: 2520 + i, lw: 2 }); return; } const bx = x + (i ? 1 : -1) * k * 260, by = y - Math.sin(k * Math.PI) * 220 + k * 40; push(bx, by, 1, k * 12); rectP(-14, -6, 28, 12, '#5c6168', { seed: 2522 + i, lw: 1.6 }); pop(); }); }
 SHOTS.push([C3.s - 0.1, 'c3alarm', 'dip'], [C3.some - 0.1, 'c3bump'], [C3.every - 0.1, 'ringIns', 'whip'], [C3.sun - 0.1, 'c3horde', 'flash'], [C3.w - 0.1, 'weightIns'], [C3.bends - 0.3, 'c3bend'],
   [C3.dont - 0.1, 'dontIns', 'whip'], [C3.hide - 0.1, 'c3hide'], [C3.rule - 0.1, 'c3rule', 'whip'], [C3.drift - 0.1, 'c3drift', 'dip'], [C3.knockS - 0.2, 'c3knock'], [C3.card, 'card12', 'tear']);
-const alarmFx = t => () => { const on = Math.floor(t * 3) % 2 === 0; if (on) { radial(1350, 820, 600, 'rgba(255,170,40,1)', 0.8); radial(1640, 800, 400, 'rgba(255,250,220,1)', 0.6); } };
+const alarmFx = t => () => { const k = 0.5 + 0.5 * Math.sin(t * Math.PI * 2.4); radial(1350, 820, 420, 'rgba(255,170,40,1)', 0.35 * k); radial(1640, 800, 320, 'rgba(255,250,220,1)', 0.3 * k); };
 Object.assign(SH, {
   c3alarm(t, u) { SE(t, [1100, 560, 1.15 + u * 0.03], { shut: true, signOff: true, canopy: 0.3, tally: 7, fn: alarmFx(t), extra: () => layer(() => zombie({ x: 1080, y: 560, s: 0.5, t, v: 1, legs: 'run', tilt: 0.3 }), { sx: 3, sy: 4, sb: 5 }) }); },
   c3bump(t, u) { SE(t, [1250, 720, 2.0 + u * 0.04], { shut: true, signOff: true, canopy: 0.3, fn: alarmFx(t), extra: () => layer(() => zombie({ x: 1120 + u * 20, y: 560, s: 0.5, t, v: 1, legs: 'run', tilt: 0.35, arms: { l: [-150, 160, 'open'], r: [200, 140, 'open'] } }), { sx: 3, sy: 4, sb: 5 }) }); },
   ringIns(t, u) { convergeMap(t, C3.every, { n: 40, rings: true, label: 'EVERYTHING WITHIN A MILE', dur: 5 }); },
   c3horde(t, u) { SE(t, [820, 560, 1.15 + u * 0.03], { shut: true, signOff: true, canopy: 0.2, amb: '#6e748e', rainA: 0.6, tally: 7, extra: () => horde(t, 40, 640, 1) }); stamp('40', t, C3.sun + 1.4, 300, 200, 180, 2530); },
-  weightIns(t, u) { shutterBg(); stamp('6,000 LBS', t, C3.w + 1.2, W / 2, 420, 170, 2531); if (t > C3.w + 0.2) { for (let i = 0; i < 5; i++) { const x = 360 + i * 300, k = clamp((t - C3.w - 0.2 - i * 0.12) / 0.4); stroke([[x, 700], [x, 700 + 200 * k]], '#c8241c', 14); piece([[x - 34, 700 + 200 * k], [x + 34, 700 + 200 * k], [x, 760 + 200 * k]], '#c8241c', { raw: true, lw: 2 }); } }
+  weightIns(t, u) { shutterBg(); stamp('6000 LBS', t, C3.w + 1.2, W / 2, 420, 170, 2531); if (t > C3.w + 0.2) { for (let i = 0; i < 5; i++) { const x = 360 + i * 300, k = clamp((t - C3.w - 0.2 - i * 0.12) / 0.4); stroke([[x, 700], [x, 700 + 200 * k]], '#c8241c', 14); piece([[x - 34, 700 + 200 * k], [x + 34, 700 + 200 * k], [x, 760 + 200 * k]], '#c8241c', { raw: true, lw: 2 }); } }
     txt('against ONE sheet of steel', W / 2, 1010, 44, { font: 'Hand', weight: 700, col: '#1c1512' }); },
-  c3bend(t, u) { const b = 0.8 + 0.5 * Math.sin(step(t, 8) * 4); SD(t, [960, 620, 1.1], { bulge: b, slits: 0.6, amb: '#6a6e88', tally: 7,
-    j: { P: { x: 1340, y: 600 }, behind: true, mood: 'shock', lid: 0, lk: [-0.9, -0.2], sweat: 1, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } }, () => boltsAt(t)); },
+  c3bend(t, u) { const b = 0.8 + 0.5 * Math.sin(step(t, 8) * 4), duck = (t > C3.pops && t < C3.pops + 0.6) || (t > C3.another && t < C3.another + 0.6);
+    SD(t, [960, 620, 1.1], { bulge: b, slits: 0.6, amb: '#6a6e88', tally: 7,
+      j: { P: { x: 1340, y: duck ? 660 : 600 }, behind: true, mood: 'shock', scream: duck ? 0.6 : 0, lid: 0, lk: [-0.9, -0.2], sweat: 1, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } }, () => boltsAt(t)); },
   dontIns(t, u) { paperBg(2540); txt('MOST PEOPLE:', W / 2, 170, 70, { font: 'Inter Black', col: '#f3ecd8' });
     ['PANIC', 'MAKE NOISE', 'RUN'].forEach((s, i) => { const k = popK(t, C3.dM[i] - 0.1, 0.3); if (k <= 0) return; push(400 + i * 560, 560, k, (i - 1) * 0.04); card(0, 0, 460, 300, 0, 2541 + i, '#f3ecd8'); txt(s, 0, 0, 70, { font: 'Inter Black', col: '#1c1512' }); stampX(0, 0, 1.4, clamp((t - C3.dM[i] - 0.25) / 0.25)); pop(); }); },
-  c3hide(t, u) { SD(t, [1300, 600, 1.7 + u * 0.03], { slits: 0.4, amb: '#5c6078', bulge: 0.4,
-    j: { P: { x: 1340, y: 610 }, behind: true, mood: 'dread', lid: 0, lk: [-0.8, -0.3], sweat: 1, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } });
+  c3hide(t, u) { const peek = Math.max(0, Math.sin(u * 0.9)) ** 2, y = 680 - 80 * peek;
+    SD(t, [1300, 600, 1.7 + u * 0.03], { slits: 0.4, amb: '#5c6078', bulge: 0.4,
+      j: { P: { x: 1340, y }, behind: true, mood: 'dread', lid: 0, lk: [-0.8, -0.3 - 0.3 * peek], sweat: 1, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } });
     if (t > C3.eleven - 0.6) { push(330, 300); clockP(0, 0, 140, 0, (t - C3.eleven + 0.6) * 1800, 0); pop(); stamp('11 HOURS', t, C3.eleven, 330, 520, 90, 2550); } },
   c3rule(t, u) { rulesSign(t, [0, 0, 0, C3.sil - 0.2], 4); },
   c3drift(t, u) { const k = clamp(u / 3.6); SE(t, [820, 560, 1.15], { shut: true, signOff: true, canopy: 0.2, amb: '#6a6080', rainA: 0.6, tally: 7, extra: () => horde(t, Math.round(lerp(40, 1, k)), 640, 0.5) }); },

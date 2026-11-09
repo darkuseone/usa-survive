@@ -40,12 +40,13 @@ function darkLight(t, o = {}) {
   lightmap(amb, () => {
     if (o.lantern) lanternGlow(o.lantern[0], o.lantern[1], (o.lk ?? 1) * (0.93 + 0.07 * Math.sin(step(t, 12) * 5)));
     if (o.shafts) shafts(t, o.shafts);
-    if (o.alarm) { const on = Math.floor(t * 2.6) % 2 === 0; if (on) radial(960, 500, 1500, 'rgba(255,160,40,1)', 0.45 * o.alarm); }
+    if (o.alarm) radial(960, 500, 1200, 'rgba(255,160,40,1)', 0.25 * o.alarm * (0.5 + 0.5 * Math.sin(t * Math.PI * 2.4)));
     if (o.red) radial(o.red[0], o.red[1], 500, 'rgba(255,40,30,1)', 0.7);
     if (o.cold) radial(960, 400, 1300, 'rgba(120,170,255,1)', 0.4 * o.cold);
     if (o.fn) o.fn();
   });
-  if (o.lantern) glowAdd(o.lantern[0], o.lantern[1], 140, 'rgba(255,220,140,1)', 0.5);
+  if (o.lantern) glowAdd(o.lantern[0], o.lantern[1], 160, 'rgba(255,220,140,1)', 0.55);
+  if (o.shafts) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; shafts(t, o.shafts * 0.45, 'rgba(255,236,200,1)'); ctx.restore(); dust(t, 900, 700, 1600, 600, 40); }
 }
 
 // ---------------- подсобка: шлакоблок, стеллажи, бойлер, задняя дверь, мониторы, щиток
@@ -84,6 +85,9 @@ function backroom(t, o = {}) {
       const r = rng(hsh(i, Math.floor(step(t, 12) * 12))); for (let q = 0; q < 14; q++) stroke([[x + 10, y + 12 + r() * 76], [x + 160, y + 12 + r() * 76]], '#5a8a6a', 1.5, { a: 0.6, smooth: false });
       if (o.cctvZ) for (let q = 0; q < 3; q++) ellP(x + 40 + q * 40, y + 50, 8, 10, '#0c1410', { line: false, tex: false }); } }); }); }
   rectP(380, 120, 120, 160, '#8e949a', { seed: 1150, lw: 2.4, shade: () => { for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) rectP(395 + j * 52, 140 + i * 44, 40, 30, '#3a3d42', { raw: true, lw: 1.4 }); } });
+  push(1000, 760); rectP(-26, -110, 52, 140, '#c8241c', { seed: 1170, lw: 2.2 }); rectP(-14, -140, 28, 34, '#2a2c30', { seed: 1171, lw: 1.6 }); stroke([[14, -124], [44, -100], [40, -40]], '#2a2c30', 6); pop();
+  push(560, 560, 1, -0.03); card(0, 0, 200, 150, 0, 1172, '#fbfaf6'); txt('EMPLOYEES', 0, -40, 22, { font: 'Inter Black', col: '#3d6fa4' }); txt('MUST WASH', 0, -8, 22, { font: 'Inter Black', col: '#3d6fa4' }); txt('HANDS 🧼', 0, 28, 22, { font: 'Inter Black', col: '#3d6fa4' }); pop(); tape(560, 482, 90, 0.1, 1173);
+  push(1460, 1000); rectP(-60, -90, 120, 90, '#f2c230', { seed: 1174, lw: 2.2 }); stroke([[30, -90], [60, -420]], '#8a6a4a', 8); piece([[40, -430], [80, -430], [86, -380], [34, -380]], '#cfc6ad', { seed: 1175, lw: 1.6 }); pop();
   rectP(-200, 1000, 2320, 300, '#7a7468', { seed: 1160, line: false, step: 60, shade: () => { ellP(1300, 1040, 300, 20, '#6a6458', { line: false, tex: false }); } });
 }
 function backLight(t, o = {}) {

@@ -87,12 +87,15 @@
 - `personHead(o)`
 - `hairdo(kind, o)`
 - `personVest(col)`
+- `idleOf(o, seed = 0)`
 - `joe(o = {})`
 - `zombie(o = {})`
 - `zombieMarks(o)`
 - `dee(o = {})`
 - `raider(o = {})`
 - `zSil(x, y, s, t, seed = 0, col = '#3a4636')`
+- `zMini(x, y, s, t, seed = 0)`
+- `zShadow(x, y, s, t, seed, col)`
 
 # Декорации и вставки эпизодов (копировать и менять, а не писать с нуля)
 
