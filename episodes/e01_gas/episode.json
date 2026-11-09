@@ -1,1 +1,1 @@
-{"timeline": "episodes/e01_gas/out/timeline.json", "size": [1920, 1080], "libs": ["engine/chars.js"], "scripts": ["set_store.js", "set2.js", "scenes.js", "ch0.js", "ch1.js", "ch2.js", "ch3.js", "ch4.js", "ch5.js", "ch6.js", "ch7.js"]}
+{"timeline": "episodes/e01_gas/out/timeline.json", "size": [1920, 1080], "libs": ["engine/chars.js"], "scripts": ["set_store.js", "set2.js", "scenes.js", "fx3.js", "ch0.js", "ch1.js", "ch2.js", "ch3.js", "ch4.js", "ch5.js", "ch6.js", "ch7.js"]}

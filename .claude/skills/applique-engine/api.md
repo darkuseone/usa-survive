@@ -78,6 +78,7 @@
 - `post(t, o)`
 
 ## engine/chars.js
+- `leanPush(o)` — наклон корпуса вокруг ступней (сидя — вокруг сиденья); lean > 0 — голова уходит ВПРАВО на экране, даже при flip
 - `person(o)`
 - `personLegs(o)`
 - `personBody(o)`
@@ -93,8 +94,8 @@
 - `zombieMarks(o)`
 - `dee(o = {})`
 - `raider(o = {})`
-- `zSil(x, y, s, t, seed = 0, col = '#3a4636')`
-- `zMini(x, y, s, t, seed = 0)`
+- `zMini(x, y, s, t, seed = 0, o = {})`
+- `zSil(x, y, s, t, seed = 0, col = '#3a4636', o = {})`
 - `zShadow(x, y, s, t, seed, col)`
 
 # Декорации и вставки эпизодов (копировать и менять, а не писать с нуля)

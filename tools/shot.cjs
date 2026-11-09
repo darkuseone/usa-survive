@@ -16,7 +16,7 @@ const puppeteer = require('puppeteer-core'); const path = require('path'); const
   }
   await b.close();
   if (files.length) {
-    const TW = CW > CH ? 480 : 360, TH = Math.round(TW * CH / CW / 2) * 2, cols = Math.min(4, files.length), rows = Math.ceil(files.length / cols), inp = [], fl = [];
+    const TW = +process.env.SHEET_TW || (CW > CH ? 480 : 360), TH = Math.round(TW * CH / CW / 2) * 2, cols = Math.min(+process.env.SHEET_COLS || 4, files.length), rows = Math.ceil(files.length / cols), inp = [], fl = [];
     files.forEach((f, i) => { inp.push('-i', f); fl.push(`[${i}]scale=${TW}:${TH},drawtext=text='${path.basename(f, '.png').slice(1)}':x=8:y=8:fontsize=28:fontcolor=yellow:box=1:boxcolor=black@0.6[v${i}]`); });
     for (let i = files.length; i < rows * cols; i++) { fl.push(`color=black:s=${TW}x${TH}[v${i}]`); }
     const rowsF = []; for (let r = 0; r < rows; r++) { const ins = Array.from({ length: cols }, (_, c) => `[v${r * cols + c}]`).join(''); rowsF.push(cols > 1 ? `${ins}hstack=${cols}[r${r}]` : `${ins}null[r${r}]`); }

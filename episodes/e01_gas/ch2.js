@@ -2,6 +2,7 @@
 const C2 = { s: LS('c2_01'), stops: WW('c2_01', /^stops/i), fr: WW('c2_02', /^fridges/i), grid: WW('c2_02', /^grid/i), quiet: LS('c2_02b'), p3: LS('c2_03'), food: WW('c2_03', /^safety/i),
   eat: LS('c2_04'), eatM: [WW('c2_04', /^hot/i), WW('c2_04', /^sandwiches/i), WW('c2_04', /^chips/i)], lan: LS('c2_04b'), lanOn: WW('c2_04b', /^lantern/i), cool: LS('c2_05'), save: LS('c2_06'),
   night: LS('c2_07'), dozens: WW('c2_07', /^dozens/i), card: LE('c2_07') + 0.1 };
+LT.push(C2.grid + 0.2);
 DAYS.push([C2.s - 0.1, 3, '02:14 PM'], [C2.night - 0.1, 3, '11:40 PM']);
 function SL(t, c, o = {}) {                                   // магазин с питанием (жалюзи опущены), lit 0..1
   cam(c[0], c[1], c[2], 0, shakeAt(t)); TT = t; store(t, { shut: 1, neonOff: true, lit: o.lit, door: 0, drops: false }); if (o.tally) tallyMarks(o.tally, 260, 380, 0.9);
@@ -13,6 +14,8 @@ function coolerFront(t, lit) {                               // стена ст�
       for (let j = 0; j < 5; j++) { rectP(x + 10, 230 + j * 150, 360, 10, '#8e949a', { raw: true, line: false }); for (let q = 0; q < 9; q++) rectP(x + 20 + q * 39, 160 + j * 150, 30, 68, ['#d8342c', '#46b86a', '#3d7fc4', '#f2c230', '#f2731c'][(q + j + i) % 5], { raw: true, lw: 1.2, tex: false }); }
       piece([[x + 30, 120], [x + 90, 120], [x + 10, 980], [x - 50, 980]], 'rgba(255,255,255,0.08)', { raw: true, line: false, tex: false }); } });
     rectP(x + 330, 480, 20, 160, '#c9ccd1', { seed: 2410 + i, lw: 1.6 }); }
+  rectP(120, 24, 1680, 84, lit > 0.5 ? '#2f6a6e' : '#1c2a2e', { seed: 2415, lw: 2.4 }); txt('ICE COLD DRINKS', 960, 68, 52, { font: 'Inter Black', col: lit > 0.5 ? '#fbfaf6' : '#4a5a5e' });
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 5; j++) rectP(170 + i * 410, 244 + j * 150, 60, 20, '#f2c230', { raw: true, lw: 1.2, tex: false });
   lightmap(lit > 0.5 ? '#b8bccc' : '#5a5e74', () => { if (lit > 0.5) for (let i = 0; i < 4; i++) radial(350 + i * 410, 140, 500, 'rgba(230,245,255,1)', 0.7); });
   if (lit > 0.5) for (let i = 0; i < 4; i++) glowAdd(350 + i * 410, 130, 200, 'rgba(220,240,255,1)', 0.35);
 }
@@ -37,9 +40,8 @@ Object.assign(SH, {
         arms: { l: [-150, 300, 'open'], r: has ? [lerp(220, 180, down), lerp(-20, 130, down), 'fist'] : [lerp(150, 230, grab), lerp(200, -20, grab), 'open'] }, lantern: has, lanternOn: on }); }); },
   c2coolerIn(t, u) { const k = clamp(u / 3), x = lerp(1350, 1000, eo(k)), sw = Math.sin(step(t, 12) * 4) * 0.2;
     SQ(t, [900, 560, 1.15 + u * 0.03], { lantern: [x + 150, 600], j: { P: { x }, flip: k < 1, legs: k < 1 ? 'walk' : 'stand', lk: k < 1 ? [0.6, -0.2] : [-0.7, -0.4], mood: '', arms: { l: [-150, 300, 'open'], r: [180, 120, 'fist'] }, lantern: true } }, () => puffs(t, x, JP.y + 70)); },
-  c2coolerDoor(t, u) { SQ(t, [300, 560, 1.4 + u * 0.08], { amb: '#55607a', lantern: [900, 700] }); },
-  c2night(t, u) { const n = t > C2.dozens ? 14 : 3; SD(t, [960, 560, 1.05 + u * 0.02], { slits: 0.5, amb: '#5a5e74', lantern: [980, 700], lk: 0.35, crate: 980,
-    j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: 'shock', lid: 0, lk: [-0.4, -0.5], sweat: 1, arms: { l: [-90, 180, 'fist'], r: [90, 170, 'fist'] } } },
-    () => { for (let i = 0; i < n; i++) { const x = ((t * 60 + i * 210) % 2400) - 300; zSil(x, 330 + (i % 3) * 30, 0.55, t, i, 'rgba(20,24,34,0.55)'); } }); },
+  c2coolerDoor(t, u) { SQ(t, [330, 560, 1.45 + u * 0.07], { amb: '#55607a', lantern: [900, 700] }, () => puffs(t, 560, 600, 2)); },
+  c2night(t, u) { const many = t > C2.dozens; SD(t, [960, 560, 1.05 + u * 0.02], { slits: 0.6, amb: '#5a5e74', lantern: [980, 700], lk: 0.35, crate: 980, shadows: many ? 12 : 2,
+    j: { P: { x: 980, y: 1000 - 220 - 345 * 0.95 }, legs: 'sit', mood: 'shock', lid: 0, lk: many ? [-0.6, -0.6] : [-0.4, -0.5], sweat: 1, arms: { l: [-90, 180, 'fist'], r: [90, 170, 'fist'] }, lantern: true, lanternOn: 0.5 } }); },
   card7(t, u) { chapterCard(t, C2.card + 0.05, 7, 'FORTY OF THEM'); }
 });

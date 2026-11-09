@@ -8,12 +8,17 @@
 const PC0 = { skin: '#f6d6c2', skinD: '#e9b9a0', hair: '#4b2d20', hairL: '#6e4330', top: '#6f7a3e', topD: '#535d2b', pants: '#3d5c8f', shoe: '#f1efe9', stub: '#8a6a58', line: '#1c1512' };
 let PC = PC0;
 
+function leanPush(o) {                                          // наклон корпуса вокруг ступней (сидя — вокруг сиденья); lean > 0 — голова уходит ВПРАВО на экране, даже при flip
+  const py = o.legs === 'sit' ? 345 : 508, a = (o.lean || 0) * (o.flip ? -1 : 1); push(0, 0, 1, 0); ctx.translate(0, py); ctx.rotate(a); ctx.translate(0, -py);
+}
 function person(o) {
   PC = { ...PC0, ...(o.pal || {}) };
   const t = o.t ?? 0, s = o.s ?? 1;
   push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1);
-  push(0, 0, 1, o.lean || 0);
+  if (!o.noShadow) ellP(0, o.legs === 'sit' ? 548 : 512, 112, 15, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.3, seed: 59 });   // контактная тень на полу
+  leanPush(o);
   const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personArms(o, 'back'); personBody(o); pop();
+  ellP(0, 108, 66, 15, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.2, seed: 58 });                                              // тень от головы на плечах
   const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52); push(jh[0], jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
   personArms(o);
   pop(); pop();
@@ -123,10 +128,10 @@ function personHead(o) {
   if (mood === 'sleepy') lid = Math.max(lid, 0.5); if (mood === 'shock' || mood === 'dread') lid = bl ? 1 : 0; if (mood === 'eww' || mood === 'sick') lid = Math.max(lid, 0.45);
   const big = mood === 'shock' ? 1.15 : 1;
   [-1, 1].forEach(sd => {
-    const ex = sd * 28, ey = -10, rx = 28 * big, ry = 34 * big;
+    const eb = o.eyeBig === sd ? 1.24 : 1, ex = sd * 28, ey = -10, rx = 28 * big * eb, ry = 34 * big * eb;
     if (lid > 0.95) { stroke([[ex - 24, ey + 4], [ex, ey + 10], [ex + 24, ey + 4]], PC.line, 5); return; }
     piece(ellPts(ex, ey, rx, ry, 0, 32), '#fbfaf6', { seed: 110 + sd, lw: 2.8, tex: false, shade: () => {
-      const pr2 = mood === 'shock' || mood === 'dread' ? 5 : 7.5; dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c');
+      const pr2 = mood === 'shock' || mood === 'dread' ? 5 : 7.5; dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c'); dot(ex + lk[0] * 13 - sd * 3 - 3, ey + 1 + lk[1] * 12, 2.4, '#ffffff', 0.9);
       if (lid > 0.02) { const ly = ey - ry + lid * ry * 2; piece([[ex - rx - 3, ey - ry - 4], [ex + rx + 3, ey - ry - 4], [ex + rx + 3, ly], [ex - rx - 3, ly]], PC.skin, { raw: true, line: false }); stroke([[ex - rx, ly], [ex + rx, ly]], PC.line, 4); }
     } });
     stroke([[ex - 18, ey + ry + 8], [ex, ey + ry + 13], [ex + 18, ey + ry + 7]], '#b98974', 2.6, { a: 0.9 });              // мешки
@@ -206,15 +211,16 @@ const ZPAL = [
   { skin: '#a6c278', skinD: '#87a35c', hair: '#6a5a40', hairL: '#7c6a4c', top: '#5d6e7c', topD: '#45535e', pants: '#3e3a36', shoe: '#4a443c', stub: '#5c6650' },
   { skin: '#88b07a', skinD: '#6c915e', hair: '#26221c', hairL: '#3a342a', top: '#8a3e34', topD: '#6a2e26', pants: '#2f3646', shoe: '#3a3632', stub: '#5c6650' }];
 function zombie(o = {}) {
-  const v = o.v ?? 0, sway = Math.sin(step(o.t ?? 0, 8) * 2.2 + v) * 0.05;
-  person({ pal: ZPAL[v % ZPAL.length], hair: ['shaggy', 'bald', 'short'][v % 3], top: 'tee', mood: 'dread', lid: 0.38, lk: [0, 0.3],
-    arms: { l: [-150, 130, 'open'], r: [150, 110, 'open'] }, legs: 'stand', tilt: 0.12 + sway, lean: sway * 0.6, ...o, t: (o.t ?? 0) * 0.5 });
+  const v = o.v ?? 0, t = o.t ?? 0, sway = Math.sin(step(t, 8) * 2.2 + v) * 0.05, gr = Math.max(0, Math.sin(step(t, 8) * 1.3 + v * 2)), jx = Math.sin(step(t, 8) * 3.1 + v) * 12;
+  person({ pal: ZPAL[v % ZPAL.length], hair: ['shaggy', 'bald', 'short'][v % 3], top: 'tee', mood: 'dread', lid: 0.38, lk: [0, 0.3], eyeBig: v % 2 ? 1 : -1,
+    m: gr > 0.45 ? { open: 0.25 + 0.6 * (gr - 0.45), round: 0.5 } : undefined, smile: -0.6,
+    arms: { l: [-150 + jx, 130 - jx * 0.5, 'open'], r: [150 + jx * 0.6, 110 + jx, 'open'] }, legs: 'stand', tilt: 0.12 + sway, lean: sway * 0.6, ...o, t: t * 0.5 });
   zombieMarks(o);
 }
 /* приметы зомби поверх person(): тёмные круги у глаз, шов-царапина, рваный подол и дыры на одежде (та же геометрия, что у person) */
 function zombieMarks(o) {
   const s = o.s ?? 1, tl = (o.tilt ?? 0.12);
-  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); push(0, 0, 1, o.lean || 0);
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); leanPush(o);
   piece([[-104, 318], [-80, 300], [-60, 334], [-34, 304], [-8, 338], [20, 306], [44, 336], [70, 302], [104, 318], [104, 340], [-104, 340]], '#2a2420', { raw: true, line: false, a: 0.55 });   // рваный подол
   ellP(-40, 220, 18, 12, '#3a2e26', { seed: 700, line: false, a: 0.6 }); ellP(50, 170, 12, 16, '#3a2e26', { seed: 701, line: false, a: 0.6 });
   push(0, 0, 1, tl); [-1, 1].forEach(sd => ellP(sd * 28, -4, 36, 42, '#3c4a2c', { seed: 702 + sd, line: false, a: 0.35, tex: false }));
@@ -228,33 +234,56 @@ function dee(o = {}) {
   const s = o.s ?? 1, sd = o.flip ? -1 : 1;
   push(o.x, o.y, s, o.rot || 0, sd); piece(spline([[60, -40], [128, -10], [138, 80], [118, 150], [96, 90], [84, 20]], true, 6), DEE.pal.hair, { seed: 990, step: 12, edge: 1.2 }); pop();   // хвост за головой
   person({ ...DEE, ...o, pal: { ...DEE.pal, ...(o.pal || {}) } });
-  push(o.x, o.y, s, o.rot || 0, sd); push(0, 0, 1, o.lean || 0); push(0, 0, 1, o.tilt || 0);
+  push(o.x, o.y, s, o.rot || 0, sd); leanPush(o); push(0, 0, 1, o.tilt || 0);
   [-1, 1].forEach(q => stroke([[q * 18, -44], [q * 34, -50]], '#1c1512', 3));                                  // ресницы-штрихи
   pop(); pop(); pop();
 }
 /* мародёр: тёмная куртка, бандана на лице */
 function raider(o = {}) {
   const s = o.s ?? 1; person({ pal: { top: '#3a3d42', topD: '#2a2c30', hair: '#2a2420', pants: '#2c2f36', shoe: '#2a2622', skin: '#d9a888', skinD: '#b8866a' }, hair: o.hair || 'buzz', top: 'jacket', mood: 'angry', ...o });
-  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); push(0, 0, 1, o.lean || 0); push(0, 0, 1, o.tilt || 0);
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); leanPush(o); push(0, 0, 1, o.tilt || 0);
   piece([[-96, 30], [96, 30], [84, 96], [40, 122], [0, 128], [-40, 122], [-84, 96]], o.band || '#8a2a24', { seed: 995, step: 10, shade: () => { for (let i = 0; i < 6; i++) dot(-60 + i * 24, 70, 4, '#f3ecd8', 0.8); } });
   pop(); pop(); pop();
 }
 /* силуэт зомби для толпы вдали: дёшево (6 деталей), качается на двойках */
-function zSil(x, y, s, t, seed = 0, col = '#3a4636') { if (/^rgba/.test(col)) return zShadow(x, y, s, t, seed, col); return zMini(x, y, s, t, seed); }
-/* зомби для толпы: та же геометрия, что у силуэта (голова −50, ноги до 380), но в цвете — кожа, рваная одежда, глаза, шаг на двойках */
-function zMini(x, y, s, t, seed = 0) {
-  const r = rng(seed * 7 + 3), P = ZPAL[seed % ZPAL.length], sw = Math.sin(step(t, 8) * (1.4 + r()) + seed) * 0.07, ph = Math.sin(step(t, 8) * 2.2 + seed), skin = mix(P.skin, '#c8f08a', 0.25);
-  push(x, y, s, sw);
-  [-1, 1].forEach(sd => piece([[sd * 10, 200], [sd * 52, 200], [sd * 50 + ph * sd * 18, 380], [sd * 16 + ph * sd * 18, 380]], P.pants, { seed: 980 + sd, step: 20, lw: 2.2 }));
-  piece(tube([[50, 50], [120, 80 + ph * 10], [175, 70 + r() * 30]], 28, 24).pts, P.top, { raw: true, lw: 2.2 }); ellP(182, 74 + r() * 30, 20, 18, skin, { seed: 981, lw: 2 });
-  piece([[-62, 30], [62, 30], [72, 228], [40, 210], [10, 236], [-24, 212], [-56, 234], [-72, 228]], P.top, { seed: 982, step: 18, lw: 2.4, shade: () => { piece([[20, 30], [72, 228], [40, 210]], P.topD, { raw: true, line: false, a: 0.6 }); ellP(-20, 140, 12, 16, '#2a2420', { seed: 983, line: false, a: 0.6 }); } });
-  piece(tube([[-50, 50], [-115, 90 - ph * 10], [-170, 96 + r() * 26]], 28, 24).pts, P.top, { raw: true, lw: 2.2 }); ellP(-176, 98 + r() * 26, 20, 18, skin, { seed: 984, lw: 2 });
-  push(0, -50, 1, 0.15 + sw); ellP(0, 0, 54, 60, skin, { seed: 985, lw: 2.4, shade: () => { ellP(14, 20, 30, 20, mix(skin, '#000000', 0.15), { line: false, a: 0.6 }); } });
-  piece([[-54, -16], [-40, -58], [0, -66], [40, -58], [54, -20], [30, -40], [0, -44], [-30, -38]], P.hair, { seed: 986, lw: 1.8 });
-  [-1, 1].forEach(sd => { ellP(sd * 20, -2, 15, 17, '#f4f2dc', { seed: 987 + sd, lw: 2, tex: false }); dot(sd * 20 + 2, 2, 4.5, '#1c1512'); ellP(sd * 20, -2, 19, 21, 'rgba(40,60,30,0.35)', { line: false, tex: false }); });
-  stroke([[-18, 32], [0, 26], [18, 34]], '#3a1414', 5); pop();
-  pop();
+/* зомби для толпы (голова −50, ступни +380 от точки (x, y); feetY = y + 380·s). o: back — вид со спины, pound — колотит руками вверх (по жалюзи), up — руки подняты,
+   walk — идёт (шаг шире), dim 0..1 — глубина/ночь (уводит цвета в синеву), lean. Вариативность от seed: рост, одежда, причёска, глаза, рот, раны. */
+function zMini(x, y, s, t, seed = 0, o = {}) {
+  const r = rng(seed * 7 + 3), P = ZPAL[seed % ZPAL.length], dim = o.dim ?? 0, C = c => dim ? mix(c, '#222a42', dim) : c;
+  const skin = C(mix(P.skin, '#c8f08a', 0.25)), skinD = mix(skin, '#000000', 0.2), top = C([P.top, '#5d6e7c', '#7a4a6a', '#4a6a4a', '#8a7a4a', '#3a4a6a', '#a0522d'][Math.floor(r() * 7)]), topD = mix(top, '#000000', 0.28),
+    pants = C([P.pants, '#3e3a36', '#2f3646', '#4a4238'][Math.floor(r() * 4)]), hair = C(['#3a362c', '#6a5a40', '#26221c', '#7a3a20', '#9a9a90'][Math.floor(r() * 5)]);
+  const hs = 0.9 + r() * 0.22, kind = Math.floor(r() * 5), mouthK = Math.floor(r() * 3), back = !!o.back, sp = o.walk ? 4.2 : 2.2, ph = Math.sin(step(t, 8) * sp + seed * 1.7), sw = Math.sin(step(t, 8) * (1.4 + r()) + seed) * 0.07,
+    pd = (o.pound || o.up) ? Math.max(0, Math.sin(step(t, 12) * (4.5 + r() * 3) + seed * 2.1)) : 0, st = o.walk ? 30 : 14, tiltH = (r() - 0.5) * 0.36;
+  push(x, y + 380 * s * (1 - hs), s * hs, sw + (o.lean || 0));
+  ellP(0, 384, 82, 12, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.32, seed: 979 });
+  [-1, 1].forEach(sd => { piece([[sd * 10, 200], [sd * 52, 200], [sd * 50 + ph * sd * st, 372], [sd * 16 + ph * sd * st, 372]], pants, { seed: 980 + sd, step: 20, lw: 2.2 });
+    blobP([[sd * 8 + ph * sd * st, 366], [sd * 60 + ph * sd * st, 364], [sd * 66 + ph * sd * st, 384], [sd * 6 + ph * sd * st, 386]], C('#3a3632'), { seed: 976 + sd, lw: 1.8 }); });
+  const armUp = (sd, lift) => { const hx = sd * (44 + 12 * r()), hy = -64 - 70 * lift - 26 * r(); piece(tube([[sd * 50, 50], [sd * 84, -6], [hx, hy]], 28, 24).pts, top, { raw: true, lw: 2.2 }); ellP(hx, hy - 8, 19, 21, skin, { seed: 981 + sd, lw: 2 });
+    for (let q = -1; q <= 1; q++) stroke([[hx + q * 9, hy - 22], [hx + q * 11, hy - 36]], skin, 7); };
+  const armFwd = sd => { const a = sd > 0 ? [[50, 50], [120, 80 + ph * 10], [175, 70 + r() * 30]] : [[-50, 50], [-115, 90 - ph * 10], [-170, 96 + r() * 26]]; piece(tube(a, 28, 24).pts, top, { raw: true, lw: 2.2 }); const e = a[2]; ellP(e[0] + sd * 7, e[1] + 3, 20, 18, skin, { seed: 984 + sd, lw: 2 }); };
+  if (o.pound || o.up) { armUp(-1, o.up ? 0.6 + 0.4 * pd : 1 - pd); armUp(1, o.up ? 1 - 0.4 * pd : pd); } else if (!back) armFwd(1);
+  piece([[-62, 30], [62, 30], [72, 228], [40, 210], [10, 236], [-24, 212], [-56, 234], [-72, 228]], top, { seed: 982, step: 18, lw: 2.4, shade: () => { piece([[20, 30], [72, 228], [40, 210]], topD, { raw: true, line: false, a: 0.6 });
+    if (r() > 0.4) ellP(-20 + r() * 30, 110 + r() * 60, 12, 16, '#2a2420', { seed: 983, line: false, a: 0.6 }); if (back) stroke([[0, 40], [2, 200]], topD, 3, { a: 0.5 }); if (r() > 0.6) piece([[-62, 30], [-30, 30], [-50, 110]], C('#6a2a24'), { raw: true, line: false, a: 0.55 }); } });
+  if (!(o.pound || o.up)) { if (back) { armFwd(1); armFwd(-1); } else armFwd(-1); }
+  push(0, -50, 1, (back ? 0 : 0.15) + sw + tiltH); ellP(0, 0, 54, 60, skin, { seed: 985, lw: 2.4, shade: () => { ellP(14, 22, 30, 20, skinD, { line: false, a: 0.5 }); } });
+  [-1, 1].forEach(sd => ellP(sd * 54, 6, 9, 14, skin, { seed: 974 + sd, lw: 1.8 }));
+  if (back) { if (kind === 1) { piece([[-40, -30], [0, -56], [40, -30], [30, 10], [-30, 10]], hair, { seed: 986, lw: 1.6, a: 0.8 }); stroke([[-10, 20], [14, 34]], '#5a2a22', 4); }
+    else piece(spline([[-56, 20], [-58, -30], [-30, -64], [0, -70], [30, -64], [58, -30], [56, 20], [40, kind === 3 ? 70 : 36], [0, kind === 3 ? 80 : 44], [-40, kind === 3 ? 70 : 36]], true, 6), hair, { seed: 986, step: 10, lw: 2 }); }
+  else {
+    if (kind === 0) piece([[-54, -16], [-40, -58], [0, -66], [40, -58], [54, -20], [30, -40], [0, -44], [-30, -38]], hair, { seed: 986, lw: 1.8 });
+    else if (kind === 2) piece(spline([[-60, 4], [-62, -40], [-30, -72], [10, -74], [50, -56], [62, -10], [44, -30], [16, -46], [-10, -34], [-36, -44], [-50, -20]], true, 5), hair, { seed: 986, step: 9, edge: 1.3, lw: 1.8 });
+    else if (kind === 3) { piece(spline([[-60, 60], [-64, -30], [-30, -68], [20, -68], [62, -30], [60, 60], [46, 10], [40, -30], [0, -44], [-40, -30], [-46, 10]], true, 5), hair, { seed: 986, step: 10, lw: 1.8 }); }
+    else if (kind === 4) { piece([[-58, -22], [58, -22], [50, -60], [0, -72], [-50, -60]], C('#5a2a2a'), { seed: 986, lw: 1.8 }); piece([[-10, -26], [84, -30], [90, -18], [-6, -14]], C('#3a1a1a'), { seed: 973, lw: 1.6 }); }
+    else { stroke([[-30, -50], [-10, -58]], '#ffffff', 4, { a: 0.3 }); stroke([[16, -52], [34, -36]], '#5a2a22', 4); }
+    const big = seed % 2 ? 1 : -1;
+    [-1, 1].forEach(sd => { const er = sd === big ? 1.25 : 0.95; ellP(sd * 21, -2, 19 * er, 21 * er, 'rgba(40,60,30,1)', { line: false, tex: false, a: 0.4 }); ellP(sd * 21, -2, 15 * er, 17 * er, '#f4f2dc', { seed: 987 + sd, lw: 2, tex: false }); dot(sd * 21 + 2, 2, sd === big ? 3.4 : 5, '#1c1512'); });
+    if (mouthK === 0) { ellP(0, 34, 16, 12 + 6 * Math.abs(ph), '#2a0e0e', { seed: 988, lw: 2 }); rectP(-10, 24, 20, 6, '#f4f2dc', { raw: true, line: false, tex: false }); }
+    else if (mouthK === 1) stroke([[-18, 36], [0, 28], [18, 38]], '#3a1414', 5); else { piece([[-20, 28], [20, 26], [16, 44], [-14, 42]], '#2a0e0e', { seed: 988, lw: 2 }); for (let q = -1; q <= 1; q++) rectP(q * 10 - 4, 27, 7, 7, '#f4f2dc', { raw: true, line: false, tex: false }); }
+    if (r() > 0.5) { stroke([[26, -40], [42, -24]], '#5a2a22', 3.4); stroke([[30, -28], [40, -38]], '#5a2a22', 2.6); }
+  }
+  pop(); pop();
 }
+function zSil(x, y, s, t, seed = 0, col = '#3a4636', o = {}) { if (/^rgba/.test(col)) return zShadow(x, y, s, t, seed, col); return zMini(x, y, s, t, seed, o); }
 function zShadow(x, y, s, t, seed, col) {
   const r = rng(seed), sw = Math.sin(step(t, 8) * (1.5 + r()) + seed) * 0.08;
   push(x, y, s, sw); piece([[-60, 0], [60, 0], [70, 220], [-70, 220]], col, { seed: 996 + seed % 7, line: false });

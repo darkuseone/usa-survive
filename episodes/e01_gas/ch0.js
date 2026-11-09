@@ -16,17 +16,23 @@ function scene0(t, jo, o = {}) {
   dust(t, 700, 400, 1400, 500, 26); storeLight(o);
 }
 function sweep0(t) { const k = pr(t, C0.lights, C0.lights + 1.3); if (k > 0 && k < 1) radial(lerp(1900, 100, k), 520, 700, 'rgba(255,250,225,1)', 0.65 * Math.sin(k * Math.PI)); }
-function tankIns(t, c) {                                     // разрез: магазин сверху, цистерны с топливом под асфальтом
-  bg('#1d2238'); rectP(-100, 430, W + 200, 800, '#5a4a3a', { seed: 2100, line: false, shade: () => { const r = rng(2101); for (let i = 0; i < 140; i++) dot(r() * W, 440 + r() * 640, 2 + r() * 5, '#4a3c2e', 0.7); } });
-  rectP(-100, 410, W + 200, 30, '#3b3f4b', { seed: 2102, lw: 2.4 });
-  rectP(260, 200, 620, 210, '#b9a98a', { seed: 2103, lw: 2.4, shade: () => { rectP(260, 200, 620, 40, '#c8342c', { raw: true, line: false }); rectP(300, 260, 540, 150, '#8e949a', { raw: true, lw: 2 }); } });
-  [[1180, '3'], [1500, '4']].forEach(([x, n], i) => { rectP(x - 40, 290, 80, 120, '#c8342c', { seed: 2104 + i, lw: 2 }); stroke([[x, 410], [x, 560]], '#8e949a', 10); });
-  [[640, 0], [1300, 1]].forEach(([x, i]) => { const k = clamp((t - c - 0.4 - i * 0.4) / 1.2);
-    push(x, 700); piece(spline([[-230, -100], [230, -100], [280, 0], [230, 100], [-230, 100], [-280, 0]], true, 6), '#8e949a', { seed: 2110 + i, lw: 3, shade: () => {
-      rectP(-280, 100 - 200 * 0.8 * k, 560, 200, '#e0a030', { raw: true, line: false, a: 0.9 }); for (let q = 0; q < 3; q++) stroke([[-150 + q * 150, -100], [-150 + q * 150, 100]], '#6c7278', 4); } }); pop();
-    stroke([[x, 590], [x, 440]], '#6c7278', 14); });
-  if (t > c + 1.6) { push(W / 2, 960, 1, -0.02); ransom('THOUSANDS OF GALLONS', 0, 0, 80, 2120, { reveal: pr(t, c + 1.6, c + 2.1), pop: true }); pop(); }
-  push(560, 130, 1, 0.03); label(0, 0, 'YOU ARE HERE', 380, '#f2731c', 0, 40); pop(); stroke([[560, 180], [560, 250]], '#f2731c', 6);
+function tankIns(t, c) {                                     // разрез: магазин сверху, под асфальтом — цистерны с топливом
+  bg('#1d2238'); rainOut(t, -100, 430, 0.8);
+  rectP(-100, 430, W + 200, 800, '#5a4a3a', { seed: 2100, line: false, shade: () => { const r = rng(2101); for (let i = 0; i < 160; i++) dot(r() * W, 450 + r() * 640, 2 + r() * 5, '#4a3c2e', 0.7);
+    for (let i = 0; i < 5; i++) stroke([[-100, 560 + i * 120], [W / 2, 540 + i * 120 + r() * 40], [W + 100, 566 + i * 120]], '#4f4032', 5, { a: 0.6 }); } });
+  rectP(-100, 404, W + 200, 34, '#3b3f4b', { seed: 2102, lw: 2.4 });
+  rectP(200, 170, 640, 236, '#b9a98a', { seed: 2103, lw: 2.4, shade: () => { rectP(200, 170, 640, 44, '#c8342c', { raw: true, line: false }); rectP(240, 240, 560, 166, '#8e949a', { raw: true, lw: 2 }); for (let y = 250; y < 406; y += 20) stroke([[240, y], [800, y]], '#6c7278', 2.4, { smooth: false }); } });
+  txt('HWY 40 FUEL & FOOD', 520, 193, 24, { font: 'Inter Black', col: '#fbfaf6' });
+  rectP(960, 150, 860, 40, '#e7e3d6', { seed: 2105, lw: 2.2 }); [1000, 1760].forEach((x, i) => rectP(x, 190, 22, 214, '#d9d4c4', { seed: 2106 + i, lw: 1.8 }));
+  [[1220, '3'], [1540, '4']].forEach(([x, n], i) => { rectP(x - 44, 280, 88, 124, '#c8342c', { seed: 2107 + i, lw: 2, shade: () => rectP(x - 44, 280, 88, 28, '#f3ecd8', { raw: true, line: false }) }); txt(n, x, 345, 30, { font: 'Osw', weight: 600, col: '#7dffb0' }); stroke([[x, 404], [x, 626]], '#8e949a', 12); stroke([[x - 3, 404], [x - 3, 626]], '#c9cfd4', 3); });
+  [[620, 0, 'REGULAR'], [1380, 1, 'DIESEL']].forEach(([x, i, nm]) => { const k = clamp((t - c - 0.4 - i * 0.4) / 1.2), wv = Math.sin(step(t, 12) * 2 + i) * 5;
+    push(x, 740); const body = spline([[-300, -120], [300, -120], [372, -60], [372, 60], [300, 120], [-300, 120], [-372, 60], [-372, -60]], true, 6), path = piece(body, '#8e949a', { seed: 2110 + i, lw: 3 });
+    ctx.save(); ctx.clip(path); const lvl = 120 - 200 * k; rectP(-380, lvl + wv, 760, 280, '#e0a030', { raw: true, line: false, a: 0.92 }); stroke([[-380, lvl + wv], [-120, lvl - wv], [120, lvl + wv], [380, lvl - wv]], '#f6c860', 6); ctx.restore();
+    for (let q = -2; q <= 2; q++) stroke([[q * 130, -116], [q * 130, 116]], '#6c7278', 4, { a: 0.7 }); for (let q = -5; q <= 5; q++) { dot(q * 60, -106, 4, '#5c6168'); dot(q * 60, 106, 4, '#5c6168'); }
+    stroke([[-300, -94], [300, -94]], '#c9cfd4', 4, { a: 0.6 }); push(0, 0, 1, -0.02); card(0, 0, 230, 64, 0, 2112 + i, '#fbfaf6'); txt(nm, 0, 3, 32, { font: 'Inter Black', col: '#c8241c' }); pop(); pop();
+    stroke([[x - 200, 624], [x - 200, 440]], '#6c7278', 16); rectP(x - 222, 420, 44, 22, '#5c6168', { seed: 2114 + i, lw: 2 }); });
+  if (t > c + 1.6) { push(W / 2, 78, 1, -0.01); ransom('THOUSANDS OF GALLONS', 0, 0, 70, 2120, { reveal: pr(t, c + 1.6, c + 2.1), pop: true }); pop(); }
+  push(170, 250, 1, -0.04); card(0, 0, 180, 84, 0, 2121, '#f2731c'); txt('YOU', 0, 4, 44, { font: 'Inter Black', col: '#1c1512' }); pop(); stroke([[230, 280], [270, 310]], '#f2731c', 8);
 }
 function fiveIns(t, c) {
   paperBg(2130); stamp('5 PROBLEMS', t, c, W / 2, 250, 140, 2131);
@@ -66,12 +72,12 @@ Object.assign(SH, {
     scene0(t, { P, legs: sk > 0.5 ? 'sit' : 'stand', lk: [0.1, 0.2], mood: 'dread', lid: 0.3, sweat: 1, arms: sk > 0.5 ? { l: [-120, 250, 'fist'], r: [120, 250, 'fist'] } : { l: [-150, 300, 'open'], r: [150, 300, 'open'] }, bob: Math.sin(step(t, 6) * 2) * 3 },
       { shut: 1, red: 0.5, lit: 0.35, neonOff: true, drops: false, crate: 980 }); pop();
     stamp('DAY 1', t, C0.day, 430, 190, 140, 504); if (t > C0.twenty) { push(1500, 760, 1, 0.03); label(0, 0, '29 TO GO', 380, '#f2c230', 0, 60); pop(); } },
-  storeOut0(t, u) { SE(t, [860, 520, 1.0 + u * 0.02], { shut: true, signOff: false, zom: false, extra: () => { for (let i = 0; i < 5; i++) zSil(1500 + i * 90, 640, 0.3, t, i); } }); },
+  storeOut0(t, u) { SE(t, [860, 540, 1.02 + u * 0.02], { shut: true, signOff: false, zom: false, extra: () => walkers(t, 6, { seed: 3210, x: (i, q, d) => 1380 + q * 460 - u * 14 * (0.5 + d), y0: 800, y1: 900, s0: 0.45, s1: 0.64 }) }); },
   shutClose0(t, u) { SD(t, [900, 600, 1.6 - u * 0.04], { bulge: 0.6 + 0.4 * Math.sin(step(t, 8) * 3), slits: 0.5, lantern: [1200, 300], lk: 0.6 }); },
   tankIns(t, u) { tankIns(t, C0.fuel); },
   countyIns(t, u) { convergeMap(t, WW('c0_05', /^every/i), { n: 26, label: 'EVERY SURVIVOR', ppl: true }); },
   fiveIns(t, u) { fiveIns(t, C0.five - 0.4); },
   flash19(t, u) { SQ(t, [700, 600, 1.45 + u * 0.08], { scratch: true, lantern: [700, 650], j: { P: { x: 700 }, mood: 'shock', scream: 0.6, sweat: 1, lk: [-0.9, 0], arms: { l: [-180, 120, 'fist'], r: [150, 300, 'open'] } } }, () => puffs(t, 700 + 20, JP.y + 60));
-    stamp('DAY 19', t, C0.nearly + 0.2, 430, 190, 140, 2140, 0.04, [['#e0201a', '#fff'], ['#111', '#fff'], ['#e0201a', '#fff'], ['#111', '#ffd21f'], ['#e0201a', '#fff'], ['#111', '#fff']]); },
+    stamp('DAY 19', t, C0.nearly + 0.2, 1470, 150, 140, 2140, 0.04, [['#e0201a', '#fff'], ['#111', '#fff'], ['#e0201a', '#fff'], ['#111', '#ffd21f'], ['#e0201a', '#fff'], ['#111', '#fff']]); },
   title0(t, u) { titleCard(t, C0.title + 0.1); }
 });

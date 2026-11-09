@@ -2,15 +2,25 @@
 const C4 = { s: LS('c4_01'), b: LS('c4_01b'), slide: WW('c4_01b', /^slide/i), dee: LS('c4_02'), please: WW('c4_02', /^please/i), name: LS('c4_03'), news: WW('c4_03', /^news/i), map: LS('c4_04'),
   p4: LS('c4_05'), partner: WW('c4_05', /^partner/i), someone: WW('c4_05', /^someone/i), ask: LS('c4_06'), what: WW('c4_06', /^what/i), bot: LS('c4_07'), nods: WW('c4_07', /^nods/i), again: LS('c4_08'), alone: WW('c4_08', /^alone/i), card: LE('c4_08') + 0.1 };
 const DEEDARK = { pal: { top: '#2a2c34', topD: '#1c1e24', skin: '#3a3440', skinD: '#2a2430', hair: '#1c1a1c', pants: '#1c1e24' }, capCol: '#1c2430' };
-function semiScene(t) {                                      // сложившаяся фура на шоссе ночью
-  bg('#141a2e', 2600); piece([[-100, 560], [400, 500], [900, 540], [1400, 480], [2000, 530], [2000, 700], [-100, 700]], '#0e1424', { seed: 2601 });
-  rectP(-100, 690, W + 200, 420, '#2a2e38', { seed: 2602, line: false, shade: () => { for (let x = -100; x < W; x += 240) rectP(x, 860, 130, 12, '#d9d0a0', { raw: true, line: false, a: 0.6 }); } });
-  push(1000, 760, 1, -0.32); rectP(-520, -230, 760, 230, '#cfd2d6', { seed: 2603, lw: 2.8, shade: () => { stroke([[-520, -120], [240, -120]], '#a9adb2', 4); txt('HAUL', -150, -110, 90, { font: 'Inter Black', col: '#3d6fa4' }); } });
-  for (let i = 0; i < 3; i++) ellP(-420 + i * 120, 0, 44, 44, '#1c1512', { seed: 2604 + i }); pop();
-  push(1360, 800, 1, 0.5); rectP(-60, -230, 240, 230, '#3d6fa4', { seed: 2607, lw: 2.8, shade: () => rectP(60, -200, 100, 90, '#9fb4c8', { raw: true, lw: 2 }) }); ellP(40, 0, 50, 50, '#1c1512', { seed: 2608 }); pop();
-  const hz = Math.floor(t * 1.6) % 2 === 0; [[560, 700], [1500, 700]].forEach(([x, y], i) => ellP(x, y, 14, 10, hz ? '#ffb030' : '#5a3a10', { seed: 2609 + i, lw: 1.4, tex: false }));
-  rainOut(t, -100, 1100, 1.3);
-  lightmap('#5a5e74', () => { if (hz) { radial(560, 700, 300, 'rgba(255,170,40,1)', 0.7); radial(1500, 700, 300, 'rgba(255,170,40,1)', 0.7); } radial(1600, 620, 500, 'rgba(255,240,200,1)', 0.4); });
+function semiScene(t) {                                      // шоссе ночью: фура сложилась «ножом», аварийка, рассыпанный груз; Ди уходит с фонариком
+  bg('#1a2238', 2600); const r0 = rng(2640); for (let i = 0; i < 40; i++) dot(r0() * W, r0() * 380, 1.5 + r0() * 2, '#8a96c0', 0.4);
+  for (let i = 0; i < 10; i++) { const r = rng(2650 + i), x = i * 220 - 60 + r() * 60, h = 150 + r() * 130; piece(spline([[x - 80, 560], [x - 50, 560 - h * 0.6], [x - 10, 560 - h], [x + 30, 560 - h * 0.7], [x + 80, 560]], true, 6), '#111727', { seed: 2651 + i, line: false }); }
+  piece([[-100, 540], [400, 500], [900, 530], [1400, 490], [2000, 520], [2000, 640], [-100, 640]], '#0f1526', { seed: 2601 });
+  rectP(-100, 620, W + 200, 520, '#30343e', { seed: 2602, line: false, step: 70, shade: () => { for (let x = -100; x < W; x += 260) rectP(x, 840, 140, 14, '#d9d0a0', { raw: true, line: false, a: 0.7 });
+    stroke([[-100, 660], [W + 100, 650]], '#e8e4d8', 6, { a: 0.5 }); stroke([[-100, 1040], [W + 100, 1050]], '#e8e4d8', 6, { a: 0.5 });
+    stroke([[200, 980], [600, 900], [900, 800], [1100, 760]], '#1c1e24', 22, { a: 0.6 }); stroke([[260, 1010], [660, 930], [960, 830], [1140, 790]], '#1c1e24', 22, { a: 0.6 }); } });      // следы торможения
+  for (let x = -60; x < W; x += 170) { rectP(x, 590, 12, 50, '#8e949a', { seed: 2660 + x, lw: 1.4 }); } rectP(-100, 584, W + 200, 16, '#b0b6bb', { seed: 2661, lw: 1.8 });            // отбойник
+  push(250, 600); rectP(-6, -150, 12, 150, '#8e949a', { seed: 2662, lw: 1.4 }); rectP(-60, -230, 120, 86, '#2f6a4a', { seed: 2663, lw: 2 }); txt('MILE', 0, -204, 22, { font: 'Inter Black', col: '#fbfaf6' }); txt('61', 0, -172, 38, { font: 'Inter Black', col: '#fbfaf6' }); pop();
+  const hz = 0.5 + 0.5 * Math.sin(t * Math.PI * 1.6);
+  push(1010, 800, 1, -0.3); rectP(-560, -250, 820, 250, '#d8dade', { seed: 2603, lw: 2.8, shade: () => { stroke([[-560, -130], [260, -130]], '#a9adb2', 4); for (let x = -520; x < 260; x += 60) stroke([[x, -250], [x, 0]], '#c2c5ca', 2, { a: 0.6 }); txt('HAUL', -150, -124, 110, { font: 'Inter Black', col: '#3d6fa4' }); rectP(-560, -20, 820, 20, '#c8342c', { raw: true, line: false }); } });
+  for (let i = 0; i < 3; i++) { ellP(-460 + i * 130, 6, 48, 48, '#1c1512', { seed: 2604 + i }); ellP(-460 + i * 130, 6, 20, 20, '#8e949a', { seed: 2607 + i }); } rectP(220, -150, 30, 60, mix('#5a3a10', '#ffb030', hz), { raw: true, lw: 1.4, tex: false }); pop();
+  push(1390, 850, 1, 0.42); rectP(-70, -250, 260, 250, '#3d6fa4', { seed: 2610, lw: 2.8, shade: () => { rectP(60, -216, 110, 96, '#9fb4c8', { raw: true, lw: 2 }); rectP(-70, -40, 260, 40, '#2d5684', { raw: true, line: false }); stroke([[-40, -250], [-40, -330]], '#8e949a', 10); } });
+  ellP(30, 4, 54, 54, '#1c1512', { seed: 2611 }); ellP(30, 4, 22, 22, '#8e949a', { seed: 2612 }); ellP(188, -70, 16, 22, '#fff6cf', { seed: 2613, lw: 1.6, tex: false }); pop();
+  [[420, 940, 0.2], [560, 1000, -0.3], [300, 1030, 0.5], [700, 960, 0.1], [180, 950, -0.1]].forEach(([x, y, a], i) => { push(x, y, 1, a); rectP(-44, -40, 88, 80, '#b98a52', { seed: 2620 + i, lw: 2, shade: () => stroke([[-44, -8], [44, -8]], '#8a6034', 4) }); pop(); });   // груз на асфальте
+  layer(() => dee({ x: 520 - (t % 60) * 6, y: 560, s: 0.5, t, flip: true, legs: 'walk', mood: 'dread', arms: { l: undefined, r: [170, 170, 'fist'] } }), { sx: 3, sy: 4, sb: 5 });
+  ripples(t); rainOut(t, -100, 1100, 1.3); mist(t, 1.4);
+  lightmap('#5a5e74', () => { radial(1040, 700, 320, 'rgba(255,170,40,1)', 0.5 * hz); radial(1600, 880, 300, 'rgba(255,170,40,1)', 0.45 * hz); cone(1560, 760, 1900, 900, 150, 'rgba(255,246,210,1)', 0.7); radial(1560, 770, 260, 'rgba(255,246,210,1)', 0.5);
+    cone(430, 640, 150, 900, 110, 'rgba(255,250,220,1)', 0.6); radial(960, 300, 1300, 'rgba(120,150,220,1)', 0.35); });
 }
 function choiceIns(t) {                                      // партнёр или вор
   paperBg(2620); stamp('PROBLEM 4', t, C4.p4, W / 2, 140, 110, 2621);
@@ -24,7 +34,8 @@ SHOTS.push([C4.s - 0.1, 'c4win', 'dip'], [C4.b - 0.1, 'c4crawl'], [C4.slide - 0.
 const winL = (dim = 1) => lightmap('#5a5e74', () => { radial(960, 120, 1100, 'rgba(255,240,210,1)', 0.75 * dim); radial(960, 900, 700, 'rgba(255,200,120,1)', 0.35); });
 Object.assign(SH, {
   c4win(t, u) { cam(W / 2, H / 2, 1.0 + u * 0.02); nightWin(t, { drawer: Math.sin(clamp((t - C4.s - 2) / 3) * Math.PI) }); winL(); pop(); push(470, 160, 1, -0.03); label(0, 0, 'NIGHT PAY WINDOW', 560, '#f2c230', 0, 50); pop(); },
-  c4crawl(t, u) { const k = clamp(u / 2.8); SD(t, [1250, 640, 1.6], { slits: 0.3, amb: '#5a5e74', j: { P: { x: lerp(1100, 1420, k), y: 640 }, behind: true, lean: 0.3, legs: 'run', mood: 'dread', lid: 0, lk: [0.9, -0.2], arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } }); },
+  c4crawl(t, u) { const k = clamp(u / 3.2), x = lerp(1285, 1395, k), by = Math.abs(Math.sin(step(t, 12) * 5)) * 8;                        // крадётся пригнувшись за прилавком: над стойкой — шапка и глаза
+    SD(t, [1400, 600, 1.8 + u * 0.03], { slits: 0.3, amb: '#5a5e74', j: { P: { x, y: 612 - by }, lean: 0.05, legs: 'walk', mood: 'dread', lid: 0, lk: [0.9, -0.3], sweat: 1, noShadow: true, arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] } } }); },
   c4inch(t, u) { cam(W / 2, 600, 1.35); nightWin(t, { drawer: 0.08 * clamp((t - C4.slide) / 0.6), dee: { mood: 'dread', arms: { l: [-150, 300, 'open'], r: [150, 300, 'open'] }, ...DEEDARK } }); winL(0.5); pop(); },
   c4dee(t, u) { const talk = t > C4.please - 0.05 && t < C4.please + 1.2; cam(980, 560, 1.25 + u * 0.03); nightWin(t, { drawer: 0.08, dee: { mood: 'shock', lid: 0, lk: [0, 0.1], arms: { l: [-170, -40, 'open'], r: [170, -40, 'open'] }, m: talk ? { open: 0.3 + 0.3 * Math.abs(Math.sin(step(t, 12) * 9)), round: 0.3 } : undefined } }); winL(); pop(); },
   c4truck(t, u) { cam(W / 2, H / 2, 1.0 + u * 0.03); semiScene(t); pop(); },

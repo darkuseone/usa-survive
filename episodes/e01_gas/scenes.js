@@ -26,7 +26,6 @@ function J(t, jo = {}) { const P = { ...JP, ...(jo.P || {}) };
     if (jo.clip) clipboard(...hw(P, [jo.arms.l[0] + 10, jo.arms.l[1] - 50], jo.flip), P.s, -0.15);
     if (jo.bottle) bottle(...hw(P, [jo.arms.r[0], jo.arms.r[1] - 60], jo.flip), P.s, jo.bottleRot || 0, jo.bottleFill || 0);
     if (jo.handset) handset(...hw(P, [jo.arms.r[0], jo.arms.r[1] - 70], jo.flip), 0.6 * P.s, jo.handsetRot || 0);
-    if (jo.pack) backpack(...hw(P, [0, 260], false), P.s * 0.9);
   }, { sx: 8, sy: 10, sb: 14 }); }
 function Z(t, zo = {}) { layer(() => zombie({ x: 960, y: 1000 - 508 * 0.9, s: 0.9, t, v: 0, ...zo }), { sx: 8, sy: 10, sb: 14 }); }
 
@@ -62,7 +61,7 @@ const GRAIN = (() => { const c = document.createElement('canvas'); c.width = 512
 function post(t, o) {
   o.save(); o.filter = 'saturate(1.18) contrast(1.06) brightness(1.03)'; o.drawImage(o.canvas, 0, 0); o.restore();
   o.save(); o.globalCompositeOperation = 'screen'; o.globalAlpha = 0.16; o.filter = 'blur(16px) brightness(0.9)'; o.drawImage(o.canvas, 0, 0); o.restore();
-  o.save(); o.globalCompositeOperation = 'overlay'; o.globalAlpha = 0.07; const fr = Math.floor(t * 12), gx = -(hsh(fr) % 256), gy = -(hsh(fr, 7) % 256);
+  o.save(); o.globalCompositeOperation = 'overlay'; o.globalAlpha = 0.05; const fr = Math.floor(t * 12), gx = -(hsh(fr) % 256), gy = -(hsh(fr, 7) % 256);
   for (let x = gx; x < W; x += 512) for (let y = gy; y < H; y += 512) o.drawImage(GRAIN, x, y); o.restore();
   const v = o.createRadialGradient(W / 2, H * 0.48, H * 0.38, W / 2, H * 0.5, H * 0.85); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.38)'); o.save(); o.fillStyle = v; o.fillRect(0, 0, W, H); o.restore();
 }

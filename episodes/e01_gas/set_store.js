@@ -82,7 +82,6 @@ function store(t, o = {}) {                                  // вся деко�
   if (o.cal) calendar(o.cal, t);
   push(300, 150, 1, 0.02); stroke([[-80, -150], [-80, -40]], '#3a3530', 3); stroke([[80, -150], [80, -40]], '#3a3530', 3); rectP(-150, -40, 300, 64, '#2f6a6e', { seed: 330, lw: 2.2 }); txt('COLD DRINKS →', 0, -7, 32, { font: 'Inter Black', col: '#fbfaf6' }); pop();
   rectP(1160, 20, 140, 60, '#b9bcb2', { seed: 331, lw: 2, shade: () => { for (let i = 0; i < 6; i++) stroke([[1170, 30 + i * 9], [1290, 30 + i * 9]], '#8e949a', 3); } });
-  push(820, 1000); piece([[-48, 0], [-20, -150], [20, -150], [48, 0]], '#f2c230', { seed: 332, lw: 2.4 }); piece([[-14, -140], [14, -140], [6, -100], [-6, -100]], '#1c1512', { raw: true, line: false }); txt('CAUTION', 0, -70, 16, { font: 'Inter Black', col: '#1c1512' }); txt('WET FLOOR', 0, -46, 13, { font: 'Inter Black', col: '#1c1512' }); pop();
   rectP(-200, 1000, 2320, 300, '#d9d4c4', { seed: 320, line: false, step: 60, shade: () => { for (let x = -200; x < 2120; x += 120) for (let y = 1000; y < 1300; y += 120) if (((x + y) / 120) % 2 === 0) rectP(x, y, 120, 120, '#c4bfae', { raw: true, line: false, tex: false }); } });
 }
 
