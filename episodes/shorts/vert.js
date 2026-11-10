@@ -9,7 +9,7 @@ for (const k in CUE) delete CUE[k];
 const VK = PH / H;                                                      // 1.778: высота мира = высота кадра
 const SRC = k => k.replace(/^x\d+_/, '');                               // ключ реплики шортса → ключ реплики эп. 1
 const TRN = { whip: 0.28, flash: 0.28 };
-let VFIT = false, VDX = 0, VT = 0;                                 // VT — время шортса в текущем кадре
+let VFIT = false, VDX = 0, VT = 0, VREW = false;                                 // VT — время шортса в текущем кадре
 
 function e1shot(te) { let lo = 0, hi = E1SHOTS.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (E1SHOTS[m][0] <= te) lo = m; else hi = m - 1; } return lo; }
 function e1(te) { SHOTS.splice(0, SHOTS.length, ...E1SHOTS); try { E1FRAME(te); } finally { SHOTS.splice(0, SHOTS.length, [0, 'v']); } }
@@ -21,7 +21,7 @@ const CROP = {
   ext0: 760, wide0: 740, mid0: 980, door0: 1040, shock0: 880, zomb0: 900, run0: 950, btnIns: 960, shut0: 1420, day0: 940,
   c3alarm: 960, c3bump: 800, ringIns: { fit: 0.58 }, c3horde: { k: [[0, 700], [4.4, 1250]] }, weightIns: 1000, c3bend: { k: [[0, 760], [3.2, 1300]] },
   dontIns: { fit: 0.62 }, c3hide: 1000, c3rule: { fit: 0.9, fx: 960, fy: 560 }, c3drift: 960, c3knock: 960,
-  c4win: 960, c4crawl: 920, c4inch: 960, c4dee: 960, c4truck: { k: [[0, 850], [3.8, 1450]] }, c4deeTalk: 1000, mapIns: { fit: 0.7, fx: 900 }, choiceIns: { fit: 0.7 },
+  c4win: 960, c4crawl: 920, c4inch: 960, c4dee: 960, c4truck: { k: [[0, 850], [3.8, 1450]] }, c4deeTalk: 1000, mapIns: { fit: 0.6, fx: 980 }, choiceIns: { fit: 0.7 },
   c4ask: 960, c4bottles: 960, c4leave: 1120, c4again: 1600,
   c5bottle: 960, c5think: 960, heaterIns: { fit: 0.75, fx: 1060 }, c5drain: 960, c5mistake: 880, c5click: 960, c5inside: { k: [[0, 640], [1.7, 640], [3.0, 1340]] },
   c5run: { k: [[0, 1000], [3.1, 680]] }, c5hold: 1100, c5fog: 960, handsetIns: { fit: 0.8, fx: 900 }, c5bang: 1040, c5speaker: 960, c5out: 960, c5slam: { k: [[0, 850], [3.9, 1100]] }, county2Ins: { fit: 0.58 },
@@ -56,7 +56,7 @@ function segAt(t) { let i = 0; while (i < SEGS.length - 1 && t >= SEGS[i + 1].t0
 
 // перемотка назад (флешфорвард → «семь дней назад»): сцены эп. 1 мелькают в обратную сторону, VHS-полосы
 function rewind(s, t, dx) {
-  const u = t - s.t0, te = Math.max(0.6, s.te0 - u * s.speed); drawE1(te, dx);
+  const u = t - s.t0, te = Math.max(0.6, s.te0 - u * s.speed); VREW = true; drawE1(te, dx); VREW = false;   // при перемотке штампы сцен не показываем
   ctx.save(); ctx.setTransform(1, 0, 0, 1, dx, 0); S = 1; const r = rng(hsh(Math.floor(t * 24), 71));
   ctx.fillStyle = 'rgba(20,30,60,0.28)'; ctx.fillRect(0, 0, PW, PH);
   for (let i = 0; i < 6; i++) { const y = r() * PH, h = 8 + r() * 40; ctx.fillStyle = `rgba(255,255,255,${0.08 + r() * 0.18})`; ctx.fillRect(0, y, PW, h); }
@@ -102,13 +102,13 @@ const stamp0 = stamp, label0 = label;
 function vText(x, y, fn, band = [640, 620, 1150, 0.8], dy = 0) { const pS = S, X = PW / 2 + clamp((x - 960) * 0.25, -170, 170); ctx.save(); ctx.setTransform(1, 0, 0, 1, VDX, 0); S = 1; push(X, clamp(band[0] + (y - 200) * band[3], band[1], band[2]) + dy); fn(2 * Math.min(X, PW - X) - 70); pop(); ctx.restore(); S = pS; }
 stamp = function (word, t, t0, x, y, size = 130, seed = 3000, rot = -0.04, bgs) {
   if (VFIT) return stamp0(word, t, t0, x, y, size, seed, rot, bgs);
-  const age = t - t0; if (age < 0 || age > 2.4 || VT - age < HOOK.until) return;   // штамп живёт 2,4 с; появившиеся под крючком — не показываем
+  const age = t - t0; if (VREW || age < 0 || age > 2.4 || VT - age < HOOK.until) return;   // штамп живёт 2,4 с; появившиеся под крючком — не показываем
   ctx.save(); ctx.globalAlpha = 1 - pr(age, 2.1, 2.4);
   vText(x, y, mw => { push(0, 0, 1, rot); ransom(word, 0, 0, size * 1.15, seed, { reveal: pr(t, t0, t0 + 0.25), pop: true, bgs, maxW: mw }); pop(); }, undefined, word === 'KNOCK' ? (x - 330) / 430 * 150 : 0); ctx.restore();    // три стука — лесенкой
 };
 label = function (x, y, s, w, col, rot, size) {
   if (VFIT) return label0(x, y, s, w, col, rot, size);
-  if (VT < HOOK.until) return; vText(x, y, mw => label0(0, 0, s, w, col, rot, Math.min((size ?? 46) * 1.2, (mw - 80) / (s.length * 0.62))), [930, 900, 1160, 0.3]);   // плашки — ниже штампов
+  if (VREW || VT < HOOK.until) return; vText(x, y, mw => label0(0, 0, s, w, col, rot, Math.min((size ?? 46) * 1.2, (mw - 80) / (s.length * 0.62))), [930, 900, 1160, 0.3]);   // плашки — ниже штампов
 };
 
 // ---------- поверх кадра: счётчик дня (вверху справа), крючок-заголовок (первые секунды), субтитры по слову
