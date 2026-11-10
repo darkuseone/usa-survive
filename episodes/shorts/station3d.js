@@ -32,7 +32,7 @@ function stLights() {
   ST.fill = P(0xfff0d8, 16, 16, 1.4, -3.4, 3.2, -4.6); ST.fill2 = P(0xffe6c8, 10, 12, 1.4, 4.2, 3.2, -2.6);
   ST.can = [-3.5, 3.5].map(x => P(0xffe8c0, 40, 18, 1.6, x, 4.4, 6.5));
   ST.win = P(0xfff2d0, 12, 10, 1.6, 0, 2, -0.8); ST.alarm = P(0xff3020, 0, 16, 1.4, 0, 3.2, -2.4); ST.exitL = P(0x40ff80, 0, 6, 1.6, 6.3, 2.5, -3.5);
-  ST.dark = P(0x6a7ec8, 0, 16, 1.1, 1.0, 3.0, -3.2); ST.cool = P(0x58c8e8, 0, 9, 1.5, -2.6, 1.6, -6.9); ST.carL = P(0xffb030, 0, 10, 1.6, -10.1, 0.9, 13.9); ST.dayFill = P(0xfff0dd, 0, 26, 1.2, 0, 3.6, 5.5);
+  ST.dark = P(0x8088b4, 0, 16, 1.1, 1.0, 3.0, -3.2); ST.cool = P(0x58c8e8, 0, 9, 1.5, -2.6, 1.6, -6.9); ST.carL = P(0xffb030, 0, 10, 1.6, -10.1, 0.9, 13.9); ST.dayFill = P(0xfff0dd, 0, 26, 1.2, 0, 3.6, 5.5);
   const cookie = dPaint(256, 256, (w, h) => { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#fff'; for (let y = 10; y < h; y += 30) ctx.fillRect(0, y, w, (y / 30 | 0) % 3 === 1 ? 5 : 11); });   // щели между ламелями
   ST.shaft = new T3.SpotLight(0xffd8a0, 0, 18, 0.7, 0.3, 0.9); ST.shaft.map = cookie; ST.shaft.castShadow = true; ST.shaft.shadow.mapSize.set(512, 512); ST.shaft.shadow.bias = -0.001; S3.add(ST.shaft, ST.shaft.target);
 }
@@ -162,7 +162,8 @@ function stInterior() {
 function stShutter() {
   const shT = dPaint(256, 256, () => { rectP(0, 0, 256, 256, '#8e949a', { seed: 66, line: false }); for (let y = 8; y < 256; y += 24) { stroke([[0, y], [256, y]], '#6c7278', 5, { smooth: false }); stroke([[0, y - 7], [256, y - 7]], '#b0b6bb', 3, { smooth: false }); } });
   shT.wrapS = shT.wrapT = T3.RepeatWrapping; shT.repeat.set(10, 3);
-  ST.shut = dQuad(14.2, 2.97, new T3.MeshStandardMaterial({ map: shT, roughness: 0.55, metalness: 0.35, side: T3.DoubleSide }), 0, 1.6, 0.5, { sx: 64, sy: 16, cast: true, name: 'жалюзи' }); ST.shut0 = ST.shut.geometry.attributes.position.array.slice();
+  const slT = dPaint(256, 256, () => { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 256, 256); ctx.fillStyle = '#fff'; for (let y = 8; y < 256; y += 24) ctx.fillRect(0, y - 1, 256, 3); }); slT.wrapS = slT.wrapT = T3.RepeatWrapping; slT.repeat.set(10, 3);   // щели между ламелями: свет снаружи (st.slits — только для планов изнутри)
+  ST.shut = dQuad(14.2, 2.97, new T3.MeshStandardMaterial({ map: shT, roughness: 0.55, metalness: 0.35, side: T3.DoubleSide, emissive: 0xffffff, emissiveMap: slT, emissiveIntensity: 0 }), 0, 1.6, 0.5, { sx: 64, sy: 16, cast: true, name: 'жалюзи' }); ST.shut0 = ST.shut.geometry.attributes.position.array.slice();
   dBox(14.4, 0.34, 0.5, dMat('#5c6168', { key: 'box' }), 0, 3.25, 0.45, { name: 'короб' });
   const plateM = dMat('#8a9098', { key: 'plate', metal: 0.5, rough: 0.4, lw: 8 }), boltM = new T3.MeshStandardMaterial({ color: 0xd6dade, metalness: 0.7, roughness: 0.3 });
   ST.plates = [-5.8, -3.45, -1.6, 1.6, 3.45, 5.8].map(x => { const g = new T3.Group(); g.position.set(x, 3.3, -0.15); DIO.scene.add(g); dBox(0.56, 0.34, 0.035, plateM, 0, 0, 0, { parent: g, noClip: true });
@@ -170,6 +171,10 @@ function stShutter() {
   const crack = dPaint(256, 256, () => { const r = rng(91); for (let k = 0; k < 5; k++) { let x = 128, y = 128; const P = [[x, y]], a0 = k * 1.26 + r(); for (let i = 0; i < 6; i++) { x += Math.cos(a0 + (r() - 0.5)) * 22; y += Math.sin(a0 + (r() - 0.5)) * 22; P.push([x, y]); } stroke(P, '#1c1512', 5 - k * 0.5, { smooth: false }); } });
   ST.cracks = [-0.19, 0.19].map(bx => dBill(crack, 0.7, 0.7, 1.6 + bx, 3.3, -0.128, { ry: Math.PI }));
   ST.spark = dHalo(0xffd890, 1.6, 3.3, -0.25, 0.9, 0);
+  // силуэт за жалюзи (кто-то стоит снаружи и заслоняет свет в щелях): мягкая тень между стеклом и жалюзи, st.fig
+  const fig = dPaint(256, 512, () => { ctx.filter = 'blur(7px)'; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(128, 100, 56, 62, 0, 0, 6.3); ctx.fill(); ctx.fillRect(58, 70, 150, 24);
+    ctx.beginPath(); ctx.moveTo(36, 512); ctx.lineTo(50, 214); ctx.quadraticCurveTo(128, 150, 206, 214); ctx.lineTo(220, 512); ctx.closePath(); ctx.fill(); ctx.filter = 'none'; });
+  ST.fig = dQuad(0.98, 1.95, new T3.MeshBasicMaterial({ map: fig, transparent: true, opacity: 0, depthWrite: false, fog: false, side: T3.DoubleSide }), 0, SWK + 0.975, 0.27, { recv: false, noClip: true }); ST.fig.visible = false;
 }
 
 // ---------- навес: панели света, столбы, колонки на островках, столб с ценой
@@ -189,7 +194,7 @@ function stCanopy() {
 // ---------- машина: кузов, кабина, стёкла, колёса с колпаками, бамперы, фары (мигают при сигнализации)
 function stCar(x, z, ry) {
   const g = ST.car = new T3.Group(); g.position.set(x, 0, z); g.rotation.y = ry; DIO.scene.add(g); const O = { parent: g };
-  const body = dMat('#4f6f9a', { key: 'carBody', lw: 7 }), dark = dMat('#1c1d22', { key: 'carDark' }), gl = new T3.MeshStandardMaterial({ color: 0x18263e, roughness: 0.12, metalness: 0.5, emissive: 0x0a1424 }), chrome = new T3.MeshStandardMaterial({ color: 0xc9cfd4, metalness: 0.7, roughness: 0.3 });
+  const body = dMat('#8fb0d4', { key: 'carBody', lw: 7 }), dark = dMat('#1c1d22', { key: 'carDark' }), gl = new T3.MeshStandardMaterial({ color: 0x18263e, roughness: 0.12, metalness: 0.5, emissive: 0x0a1424 }), chrome = new T3.MeshStandardMaterial({ color: 0xc9cfd4, metalness: 0.7, roughness: 0.3 });
   dBox(1.85, 0.55, 4.3, body, 0, 0.64, 0, { ...O, name: 'машина' }); dBox(1.66, 0.52, 2.2, body, 0, 1.17, -0.3, { ...O, name: 'кабина' });
   dBox(1.5, 0.36, 0.04, gl, 0, 1.17, 0.815, { ...O, noClip: true }); dBox(1.5, 0.36, 0.04, gl, 0, 1.17, -1.415, { ...O, noClip: true }); [-0.84, 0.84].forEach(sx => dBox(0.04, 0.34, 1.8, gl, sx, 1.18, -0.3, { ...O, noClip: true }));
   [[-0.93, 1.38], [0.93, 1.38], [-0.93, -1.38], [0.93, -1.38]].forEach(([wx, wz]) => { dCyl(0.37, 0.37, 0.26, dark, wx, 0.37, wz, { ...O, rz: Math.PI / 2, noClip: true }); dCyl(0.19, 0.19, 0.28, chrome, wx, 0.37, wz, { ...O, rz: Math.PI / 2, seg: 12, noClip: true }); });
@@ -234,9 +239,9 @@ function stNeon() {
   [[-6.6, 0xc8242c], [-5.65, 0x2a6ad8]].forEach(([x, c]) => N.night.push(dHalo(c, x, 1.3, 1.6, 2.0, 0.3)));
   const lampHead = dMat('#2a2e36', { key: 'lampHead' });
   [[-12, 14.2], [12, 14.2], [30, 14.2], [-30, 14.2]].forEach(([x, z]) => { dCyl(0.1, 0.12, 6.5, dMat('#4a4e56', { key: 'lampPole' }), x, 3.25, z, { name: 'фонарь' }); dBox(1.2, 0.18, 0.4, lampHead, x + 0.5, 6.5, z, { noClip: true }); dBox(0.9, 0.04, 0.3, dGlow(0xffb060, 3), x + 0.5, 6.4, z, { cast: false, glow: true });
-    const l = new T3.PointLight(0xffa040, 18, 13, 1.5); l.position.set(x + 0.5, 6.2, z); DIO.scene.add(l); N.night.push(dHalo(0xffa040, x + 0.5, 6.35, z, 3.0, 0.5), dCone(0xffa040, x + 0.5, 6.35, z, 2.6, 6.3, 0.07), dRefl(0xffa040, x + 0.5, z + 2.5, 2.4, 5, 0.2), l); });
-  dCyl(0.18, 0.22, 7, dMat('#3a3d44', { key: 'mPole' }), -16, 3.5, 31); N.night.push(...dNeon('MOTEL', '#ff4fb0', -16, 7.6, 31.2, 3.6, { refl: false, halo: 0.4, fog: false, size: 110 }), ...dNeon('VACANCY', '#40f0ff', -16, 6.3, 31.2, 2.8, { refl: false, halo: 0.35, fog: false, size: 100 }));
-  dCyl(0.15, 0.18, 4.6, dMat('#3a3d44', { key: 'mPole' }), 17, 2.3, 33.2); N.night.push(...dNeon('EAT', '#ffd040', 17, 5.2, 33, 3.2, { refl: false, halo: 0.45, fog: false }));
+    const l = new T3.PointLight(0xffa040, 70, 18, 1.5); l.position.set(x + 0.5, 6.2, z); DIO.scene.add(l); N.night.push(dHalo(0xffa040, x + 0.5, 6.35, z, 3.0, 0.5), dCone(0xffa040, x + 0.5, 6.35, z, 2.6, 6.3, 0.07), dRefl(0xffa040, x + 0.5, z + 2.5, 2.4, 5, 0.2), l); });
+  dCyl(0.18, 0.22, 7, dMat('#3a3d44', { key: 'mPole' }), -16, 3.5, 31); N.night.push(...dNeon('MOTEL', '#ff4fb0', -16, 7.6, 31.2, 3.6, { refl: false, halo: 0.4, fog: false, size: 110, ry: Math.PI }), ...dNeon('VACANCY', '#40f0ff', -16, 6.3, 31.2, 2.8, { refl: false, halo: 0.35, fog: false, size: 100, ry: Math.PI }));
+  dCyl(0.15, 0.18, 4.6, dMat('#3a3d44', { key: 'mPole' }), 17, 2.3, 33.2); N.night.push(...dNeon('EAT', '#ffd040', 17, 5.2, 33, 3.2, { refl: false, halo: 0.45, fog: false, ry: Math.PI }));
   ST.traffic = dHalo(0xffb000, 22, 5.2, 17, 1.4, 0.9); dBox(0.4, 1.0, 0.35, dMat('#1c1d22', { key: 'tl' }), 22, 5.2, 17.15, { noClip: true }); dTube([[14, 6.2, 17], [22, 5.8, 17], [30, 6.2, 17]], 0.03, new T3.MeshBasicMaterial({ color: 0x0c0c12 }), { cast: false, noClip: true });
   for (let x = -6; x <= 6; x += 3) for (const z of [4.5, 8.5]) N.cones.push(dCone(0xfff0d0, x, 4.55, z, 1.3, 4.5, 0.05));
   N.store.push(...dNeon('ICE COLD', '#5ad8ff', -2.3, 3.15, -7.8, 2.6, { refl: false, halo: 0.25, size: 84 }));
@@ -276,8 +281,8 @@ function stSet(t, st = {}) {
   ST.nx.store.forEach(o => { o.visible = neon && nf > 0; }); ST.nx.night.forEach(o => { o.visible = dark; });
   ST.can.forEach(l => l.intensity = cnp * 40); ST.canLamps.forEach(l => { l.material.emissiveIntensity = 0.05 + 2.5 * cnp; l.userData.glow = cnp > 0.15; });
   ST.nx.cones.forEach(c => { c.visible = dark && cnp > 0.4; c.material.opacity = 0.05 * cnp; }); ST.traffic.material.opacity = dark && Math.floor(t * 1.4) % 2 ? 0.9 : 0.05;
-  ST.door.position.x = 1.85 * sm(st.door ?? 0); stShutter2(st.shut ?? 0, Math.min(0.7, st.bulge ?? 0), t, st.dents ?? 0, st.knock); ST.btn.position.y = st.btnDown ? 1.215 : 1.245; stClock(st.clock || '3:07');
-  const ca = st.car ? (Math.floor(t * 3.2) % 2 ? 1 : 0.06) : 0; ST.carLights.forEach(m => m.material.emissiveIntensity = 0.15 + 3.2 * ca); ST.carL.intensity = ca * 16; ST.carHalo[0].material.opacity = 0.75 * ca; ST.carHalo[1].material.opacity = 0.3 * ca;
+  ST.door.position.x = 1.85 * sm(st.door ?? 0); stShutter2(st.shut ?? 0, Math.min(0.7, st.bulge ?? 0), t, st.dents ?? 0, st.knock); ST.shut.material.emissive.setHex(st.slitCol ?? 0xffc890); ST.shut.material.emissiveIntensity = (st.slits ?? 0) * 1.8; ST.fig.visible = (st.fig ?? 0) > 0.01; ST.fig.material.opacity = 0.66 * (st.fig ?? 0); ST.btn.position.y = st.btnDown ? 1.215 : 1.245; stClock(st.clock || '3:07');
+  const ca = st.car ? (Math.floor(t * 3.2) % 2 ? 1 : 0.06) : 0; ST.carLights.forEach(m => m.material.emissiveIntensity = 0.15 + 2.0 * ca); ST.carL.intensity = ca * 12; ST.carHalo[0].material.opacity = 0.45 * ca; ST.carHalo[1].material.opacity = 0.25 * ca;
   const sh = st.shafts ?? 0; ST.shaft.intensity = sh * 60; if (sh) { const sx = st.shaftX ?? 1; ST.shaft.color.setHex(st.shaftCol ?? 0xffd8a0); ST.shaft.position.set(sx, 2.7, -0.25); ST.shaft.target.position.set(sx + (st.shaftTX ?? 1.6), 0.4, -3.6); ST.shaft.target.updateMatrixWorld(); }
   // анкерная пластина с двумя болтами (x = 1.6): pop = [t1, t2] — болты вылетают по очереди, пластина повисает и падает
   const P = ST.plates[3], [p1, p2] = st.pop || [1e9, 1e9], u1 = t - p1, u2 = t - p2, jit = (st.bulge ?? 0) * 0.004 * Math.sin(t * 47);
@@ -293,6 +298,8 @@ function stSet(t, st = {}) {
   ST.crowd.forEach((c, k) => { const vis = !!cr && k < n; c.q.visible = vis; if (!vis) return; const fr = (Math.floor(t * 8) + c.ph) % 8; let q = 0, set = 'pound';
     if (cr === 'gather') { q = 1 - clamp(ck * 1.35 - c.lag * 0.35); set = q > 0.001 ? 'walkFront' : 'pound'; }
     if (cr === 'leave') { q = clamp(ck * 1.4 - c.lag * 0.4); set = q > 0.001 ? 'walkBack' : 'pound'; }
-    const [x, z] = q > 0 ? stPath(c, q) : c.home; c.set(ST.poses[set][c.v * 8 + fr]); c.q.position.set(x, (z < 1.75 ? SWK : 0) + c.hM * (660 / 740 - 0.5), z); });
+    const [x, z] = q > 0 ? stPath(c, q) : c.home; c.q.position.set(x, (z < 1.75 ? SWK : 0) + c.hM * (660 / 740 - 0.5), z); c.fr = c.v * 8 + fr;
+    if (set === 'pound') { c.mv = null; c.pose = 'pound'; } else { const [x2, z2] = stPath(c, clamp(q + (cr === 'leave' ? 0.02 : -0.02))); c.mv = [x2 - x, z2 - z]; c.pose = st.crowdPose || null; } });
 }
-function stFace() { const c = DIO.cam.position; [...DIO.cards, ...DIO.crowd].forEach(d => { const q = d.q; if (q.visible) q.rotation.set(0, Math.atan2(c.x - q.position.x, c.z - q.position.z), 0); }); }
+function stFace() { const c = DIO.cam.position; [...DIO.cards, ...DIO.crowd].forEach(d => { const q = d.q; if (!q.visible) return; q.rotation.set(0, Math.atan2(c.x - q.position.x, c.z - q.position.z), 0);
+  if (d.fr != null) d.set(ST.poses[d.pose || (d.mv[0] * (c.x - q.position.x) + d.mv[1] * (c.z - q.position.z) > 0 ? 'walkFront' : 'walkBack')][d.fr]); }); }   // идущий к камере — лицом, от камеры — спиной
