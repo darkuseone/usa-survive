@@ -19,7 +19,7 @@ function person(o) {
   leanPush(o);
   const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personArms(o, 'back'); personBody(o); pop();
   ellP(0, 108, 66, 15, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.2, seed: 58 });                                              // тень от головы на плечах
-  const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52); push(jh[0], jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
+  const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52), tr = o.tremble ? Math.sin(step(o.t ?? 0, 24) * 61) * 3.5 * o.tremble : 0; push(jh[0] + tr, jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt + tr * 0.004); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
   personArms(o);
   pop(); pop();
 }
@@ -122,6 +122,7 @@ function personHead(o) {
     const r = rng(102); ctx.fillStyle = PC.stub; if (o.stubble) for (let i = 0; i < 90; i++) { const a = 0.2 + r() * 2.7, rr = 0.6 + r() * 0.4, x = Math.cos(a) * 84 * rr, y = 44 + Math.sin(a) * 72 * rr; if (y < 60) continue; ctx.globalAlpha = 0.55; ctx.fillRect(x, y, 2.4, 2.4); }   // щетина
     ctx.globalAlpha = 1; if (o.freckles) [[-54, 28], [-44, 36], [-62, 40], [52, 30], [42, 38], [62, 42], [-50, 46], [50, 48]].forEach(([x, y]) => dot(x, y, 3, '#d58a5e', 0.85));     // веснушки
     ellP(-60, 40, 18, 10, '#f2a99a', { line: false, a: 0.3, tex: false }); ellP(60, 40, 18, 10, '#f2a99a', { line: false, a: 0.3, tex: false });
+    if (o.pale) { ctx.fillStyle = `rgba(150,205,190,${0.38 * o.pale})`; ctx.fillRect(-120, -120, 240, 260); }                     // бледность от страха
   } });
   // глаза-овалы (как в «ЮП»), мешки, веки
   const bl = Math.max(blinkAt(t, 3), o.blink ?? 0); let lid = bl ? 1 : (o.lid ?? 0.12);
@@ -131,8 +132,11 @@ function personHead(o) {
     const eb = o.eyeBig === sd ? 1.24 : 1, ex = sd * 28, ey = -10, rx = 28 * big * eb, ry = 34 * big * eb;
     if (lid > 0.95) { stroke([[ex - 24, ey + 4], [ex, ey + 10], [ex + 24, ey + 4]], PC.line, 5); return; }
     piece(ellPts(ex, ey, rx, ry, 0, 32), '#fbfaf6', { seed: 110 + sd, lw: 2.8, tex: false, shade: () => {
-      const pr2 = mood === 'shock' || mood === 'dread' ? 5 : 7.5; dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c'); dot(ex + lk[0] * 13 - sd * 3 - 3, ey + 1 + lk[1] * 12, 2.4, '#ffffff', 0.9);
+      const pr2 = (mood === 'shock' || mood === 'dread' ? 5 : 7.5) * (o.pupil ?? 1); dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c'); dot(ex + lk[0] * 13 - sd * 3 - 3, ey + 1 + lk[1] * 12, 2.4, '#ffffff', 0.9);
       if (lid > 0.02) { const ly = ey - ry + lid * ry * 2; piece([[ex - rx - 3, ey - ry - 4], [ex + rx + 3, ey - ry - 4], [ex + rx + 3, ly], [ex - rx - 3, ly]], PC.skin, { raw: true, line: false }); stroke([[ex - rx, ly], [ex + rx, ly]], PC.line, 4); }
+      const tl = o.eyeTilt ?? 0;                                        // косые веки: >0 тревога/страх (внутренние уголки вверх), <0 злость/решимость
+      if (tl) { const xi = ex - sd * rx, xo = ex + sd * rx, top = ey - ry - 6, yi = ey - ry + Math.max(0, -tl) * ry * 1.05 + Math.max(0, tl) * ry * 0.08, yo = ey - ry + Math.max(0, tl) * ry * 0.95 + Math.max(0, -tl) * ry * 0.1;
+        piece([[xi - sd * 4, top], [xo + sd * 4, top], [xo + sd * 4, yo], [xi - sd * 4, yi]], PC.skin, { raw: true, line: false }); stroke([[xi, yi], [xo, yo]], PC.line, 6); }
     } });
     stroke([[ex - 18, ey + ry + 8], [ex, ey + ry + 13], [ex + 18, ey + ry + 7]], '#b98974', 2.6, { a: 0.9 });              // мешки
   });
@@ -147,6 +151,11 @@ function personHead(o) {
   if (mood === 'eww' && m.open < 0.06) { mouth(0, 64, 54, { open: 0.35, round: 0 }, { noTeeth: true }); piece(spline([[-8, 76], [10, 76], [8, 100], [-6, 100]], true, 5), '#e07a8a', { raw: true, lw: 2.2 }); }
   else if (mood === 'dread' && m.open < 0.06) mouth(0, 64, 46, { open: 0.0 }, { smile: -0.9 });
   else if (o.scream) screamMouth(0, 62, 64, o.scream);
+  else if (o.mouthKind === 'clench') mouth(0, 62, 58, { open: 0 }, { clench: true });
+  else if (o.mouthKind === 'wavy') stroke([[-30, 66], [-18, 58], [-6, 68], [6, 58], [18, 68], [30, 60]], '#1c1512', 4.5, { smooth: true });
+  else if (o.mouthKind === 'grimace') { const P = [[-40, 54], [40, 54], [36, 80], [-36, 80]]; piece(P, '#2a0e0e', { raw: true, lw: 3 }); rectP(-36, 56, 72, 11, '#fbf7ef', { raw: true, line: false }); rectP(-32, 69, 64, 9, '#fbf7ef', { raw: true, line: false });
+    for (let i = -2; i <= 2; i++) stroke([[i * 13, 56], [i * 13, 78]], '#1c1512', 2); }
+  else if (o.mouthKind === 'puff') { [-1, 1].forEach(sd => { stroke([[sd * 40, 34], [sd * 64, 46], [sd * 46, 70]], PC.skinD, 3); ellP(sd * 58, 50, 16, 10, '#e88a7a', { line: false, a: 0.45, tex: false }); }); stroke([[-14, 66], [0, 63], [14, 66]], '#1c1512', 4.5); }
   else mouth(0, 62, 58, m, { smile: o.smile ?? (mood === 'dumb' ? 0.8 : 0), smirk: o.smirkN ?? 0 });
     hairdo(o.hair || 'short', o);
   if (o.beard) piece(spline([[-92, 30], [-70, 96], [-30, 128], [0, 134], [30, 128], [70, 96], [92, 30], [70, 70], [30, 92], [0, 88], [-30, 92], [-70, 70]], true, 6), PC.hair, { seed: 130, step: 10, edge: 1.1 });

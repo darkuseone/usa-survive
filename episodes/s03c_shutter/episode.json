@@ -1,0 +1,1 @@
+{"timeline": "episodes/s03c_shutter/out/timeline.json", "size": [1920, 1080], "page": [1080, 1920], "libs": ["engine/vendor/three.r180.js", "engine/chars.js", "engine/dio.js", "episodes/e01_gas/set_store.js", "episodes/e01_gas/scenes.js", "episodes/shorts/station3d.js"], "scripts": ["combo.js"]}
