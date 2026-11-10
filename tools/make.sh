@@ -12,7 +12,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 EP=$1; MODE=${2:-all}; B=build/$EP; PY=${PY:-$( [ -x .venv/bin/python ] && echo .venv/bin/python || echo python3 )}
-PARTLEN=${PART:-60}; WORKERS=${WORKERS:-4}
+PARTLEN=${PART:-60}; WORKERS=${WORKERS:-4}; FPS=$(python3 -c "import json; print(json.load(open('episodes/$EP/episode.json')).get('fps', 24))")
 python3 tools/mkpage.py "$EP" >/dev/null
 if [ "$MODE" = snap ]; then node tools/shot.cjs "$B/film" "$B/snaps" ${3//,/ } | tail -1; exit 0; fi
 if [ "$MODE" = dbg ]; then node tools/dbg.cjs "$B/film" | tail -3; exit 0; fi
@@ -28,7 +28,7 @@ if [ "$MODE" != mux ]; then
   for A in $(python3 -c "import math; d=$DUR; print(' '.join(f'{i*$PARTLEN:07.2f}' for i in range(math.ceil(d/$PARTLEN))))"); do
     P="$B/parts/$A.mp4"; [ -s "$P" ] && { echo "часть $A — готова, пропускаю"; continue; }
     E=$(python3 -c "print($A + $PARTLEN)"); python3 tools/mkpage.py "$EP" --part "$A" "$E" "$B/part_$A" >/dev/null
-    echo "часть $A…$E: рендер"; npx hyperframes render "$B/part_$A" -f 24 -q high -w "$WORKERS" -o "$P.tmp.mp4" > "$B/render_$A.log" 2>&1 && mv "$P.tmp.mp4" "$P"
+    echo "часть $A…$E: рендер"; npx hyperframes render "$B/part_$A" -f "$FPS" -q high -w "$WORKERS" -o "$P.tmp.mp4" > "$B/render_$A.log" 2>&1 && mv "$P.tmp.mp4" "$P"
     rm -rf "$B/part_$A"
   done
 fi

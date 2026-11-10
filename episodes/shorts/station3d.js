@@ -28,7 +28,7 @@ function stBuild() {
   // ---- земля: асфальт с пятнами и разметкой парковки, лужи, тротуар, трасса
   const asph = dPaper('#2b2f38', { key: 'asph', w: 512, h: 512, rep: [12, 12], edge: false, fibers: 400, fn: (w, h) => { const r = rng(21); for (let i = 0; i < 14; i++) ellP(r() * w, r() * h, 20 + r() * 50, 10 + r() * 30, 'rgba(15,16,22,0.35)', { raw: true, line: false, tex: false });
     for (let i = 0; i < 6; i++) stroke([[r() * w, r() * h], [r() * w, r() * h], [r() * w, r() * h]], 'rgba(10,10,14,0.5)', 2); } });
-  dQuad(160, 160, new T3.MeshStandardMaterial({ map: asph, roughness: 0.62 }), 0, 0, 0, { rx: -Math.PI / 2 });
+  ST.asphTex = asph; dQuad(160, 160, new T3.MeshStandardMaterial({ map: asph, roughness: 0.42, metalness: 0.15 }), 0, 0, 0, { rx: -Math.PI / 2 });
   const puddle = new T3.MeshStandardMaterial({ color: 0x0c1020, roughness: 0.08, metalness: 0.6, transparent: true, opacity: 0.75 });
   [[-3, 4.2, 1.6, 0.8], [3.8, 8.4, 2.2, 1.0], [-6.5, 9.5, 1.4, 0.6], [1.2, 12.5, 2.6, 1.1], [7, 3.5, 1.2, 0.5]].forEach(([x, z, a, b]) => { const e = new T3.Mesh(new T3.CircleGeometry(1, 28), puddle); e.scale.set(a, b, 1); dAdd(e, x, 0.012, z, { rx: -Math.PI / 2, cast: false }); });
   for (let x = -7; x <= 7; x += 2.8) dQuad(0.12, 4, dGlow(0xd9d4c4, 0.15), x, 0.013, 12.8, { rx: -Math.PI / 2 });           // разметка стоянки
@@ -140,6 +140,7 @@ function stBuild() {
   ST.crowd = Array.from({ length: 40 }, (_, k) => { const c = dCrowdCard(1.95 + rng(500 + k)() * 0.25); const q = rng(600 + k); c.home = [-6.2 + (k % 14) * 0.95 + (q() - 0.5) * 0.4, 0.75 + Math.floor(k / 14) * 0.85 + q() * 0.3]; c.v = k % 3; c.ph = Math.floor(q() * 8); return c; });
   // герои
   ST.joe = dCard(2.05, 1); ST.z1 = dCard(2.05, 1);
+  stNeon();
 }
 function stRain(t, a) { ST.rain.visible = a > 0; if (!a) return; ST.rain.material.opacity = 0.45 * a; const p = ST.rain.geometry.attributes.position.array;
   ST.rain0.forEach(([x, y, z, v], i) => { const yy = ((y - t * 9 * v) % 12 + 12) % 12, xx = x - (12 - yy) * 0.12; p.set([xx, yy, z, xx + 0.04, yy + 0.35, z], i * 6); }); ST.rain.geometry.attributes.position.needsUpdate = true; }
@@ -170,7 +171,7 @@ function stSet(t, st = {}) {
   ST.shaft.intensity = (st.shafts ?? 0) * 40; if (st.shafts) ST.shaft.target.position.set(lerp(-2, 5, st.shaftK ?? 0.5), 0, lerp(-5, -2.5, st.shaftK ?? 0.5));
   ST.bolts.forEach((b, i) => { const pop = (st.bolts || [])[i]; if (pop == null || t < pop) { b.position.set([-2.3, 2.3, -4.6, 4.6][i], 2.75, 0.12); b.rotation.set(Math.PI / 2, 0, 0); return; }
     const u = t - pop; b.position.set([-2.3, 2.3, -4.6, 4.6][i] + u * 1.2 * (i % 2 ? 1 : -1), 2.75 + u * 2.5 - 4.9 * u * u, 0.12 - u * 3.0); b.rotation.set(Math.PI / 2 + u * 14, u * 9, 0); });
-  stRain(t, st.rain ?? 1);
+  stRain(t, st.rain ?? 1); stNeonSet(t, st);
   // толпа: 'pound' — у жалюзи, 'gather' — сходятся к магазину (k 0..1), 'leave' — расходятся (k 0..1), иначе скрыта
   const cr = st.crowd, ck = st.crowdK ?? 1, n = st.crowdN ?? 40;
   ST.crowd.forEach((c, k) => { const on = cr && k < n; c.q.visible = !!on; if (!on) return; const [hx, hz] = c.home, r = rng(700 + k), fr = (Math.floor(t * 8) + c.ph) % 8;
@@ -180,3 +181,62 @@ function stSet(t, st = {}) {
     c.set(ST.poses[set][c.v * 8 + fr]); c.q.position.set(x, c.hM * (660 / 740 - 0.5), z); const cp = DIO.cam.position; c.q.rotation.set(0, Math.atan2(cp.x - x, cp.z - z), 0); });
 }
 function stFace() { const c = DIO.cam.position; [...DIO.cards.map(d => d.q), ...ST.crowd.map(d => d.q)].forEach(q => { if (q.visible) q.rotation.set(0, Math.atan2(c.x - q.position.x, c.z - q.position.z), 0); }); }
+
+/* ---------- неон, свечение, объёмный свет, мокрые отражения, детали (v2: «как в кино») */
+function dGlowTex() { if (ST.glowTex) return ST.glowTex; return (ST.glowTex = dPaint(128, 128, () => { const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128); })); }
+function dHalo(col, x, y, z, s, a = 0.8) { const m = new T3.SpriteMaterial({ map: dGlowTex(), color: col, blending: T3.AdditiveBlending, transparent: true, depthWrite: false, opacity: a }); const sp = new T3.Sprite(m); sp.position.set(x, y, z); sp.scale.set(s, s, 1); DIO.scene.add(sp); return sp; }
+function dNeonTex(text, col, w = 512, h = 160, size = 96, font = "'Osw'") { return dPaint(w, h, () => { ctx.clearRect(0, 0, w, h); ctx.font = `600 ${size}px ${font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = col; for (const [b, a] of [[40, 0.9], [18, 1], [6, 1]]) { ctx.shadowBlur = b; ctx.globalAlpha = a; ctx.fillStyle = col; ctx.fillText(text, w / 2, h / 2); } ctx.shadowBlur = 0; ctx.globalAlpha = 1; ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.85; ctx.fillText(text, w / 2, h / 2); }); }
+function dNeon(text, col, x, y, z, w, o = {}) { const tx = dNeonTex(text, col, 512, 160, o.size || 96, o.font); const q = dQuad(w, w * 160 / 512, new T3.MeshBasicMaterial({ map: tx, transparent: true, depthWrite: false, blending: T3.AdditiveBlending, side: T3.DoubleSide }), x, y, z, { ry: o.ry, recv: false });
+  const halo = dHalo(col, x, y, z + (o.hz ?? 0.05), w * 1.6, o.halo ?? 0.35); const rf = o.refl !== false ? dRefl(col, x, z + (o.rz ?? 0.8), w * 0.7, o.rl ?? 2.4, o.ra ?? 0.32) : null; return { q, halo, rf }; }
+function dRefl(col, x, z, w, l, a) { const m = new T3.MeshBasicMaterial({ map: dGlowTex(), color: col, blending: T3.AdditiveBlending, transparent: true, depthWrite: false, opacity: a }); const q = new T3.Mesh(new T3.PlaneGeometry(w, l), m); q.rotation.x = -Math.PI / 2; q.position.set(x, 0.02, z); DIO.scene.add(q); return q; }   // мокрый асфальт: размытое отражение неона
+function dCone(col, x, y, z, r, h, a = 0.09) { const tx = dPaint(64, 256, () => { const g = ctx.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(0,0,0,1)'); ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 256); });
+  const m = new T3.MeshBasicMaterial({ map: tx, color: col, blending: T3.AdditiveBlending, transparent: true, depthWrite: false, opacity: a, side: T3.DoubleSide }); const c = new T3.Mesh(new T3.ConeGeometry(r, h, 28, 1, true), m); c.position.set(x, y - h / 2, z); DIO.scene.add(c); return c; }   // объёмный луч под лампой
+
+function stNeon() {
+  const N = ST.nx = { store: [], night: [], cones: [] };
+  // навес: неоновые кромки (бирюза) и розовая полоса на фасаде
+  const cyan = 0x38e8ff, pink = 0xff3fa0, gold = 0xffc840;
+  [[0, 4.6, 2.0, 16.2, 0], [0, 4.6, 11.0, 16.2, 0], [-8.05, 4.6, 6.5, 9, Math.PI / 2], [8.05, 4.6, 6.5, 9, Math.PI / 2]].forEach(([x, y, z, l, ry]) => { const b = dBox(l, 0.06, 0.06, dGlow(cyan, 3.2), x, y, z, { cast: false, ry }); N.night.push(b); });
+  N.store.push(dBox(14.3, 0.07, 0.07, dGlow(pink, 3.0), 0, 3.66, 0.2, { cast: false }));
+  for (let x = -6; x <= 6; x += 3) N.night.push(dHalo(cyan, x, 4.55, 2.0, 1.4, 0.35));
+  // неон в витрине (виден и снаружи, и изнутри) + отражения на мокром асфальте
+  [['BEER', 0x3fa8ff, -5.4, 2.1], ['LOTTO', gold, -2.9, 2.25], ['OPEN', 0xff3a3a, 3.0, 2.2]].forEach(([s, c, x, y]) => { const n = dNeon(s, '#' + c.toString(16).padStart(6, '0'), x, y, -0.06, 1.5, { rz: 1.6 }); N.store.push(n.q, n.halo, n.rf); });
+  // торговые автоматы у стены (светятся), фонари трассы с лучами, мотель и закусочная через дорогу, мигающий светофор
+  [[-6.6, '#c8242c', 'COLA'], [-5.6, '#2a6ad8', 'ICE COLD']].forEach(([x, c, s], i) => { const f = new T3.MeshStandardMaterial({ map: dSign(220, 420, c, s, 44, '#fbf8f0', 'Inter Black', { fn: (w, h) => { for (let r = 0; r < 4; r++) for (let q = 0; q < 3; q++) rectP(24 + q * 62, 120 + r * 60, 48, 46, '#fbf8f0', { seed: 50 + r * 3 + q, lw: 2 }); } }), emissive: 0xffffff, emissiveIntensity: 0.55 });
+    f.emissiveMap = f.map; dBox(0.85, 1.9, 0.75, [dMat(c, { key: 'vend' + i }), dMat(c, { key: 'vend' + i }), dMat(c, { key: 'vend' + i }), dMat(c, { key: 'vend' + i }), f, dMat(c, { key: 'vend' + i })], x, 0.95, 1.35); N.night.push(dHalo(c, x, 1.2, 1.8, 2.2, 0.35)); });
+  const lampHead = dMat('#2a2e36', { key: 'lampHead' });
+  [[-12, 14.2], [12, 14.2], [30, 14.2], [-30, 14.2]].forEach(([x, z]) => { dCyl(0.1, 0.12, 6.5, dMat('#4a4e56', { key: 'lampPole' }), x, 3.25, z); dBox(1.2, 0.18, 0.4, lampHead, x + 0.5, 6.5, z); dBox(0.9, 0.04, 0.3, dGlow(0xffb060, 3), x + 0.5, 6.4, z, { cast: false });
+    N.night.push(dHalo(0xffa040, x + 0.5, 6.35, z, 3.2, 0.55), dCone(0xffa040, x + 0.5, 6.35, z, 2.6, 6.3, 0.07), dRefl(0xffa040, x + 0.5, z + 2.5, 2.4, 5, 0.22)); const l = new T3.PointLight(0xffa040, 18, 12, 1.6); l.position.set(x + 0.5, 6.2, z); DIO.scene.add(l); N.night.push(l); });
+  const motel = new T3.Group(); DIO.scene.add(motel); motel.position.set(-16, 0, 31); dCyl(0.18, 0.22, 7, dMat('#3a3d44', { key: 'mPole' }), 0, 3.5, 0, { parent: motel });
+  [['MOTEL', '#ff4fb0', 7.6, 3.4], ['VACANCY', '#40f0ff', 6.3, 2.6]].forEach(([s, c, y, w]) => { const t = dNeonTex(s, c, 512, 160, 110); const q = new T3.Mesh(new T3.PlaneGeometry(w, w * 160 / 512), new T3.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: T3.AdditiveBlending, fog: false }));
+    q.position.set(0, y, 0.2); motel.add(q); N.night.push(q); const h = dHalo(c, -16, y, 31.3, w * 1.8, 0.45); N.night.push(h); });
+  const eat = dNeon('EAT', '#ffd040', 17, 5.2, 33, 3.2, { refl: false, halo: 0.5 }); N.night.push(eat.q, eat.halo); dCyl(0.15, 0.18, 4.6, dMat('#3a3d44', { key: 'mPole' }), 17, 2.3, 33.2);
+  ST.traffic = dHalo(0xffb000, 22, 5.2, 17, 1.4, 0.9); dBox(0.4, 1.0, 0.35, dMat('#1c1d22', { key: 'tl' }), 22, 5.2, 17.15); dTube([[14, 6.2, 17], [22, 5.8, 17], [30, 6.2, 17]], 0.03, new T3.MeshBasicMaterial({ color: 0x0c0c12 }), { cast: false });
+  // под навесом — лучи от панелей, внутри — дымка в свете ламп
+  for (let x = -6; x <= 6; x += 3) for (const z of [4.5, 8.5]) N.cones.push(dCone(0xfff0d0, x, 4.55, z, 1.3, 4.5, 0.05));
+  // внутри: слаш-машина, банкомат, табличка «мокрый пол», баннеры под потолком, неон над холодильниками
+  dBox(0.9, 0.7, 0.55, dMat('#2a2c30', { key: 'slushB' }), -6.5, 1.35, -2.6);
+  [['#ff3a6a', -6.75], ['#3ad0ff', -6.5], ['#a6ff3a', -6.25]].forEach(([c, x]) => { const m = new T3.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 1.6, transparent: true, opacity: 0.85, roughness: 0.2 }); dCyl(0.11, 0.11, 0.45, m, x, 1.92, -2.6); });
+  dBox(0.7, 1.6, 0.6, [dMat('#3a3d44', { key: 'atm' }), dMat('#3a3d44', { key: 'atm' }), dMat('#3a3d44', { key: 'atm' }), dMat('#3a3d44', { key: 'atm' }), new T3.MeshStandardMaterial({ map: dSign(160, 360, '#2a2c30', 'ATM', 52, '#3ad0ff', 'Inter Black', { dy: -120, fn: (w, h) => rectP(20, 140, w - 40, 90, '#2a6ad8', { seed: 60, lw: 3 }) }), emissive: 0x2a6ad8, emissiveIntensity: 0.6 }), dMat('#3a3d44', { key: 'atm' })], 6.55, 0.8, -1.0, { ry: -Math.PI / 2 });
+  const wet = dPaint(128, 160, () => { piece([[64, 6], [120, 154], [8, 154]], '#f2c230', { seed: 61, lw: 4 }); txt('WET', 64, 96, 28, { font: 'Inter Black', col: '#1c1512' }); txt('FLOOR', 64, 124, 22, { font: 'Inter Black', col: '#1c1512' }); });
+  dBill(wet, 0.55, 0.7, -0.9, 0.35, -1.6, { cast: true, ry: 0.5 });
+  [['SALE!', '#d8342c', -4.0, -3.4], ['2 FOR $3', '#f2c230', -1.6, -5.2], ['COLD!', '#3d7fc4', 2.2, -6.2]].forEach(([s, c, x, z], i) => { const tx = dSign(300, 140, c, s, 64, i === 1 ? '#1c1512' : '#fbf8f0'); dQuad(1.1, 0.5, new T3.MeshStandardMaterial({ map: tx, side: T3.DoubleSide }), x, 2.95, z, { ry: 0.3 * (i - 1) }); });
+  const ice = dNeon('ICE COLD', '#5ad8ff', -3.6, 3.15, -7.8, 2.4, { refl: false, halo: 0.3 }); N.store.push(ice.q, ice.halo);
+  ST.inPink = new T3.PointLight(0xff3fa0, 5, 6, 1.6); ST.inPink.position.set(-2.9, 2.2, -0.6); DIO.scene.add(ST.inPink); N.store.push(ST.inPink);
+  ST.cyanL = new T3.PointLight(0x38e8ff, 10, 14, 1.6); ST.cyanL.position.set(0, 4.3, 6.5); DIO.scene.add(ST.cyanL); N.night.push(ST.cyanL);
+  // пылинки в свете ламп
+  const n = 360, pp = new Float32Array(n * 3), rr = rng(81); ST.dust0 = []; for (let i = 0; i < n; i++) ST.dust0.push([rr() * 13 - 6.5, rr() * 3.3, -rr() * 7.6, rr()]);
+  const dg = new T3.BufferGeometry(); dg.setAttribute('position', new T3.BufferAttribute(pp, 3)); ST.dust = new T3.Points(dg, new T3.PointsMaterial({ color: 0xfff2d8, size: 0.025, transparent: true, opacity: 0.55, depthWrite: false, blending: T3.AdditiveBlending })); DIO.scene.add(ST.dust);
+  // мокрый асфальт блестит
+  DIO.scene.children.forEach(o => { if (o.material && o.material.map === ST.asphTex) { o.material.roughness = 0.42; o.material.metalness = 0.15; } });
+}
+function stNeonSet(t, st) {
+  const sky = st.sky || 'night', dark = sky !== 'day', on = st.neon ?? true, fl = (k) => (hsh(Math.floor(t * 14), k) % 23 === 0 ? 0.2 : 1);
+  ST.nx.night.forEach((o, i) => { o.visible = dark; if (o.isLight) o.intensity = o.userData.base ?? (o.userData.base = o.intensity); });
+  ST.nx.store.forEach((o, i) => { o.visible = on; });
+  ST.nx.cones.forEach(c => { c.visible = dark && (st.canopy ?? 1) > 0.4; c.material.opacity = 0.05 * (st.canopy ?? 1); });
+  ST.traffic.material.opacity = dark && Math.floor(t * 1.4) % 2 ? 0.9 : 0.05;
+  const p = ST.dust.geometry.attributes.position.array; ST.dust0.forEach(([x, y, z, v], i) => { p[i * 3] = x + Math.sin(t * 0.3 + v * 9) * 0.3; p[i * 3 + 1] = (y + t * 0.05 * (v - 0.5) + 3.3) % 3.3; p[i * 3 + 2] = z + Math.cos(t * 0.25 + v * 7) * 0.3; });
+  ST.dust.geometry.attributes.position.needsUpdate = true; ST.dust.material.opacity = 0.25 + 0.4 * Math.max(st.lit ?? 1, st.shafts ?? 0);
+}
