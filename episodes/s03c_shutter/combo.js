@@ -3,6 +3,8 @@
 const CUE = {}; SHOTS.push([0, 'v']); SH.v = () => {};
 function stack3(t) { const p = (step(t, 12) % 1.6) / 1.6; return kf(p, [[0, [215, 70]], [0.3, [130, 300]], [0.42, [130, 300]], [0.7, [175, 160]], [0.92, [215, 70]], [1, [215, 70]]]); }
 function R3(o) { stFace(); dRender(o); }
+const dCam0 = dCam; let HAND = 1;                                       // «ручная» камера: живое покачивание поверх любого движения
+dCam = function (t, K, e) { dCam0(t, K, e); const c = DIO.cam; c.rotateY((Math.sin(t * 0.9) * 0.006 + Math.sin(t * 2.3 + 1) * 0.0025) * HAND); c.rotateX((Math.sin(t * 1.1 + 2) * 0.005 + Math.sin(t * 2.9) * 0.002) * HAND); };
 const K_ = k => LS(k), W_ = (k, re, n) => WW(k, re, n);
 const T = { k01: K_('k01'), k02: K_('k02'), k03: K_('k03'), k04: K_('k04'), k05: K_('k05'), k06: K_('k06'), k07: K_('k07'), k08: K_('k08'), k09: K_('k09'), k10: K_('k10'), k11: K_('k11'), k12: K_('k12'), k13: K_('k13'), k14: K_('k14'),
   chime: W_('k05', /^chime/i), walks: W_('k05', /^walks/i), not: W_('k05', /^not/i), gas: W_('k05', /^gas/i), slam: W_('k06', /^slam/i), steel: W_('k06', /^steel/i), crash: W_('k06', /^crash/i),
@@ -34,7 +36,7 @@ const SHOT3 = [
   [0, 'hook', (t, u) => { stSet(t, { sky: 'dawn', lit: 0.25, neon: false, shut: 1, dents: 1, crowd: 'pound', rain: 0.5, canopy: 0.3, exit: 1 }); ST.joe.q.visible = false; ST.z1.q.visible = false;
     dCam(t, [[0, 0.9, 1.0, 5.2, -1.6, 1.5, 0.8, 64], [T.k02 - 0.1, 3.4, 3.4, 8.6, 0, 1.2, 0.8, 58]]); dShake(Math.max(0, Math.sin(t * 9)) * 3); R3(); }],
   [T.k02 - 0.1, 'bend', (t, u) => { stSet(t, { sky: 'dawn', lit: 0.35, neon: false, shut: 1, bulge: 0.25 + 0.6 * pr(t, T.k02, T.k03), dents: 1, exit: 1, rain: 0 }); ST.joe.q.visible = false; ST.z1.q.visible = false;
-    dCam(t, [[T.k02 - 0.1, 5.3, 1.5, -4.0, 0, 1.6, 0.2, 58], [T.k03, 4.9, 1.55, -3.6, 0, 1.6, 0.2, 52]]); dShake(4 + 3 * Math.sin(t * 13)); R3({ blur: 3 });
+    dCam(t, [[T.k02 - 0.1, 5.6, 1.4, -4.3, 0, 1.6, 0.2, 60, 0.04], [T.k03, 4.6, 1.6, -3.4, 0, 1.7, 0.2, 48, -0.03]]); dShake(4 + 3 * Math.sin(t * 13)); R3({ blur: 3 });
     dHero(3.3, 0, -3.0, joe2({ t, mood: 'shock', pupil: 0.55, eyeTilt: 0.8, mouthKind: 'grimace', pale: 1, tremble: 1, sweat: 1, lk: [-0.9, -0.1], arms: { l: [-170, 160, 'open'], r: [160, 190, 'open'] } }), { tint: 'rgba(40,30,60,0.25)' }); }],
   [T.k03 - 0.15, 'rewind', (t, u) => { const k = pr(t, T.k03 - 0.15, T.k04 - 0.05); stSet(t, { sky: 'night', lit: 1, neon: true, shut: 1 - eo(k), rain: 1 }); ST.joe.q.visible = false; ST.z1.q.visible = false;
     dCam(t, [[T.k03 - 0.15, 3.0, 1.5, -2.5, 0, 1.6, 0.2, 58], [T.k04 - 0.05, -1.0, 1.4, 12, 0, 1.8, 0, 60]], k => k); R3(); vhs(t);
@@ -54,10 +56,10 @@ const SHOT3 = [
     const b = dProj(3.55, 1.2, -2.2), k = t < hit ? eo(clamp((t - (hit - 0.3)) / 0.3)) : 1; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); S = 1; fist2(lerp(PW + 200, b.x + 40, k), lerp(-200, b.y - 40, k) + (t > hit ? 20 : 0), k); ctx.restore();
     vstamp('LOCKDOWN!', t, hit, 560, 120, 502); }],
   [T.steel - 0.1, 'crash', (t, u) => { const sh = pr(t, T.steel, T.crash + 0.05); stSet(t, { ...night, door: 0, alarm: 1, lit: 0.55, neon: false, shut: sh, flick: true }); ST.z1.q.visible = false; ST.joe.q.visible = false;
-    dCam(t, [[T.steel - 0.1, 5.1, 1.25, -3.6, 0, 1.7, 0.3, 62], [T.k07 - 0.1, 4.7, 1.35, -3.3, 0, 1.75, 0.3, 58]]); dShake(t > T.crash && t < T.crash + 0.6 ? 22 * (1 - (t - T.crash) / 0.6) : 0); R3();
+    dCam(t, [[T.steel - 0.1, 5.4, 1.1, -3.8, 0, 1.9, 0.3, 66, 0], [T.crash, 5.0, 1.2, -3.5, 0, 1.6, 0.3, 60, 0.05], [T.k07 - 0.1, 4.6, 1.35, -3.2, 0, 1.75, 0.3, 56, 0]]); dShake(t > T.crash && t < T.crash + 0.6 ? 22 * (1 - (t - T.crash) / 0.6) : 0); R3();
     vstamp('CRASH!', t, T.crash, 560, 130, 503); }],
   [T.k07 - 0.1, 'car', (t, u) => { stSet(t, { sky: 'night', lit: 0.2, neon: false, shut: 1, car: t > T.alarm - 0.2, rain: 0.8, canopy: 0.6 }); ST.joe.q.visible = false;
-    dCam(t, [[T.k07 - 0.1, -1.6, 0.7, 11.8, -5.0, 1.0, 7.4, 58], [T.k08 - 0.05, -2.4, 0.9, 10.8, -5.0, 1.0, 7.2, 50]]);
+    dCam(t, [[T.k07 - 0.1, 0.5, 0.6, 13.0, -5.0, 1.0, 7.4, 60], [T.alarm, -2.0, 0.75, 10.9, -5.0, 1.0, 7.3, 52], [T.k08 - 0.05, -2.8, 1.0, 10.2, -5.0, 1.0, 7.2, 46]]);
     dDraw(ST.z1, () => zombie({ x: 256, y: 660 - 512 * 0.88, s: 0.88, t, v: 1, noShadow: true, legs: 'run', tilt: 0.2 + Math.sin(step(t, 8) * 3) * 0.06, arms: { l: [-150, 110, 'open'], r: [150, 90, 'open'] } }));
     const zk = pr(t, T.k07, T.alarm), bump = t > T.alarm - 0.2 ? Math.sin((t - T.alarm) * 20) * 0.05 * Math.max(0, 1 - (t - T.alarm)) : 0; dPlace(ST.z1, lerp(-1.5, -3.9, zk) + bump, lerp(12.5, 8.6, zk)); R3(); }],
   [T.k08 - 0.05, 'gather', (t, u) => { stSet(t, { sky: 'dawn', lit: 0.25, neon: false, shut: 1, crowd: 'gather', crowdK: pr(t, T.k08 - 0.3, T.k09 - 0.4), rain: 0.25, canopy: 0.3 }); ST.joe.q.visible = false; ST.z1.q.visible = false;
@@ -113,7 +115,9 @@ function shot3(t) { let i = 0; while (i < SHOT3.length - 1 && t >= SHOT3[i + 1][
 frame = function (t) {
   if (!SINIT) { if (!document.fonts.check("600 40px 'Osw'")) return; stBuild(); SINIT = true; }
   const i = shot3(t), [t0, nm, fn] = SHOT3[i], u = t - t0; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); S = 1; fn(t, u); ctx.restore();
-  if (i > 0 && u < 0.12 && !['door', 'shock', 'rewind'].includes(nm)) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = `rgba(255,250,240,${0.35 * (1 - u / 0.12)})`; ctx.fillRect(0, 0, PW, PH); ctx.restore(); }
+  if (i > 0 && u < 0.18 && !['rewind', 'end'].includes(nm)) {             // «хлыст»: камера прилетает со смазом (направление чередуется)
+    const k = 1 - u / 0.18, dir = i % 2 ? 1 : -1, sp = 140 * k * k; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    for (let j = 1; j <= 3; j++) { ctx.globalAlpha = 0.28 * k; ctx.drawImage(ctx.canvas, dir * sp * j / 3, 0); } ctx.restore(); }
 };
 
 // ---------- поверх: день (вверху справа), крючок, субтитры по слову
@@ -134,9 +138,12 @@ hudFrame = function (t) {
   if (t < HOOK.until) { const a = 1 - pr(t, HOOK.until - 0.25, HOOK.until); HOOK.text.split('|').forEach((ln, j) => { push(PW / 2 - 20 + j * 40, 420 + j * 150, 0.9 + 0.1 * a, -0.035 + j * 0.03); ctx.globalAlpha = a; ransom(ln, 0, 0, 130, HOOK.seed + j * 17, { reveal: pr(t, 0.05 + j * 0.3, 0.4 + j * 0.3), pop: true, maxW: 900 }); ctx.globalAlpha = 1; pop(); }); }
   if (nm !== 'end') vSub3(t);
 };
+const BLOOM = document.createElement('canvas'); BLOOM.width = PW / 2; BLOOM.height = PH / 2;
 post = function (t, o) {
-  o.save(); o.filter = 'saturate(1.15) contrast(1.06) brightness(1.03)'; o.drawImage(o.canvas, 0, 0); o.restore();
-  o.save(); o.globalCompositeOperation = 'screen'; o.globalAlpha = 0.18; o.filter = 'blur(18px) brightness(0.9)'; o.drawImage(o.canvas, 0, 0); o.restore();
+  o.save(); o.filter = 'saturate(1.2) contrast(1.08) brightness(1.03)'; o.drawImage(o.canvas, 0, 0); o.restore();
+  const b = BLOOM.getContext('2d'); b.setTransform(1, 0, 0, 1, 0, 0); b.filter = 'brightness(0.6) contrast(2.8) saturate(1.6)'; b.clearRect(0, 0, PW / 2, PH / 2); b.drawImage(o.canvas, 0, 0, PW / 2, PH / 2); b.filter = 'none';   // только яркое: неон, лампы
+  o.save(); o.globalCompositeOperation = 'screen'; o.globalAlpha = 0.55; o.filter = 'blur(22px)'; o.drawImage(BLOOM, 0, 0, PW, PH); o.globalAlpha = 0.35; o.filter = 'blur(6px)'; o.drawImage(BLOOM, 0, 0, PW, PH); o.restore();
+  o.save(); o.globalCompositeOperation = 'soft-light'; const gg = o.createLinearGradient(0, 0, 0, PH); gg.addColorStop(0, 'rgba(40,120,170,0.35)'); gg.addColorStop(1, 'rgba(255,140,60,0.25)'); o.fillStyle = gg; o.fillRect(0, 0, PW, PH); o.restore();
   o.save(); o.globalCompositeOperation = 'overlay'; o.globalAlpha = 0.05; const fr = Math.floor(t * 12), gx = -(hsh(fr) % 256), gy = -(hsh(fr, 7) % 256); for (let x = gx; x < PW; x += 512) for (let y = gy; y < PH; y += 512) o.drawImage(GRAIN, x, y); o.restore();
   const v = o.createRadialGradient(PW / 2, PH * 0.48, PW * 0.45, PW / 2, PH * 0.5, PH * 0.62); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.38)'); o.save(); o.fillStyle = v; o.fillRect(0, 0, PW, PH); o.restore();
 };
