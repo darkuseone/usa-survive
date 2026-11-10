@@ -31,7 +31,7 @@ function quad(w, h, m, x, y, z, o = {}) { const q = new T3.Mesh(new T3.PlaneGeom
 function signTex(w, h, bg, text, size, col, font = 'Inter Black') { return paint(w, h, () => { rectP(0, 0, w, h, bg, { seed: hsh(w, text.length), line: false }); txt(text, w / 2, h / 2 + 3, size, { font, col }); ctx.strokeStyle = '#1c1512'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, w - 6, h - 6); }); }
 
 // ---------- вырезанные фигурки: плоскость с текстурой, которую каждый кадр рисует chars.js
-function card(name, hM = 2.05) {
+function cutCard(name, hM = 2.05) {
   const c = document.createElement('canvas'); c.width = 512; c.height = 740; const tx = new T3.CanvasTexture(c); tx.colorSpace = T3.SRGBColorSpace;
   const m = new T3.MeshStandardMaterial({ map: tx, transparent: true, alphaTest: 0.45, roughness: 0.9, side: T3.DoubleSide });
   const wM = hM * 512 / 740, q = new T3.Mesh(new T3.PlaneGeometry(wM, hM), m); q.castShadow = true; q.receiveShadow = false;
@@ -113,7 +113,7 @@ function dioInit() {
   const ctr = mat('#7a5a3a', { fn: (w, h) => { for (let i = 1; i < 6; i++) stroke([[0, i * 42], [w, i * 42]], '#6a4c30', 3); } });
   box(3.2, 1.05, 0.8, ctr, 4.3, 0.53, -2.4); box(3.4, 0.08, 1.0, mat('#d9d4c4'), 4.3, 1.09, -2.4);
   box(0.55, 0.35, 0.45, mat('#2a2c30'), 5.1, 1.3, -2.45); box(0.5, 0.06, 0.2, new T3.MeshStandardMaterial({ color: 0x3aa070, emissive: 0x3aa070, emissiveIntensity: 1.2 }), 5.1, 1.5, -2.3, { cast: false });
-  box(0.4, 0.6, 0.4, mat('#1c1512'), 3.0, 1.43, -2.55);
+  box(0.4, 0.6, 0.4, mat('#1c1512'), 5.55, 1.43, -2.6);
   DIO.btnBase = box(0.36, 0.06, 0.36, mat('#f2c230'), 3.8, 1.16, -2.2); DIO.btn = new T3.Mesh(new T3.CylinderGeometry(0.12, 0.13, 0.08, 24), new T3.MeshStandardMaterial({ color: 0xd8342c, emissive: 0x400000, roughness: 0.4 }));
   DIO.btn.position.set(3.8, 1.22, -2.2); DIO.btn.castShadow = true; scene.add(DIO.btn);
   box(3.4, 1.6, 0.7, shelfM, -3.6, 0.8, -2.9);                                                       // ещё один ряд ближе к двери
@@ -138,7 +138,7 @@ function dioInit() {
   const rg = new T3.BufferGeometry(); rg.setAttribute('position', new T3.BufferAttribute(pos, 3));
   DIO.rain = new T3.LineSegments(rg, new T3.LineBasicMaterial({ color: 0xaac4f0, transparent: true, opacity: 0.45, fog: true })); scene.add(DIO.rain);
   // герои
-  DIO.joe = card('joe'); DIO.z1 = card('z1'); DIO.zs = [0, 1, 2, 3, 4, 5].map(i => card('zc' + i));
+  DIO.joe = cutCard("joe"); DIO.z1 = cutCard("z1"); DIO.zs = [0, 1, 2, 3, 4, 5].map(i => cutCard("zc" + i));
 }
 function rainAt(t) { const p = DIO.rain.geometry.attributes.position.array; DIO.rain0.forEach(([x, y, z, v], i) => { const yy = ((y - t * 9 * v) % 12 + 12) % 12, xx = x - (12 - yy) * 0.12; p.set([xx, yy, z, xx + 0.04, yy + 0.35, z], i * 6); }); DIO.rain.geometry.attributes.position.needsUpdate = true; }
 
@@ -156,7 +156,7 @@ const KS = [
   [10.44, [[10.44, 0.6, 1.45, -0.8, JX, 1.1, JZ, 44], [11.22, 1.8, 1.5, -0.9, BX, 1.15, BZ, 44]]],
   [11.22, [[11.22, 3.55, 1.75, -1.55, 3.8, 1.18, -2.2, 40], [11.99, 3.65, 1.6, -1.75, 3.8, 1.18, -2.2, 34]]],
   [11.99, [[11.99, -0.6, 1.25, -4.2, 0.6, 1.7, 0.4, 50], [14.17, -0.2, 1.35, -4.0, 0.4, 1.8, 0.4, 46]]],
-  [14.17, [[14.17, 0.4, 1.5, -1.5, 2.2, 1.15, -3.7, 38], [16.78, 3.6, 1.5, -1.9, 2.2, 1.2, -3.7, 34]]],
+  [14.17, [[14.17, 0.4, 1.5, -1.5, 2.2, 1.15, -3.7, 38], [16.78, 2.9, 1.55, -1.7, 2.2, 1.2, -3.7, 34]]],
   [16.78, [[16.78, 1.5, 1.2, 7.5, 0, 1.6, 0, 46], [20, -3.5, 4.5, 16, 0, 1.5, 0, 46]]]
 ];
 function shotI(t) { let i = 0; while (i < KS.length - 1 && t >= KS[i + 1][0]) i++; return i; }
