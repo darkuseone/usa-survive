@@ -67,6 +67,25 @@ tools/make.sh <эп> all <имя> > build/<эп>/make.log 2>&1; echo "exit $?" >
 - Звук в целях, голос ровный, `.srt` есть, обложка есть.
 - Коммит в `main`: `episodes/<эп>/`, `out/<имя>_sheet.jpg`, `.srt`, `_thumb.png`, `publish/<эп>.txt` (сам `.mp4` > 100 МБ — не в git, отправить пользователю). `python3 tools/gen_refs.py`.
 
+## 9. Шортсы из эпизода (9:16, 60–90 с) — без перерисовки сцен
+Формула — `research/shorts.md`: крючок за 0–3 с (надпись ransom + самый напряжённый кадр), контекст одной фразой, поворот на середине, клиффхэнгер, мягкое «All thirty days are on my channel», финальная карточка со стрелкой на ссылку Related video.
+1. `episodes/s0N_<слово>/script.json`. Реплики эпизода с ключами `x01_<ключ>`: mp3 копируются из `vo/` эпизода, `after` ≤ 0,3. Новые реплики — крючок `h*`, мост `b*`, финал `e*`: `pipeline/tts.py` озвучит только их. Дальше `transcribe.py` и `voice_v2.py`.
+2. `episode.json`:
+   - `"size": [1920, 1080], "page": [1080, 1920]`;
+   - в `libs` — файлы эпизода (set, scenes, fx, `episodes/shorts/e01_lines.js`, ch*), затем `episodes/shorts/vert.js`;
+   - `scripts: ["short.js"]`.
+3. `short.js` объявляет:
+   - `HOOK` — текст крючка, `|` переносит строку;
+   - `SEGS` — `lineSegs([...])` для реплик эпизода и вручную `{t0, te0, rate, tr, kind: 'rewind' | 'end'}`;
+   
+   затем вызывает `finishSegs()`.
+   
+   Кроп планов задаёт `CROP` в vert.js: x центра, `{k: [[u, x]…]}` для панорамы, `{fit: s, fx}` для вставок «фото на скотче». Проверять контакт-листом всё: штампы, плашки, вставки.
+4. Звук:
+   - один раз выгрузить шумы эпизода без голоса: `STEM=1 tools/make.sh <эп> sound` → `build/<эп>/fx_stem.wav`;
+   - затем `mkpage`, `cues.cjs`, `python3 episodes/shorts/mksound.py <шортс>` и `tools/make.sh <шортс> sound`.
+5. Рендер `tools/make.sh <шортс> all <шортс>` — в фоне. Во время рендера не править engine/, файлы эпизода и episodes/shorts/: части собираются лениво.
+
 ## Экономия токенов
 - Не читать целиком `engine/*.js`, `reference/**` — есть `applique-engine/api.md` и `grep -n`.
 - Один контакт-лист на главу, переснимать только изменённое. Склеивать шаги в один Bash через `&&`.

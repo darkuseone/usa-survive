@@ -257,15 +257,15 @@ function frame(t) {
   const i = shotAt(t), [t0, name, tr] = SHOTS[i], d = TRD[tr] || 0, u = t - t0;
   if (!tr || i === 0 || u >= d) { SH[name](t, u); return; }
   const [pt0, pname] = SHOTS[i - 1], p = u / d;
-  if (tr === 'flash') { SH[name](t, u); ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = `rgba(255,250,240,${1 - p})`; ctx.fillRect(0, 0, W, H); ctx.restore(); return; }
-  if (tr === 'dip') { if (p < 0.5) SH[pname](t, t - pt0); else SH[name](t, u); ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = `rgba(0,0,0,${1 - Math.abs(p - 0.5) * 2})`; ctx.fillRect(0, 0, W, H); ctx.restore(); return; }
+  if (tr === 'flash') { SH[name](t, u); ctx.save(); ctx.setTransform(...BASE); ctx.fillStyle = `rgba(255,250,240,${1 - p})`; ctx.fillRect(0, 0, W, H); ctx.restore(); return; }
+  if (tr === 'dip') { if (p < 0.5) SH[pname](t, t - pt0); else SH[name](t, u); ctx.save(); ctx.setTransform(...BASE); ctx.fillStyle = `rgba(0,0,0,${1 - Math.abs(p - 0.5) * 2})`; ctx.fillRect(0, 0, W, H); ctx.restore(); return; }
   if (tr === 'whip') { const e = eio(p); push(-e * W * 1.1, 0); SH[pname](t, t - pt0); pop(); push((1 - e) * W * 1.1, 0); SH[name](t, u); pop();
-    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 0.5 * Math.sin(p * Math.PI); ctx.drawImage(ctx.canvas, -40, 0); ctx.drawImage(ctx.canvas, 40, 0); ctx.restore(); return; }
+    ctx.save(); ctx.setTransform(...BASE); ctx.globalAlpha = 0.5 * Math.sin(p * Math.PI); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(ctx.canvas, -40, 0); ctx.drawImage(ctx.canvas, 40, 0); ctx.restore(); return; }
   // tear: новый план «отрывается» поверх старого рваной кромкой слева направо
   SH[pname](t, t - pt0); const e = eio(p);
-  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.beginPath(); ctx.moveTo(-10, -10); for (let y = -10; y <= H + 10; y += 16) ctx.lineTo(tornEdgeX(y, e), y); ctx.lineTo(-10, H + 10); ctx.closePath(); ctx.clip();
+  ctx.save(); ctx.setTransform(...BASE); ctx.beginPath(); ctx.moveTo(-10, -10); for (let y = -10; y <= H + 10; y += 16) ctx.lineTo(tornEdgeX(y, e), y); ctx.lineTo(-10, H + 10); ctx.closePath(); ctx.clip();
   S = 1; SH[name](t, u); ctx.restore();
-  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); S = 1; const pts = []; for (let y = -10; y <= H + 10; y += 16) pts.push([tornEdgeX(y, e), y]); for (let y = H + 10; y >= -10; y -= 16) pts.push([tornEdgeX(y, e) + 18 + ((hsh(y) % 7)), y]);
+  ctx.save(); ctx.setTransform(...BASE); S = 1; const pts = []; for (let y = -10; y <= H + 10; y += 16) pts.push([tornEdgeX(y, e), y]); for (let y = H + 10; y >= -10; y -= 16) pts.push([tornEdgeX(y, e) + 18 + ((hsh(y) % 7)), y]);
   piece(pts, '#f3ecd8', { raw: true, lw: 2 }); ctx.restore();
 }
 

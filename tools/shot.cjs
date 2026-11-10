@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer-core'); const path = require('path'); const
   const b = await puppeteer.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--allow-file-access-from-files'] });
   const p = await b.newPage(); let errs = 0;
   p.on('pageerror', e => { errs++; console.log('ERR(load)', e.message); });
-  await p.goto('file://' + path.resolve(film) + '/index.html'); const [CW, CH] = await p.evaluate(() => [W, H]); await p.setViewport({ width: CW, height: CH }); await p.evaluate(() => document.fonts.ready); await new Promise(r => setTimeout(r, 800));
+  await p.goto('file://' + path.resolve(film) + '/index.html'); const [CW, CH] = await p.evaluate(() => [PW, PH]); await p.setViewport({ width: CW, height: CH }); await p.evaluate(() => document.fonts.ready); await new Promise(r => setTimeout(r, 800));
   const files = [];
   for (const t of ts.map(Number)) {
     const r = await p.evaluate(t => { try { lastFr = -1; const t0 = performance.now(); draw(t); const ms = performance.now() - t0; return { ms, ok: document.getElementById('c').toDataURL('image/png') }; } catch (e) { return { err: e.message + ' @ ' + (e.stack || '').split('\n').slice(1, 4).join(' | ') }; } }, t);

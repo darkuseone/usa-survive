@@ -6,10 +6,13 @@
    Размер кадра W×H приходит из data.js (episode.json → "size", по умолчанию 1920×1080). */
 const DFPS = 12;                                                   // W, H, DUR, T0, LINES — из data.js (tools/mkpage.py)
 const cv = document.getElementById('c'), out = cv.getContext('2d');
-const ink = document.createElement('canvas'); ink.width = W; ink.height = H;
+/* PW×PH — размер холста страницы (episode.json → "page"; по умолчанию W×H). Мир сцен всегда W×H; BASE — матрица мир→холст
+   (вертикальные шортсы из горизонтальных сцен: кадрирование и зум без пересъёмки). Экранные оверлеи сцен рисовать через ctx.setTransform(...BASE). */
+let BASE = [1, 0, 0, 1, 0, 0];
+const ink = document.createElement('canvas'); ink.width = PW; ink.height = PH;
 let ctx = ink.getContext('2d');
 let FRAME = 0, S = 1; const SS = [];
-const paper = document.createElement('canvas'); paper.width = W; paper.height = H; (function () { const g = paper.getContext('2d'); g.fillStyle = '#1a1716'; g.fillRect(0, 0, W, H); })();
+const paper = document.createElement('canvas'); paper.width = PW; paper.height = PH; (function () { const g = paper.getContext('2d'); g.fillStyle = '#1a1716'; g.fillRect(0, 0, PW, PH); })();
 const grain = document.createElement('canvas'); grain.width = 4; grain.height = 4;
 
 // ------------------------------------------------------------------ математика
@@ -101,12 +104,12 @@ function stroke(pts, col, w, o = {}) {                            // марке�
 function dot(x, y, r, col, a = 1) { ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.3); ctx.fill(); ctx.restore(); }
 
 /* слой с тенью: всё, что нарисует fn, ложится как бумага на бумагу — с общей мягкой тенью */
-const LAY = [0, 1, 2].map(() => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; }); let LAYI = 0;
+const LAY = [0, 1, 2].map(() => { const c = document.createElement('canvas'); c.width = PW; c.height = PH; return c; }); let LAYI = 0;
 function layer(fn, o = {}) {
   const c = LAY[LAYI++ % LAY.length], g = c.getContext('2d'), prev = ctx, pS = S, pSS = SS.splice(0);
-  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H); g.setTransform(prev.getTransform()); ctx = g; S = pS; fn(); ctx = prev; S = pS; SS.push(...pSS);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, PW, PH); g.setTransform(prev.getTransform()); ctx = g; S = pS; fn(); ctx = prev; S = pS; SS.push(...pSS);
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (o.shadow !== false) { ctx.shadowColor = o.sc || 'rgba(10,6,4,0.45)'; ctx.shadowBlur = o.sb ?? 10; ctx.shadowOffsetX = o.sx ?? 5; ctx.shadowOffsetY = o.sy ?? 7; }
+  if (o.shadow !== false) { const k = BASE[0]; ctx.shadowColor = o.sc || 'rgba(10,6,4,0.45)'; ctx.shadowBlur = (o.sb ?? 10) * k; ctx.shadowOffsetX = (o.sx ?? 5) * k; ctx.shadowOffsetY = (o.sy ?? 7) * k; }
   ctx.globalAlpha = o.a ?? 1; ctx.drawImage(c, 0, 0); ctx.restore();
 }
 
@@ -135,7 +138,7 @@ function ransom(s, x, y, size, seed, o = {}) {
     push(cx + sp.w * kk / 2 + jj[0], y + sp.dy + jj[1], sk, sp.rot + jj[2] * 4);
     const bw = sp.w, bh = sp.sz * 1.18;
     piece([[-bw / 2, -bh / 2], [bw / 2, -bh / 2 + (r() - 0.5) * 4], [bw / 2, bh / 2], [-bw / 2 + (r() - 0.5) * 4, bh / 2]], sp.bg[0], { step: 10, edge: 1.4, lw: 1.4, la: 0.5, seed: seed + i });
-    ctx.font = `900 ${sp.sz / S}px '${sp.f}'`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = sp.bg[1]; ctx.fillText(sp.ch, 0, sp.sz * 0.04);
+    ctx.font = `900 ${sp.sz * sk / S}px '${sp.f}'`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = sp.bg[1]; ctx.fillText(sp.ch, 0, sp.sz * 0.04);
     pop(); cx += sp.w * kk;
   });
   pop(); return total * kk;

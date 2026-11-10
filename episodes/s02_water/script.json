@@ -1,0 +1,127 @@
+{
+ "title": "The Day 19 Mistake (Zombie Outbreak)",
+ "lang": "en",
+ "model": "eleven_v4",
+ "fps": 24,
+ "tempo": {
+  "nar": 1.0
+ },
+ "voices": {
+  "nar": {
+   "voice_id": "C1npRmjB19a6yNkEucvx",
+   "settings": {
+    "stability": 0.42,
+    "similarity_boost": 0.8,
+    "style": 0.35,
+    "speed": 0.98
+   }
+  }
+ },
+ "head": 0.12,
+ "tail": 2.6,
+ "gap": 0.2,
+ "lines": [
+  {
+   "speaker": "nar",
+   "after": 0.3,
+   "key": "h2",
+   "text": "Day 19 of the zombie outbreak. You're locked inside a gas station, and your last bottle of water is empty.",
+   "tts": "[tense, low] Day nineteen of the zombie outbreak. You're locked inside a gas station, and your last bottle of water is empty."
+  },
+  {
+   "key": "x01_c5_02",
+   "src": "c5_02",
+   "speaker": "nar",
+   "text": "But you didn't skip the boring part of survival. FEMA lists a hidden water source in almost every building: the water heater.",
+   "tts": "[confident] But you didn't skip the boring part of survival. FEMA lists a hidden water source in almost every building. The water heater.",
+   "after": 0.3
+  },
+  {
+   "key": "x02_c5_03",
+   "src": "c5_03",
+   "speaker": "nar",
+   "text": "Forty gallons, sitting in the back room. You open the drain valve. Clean water. Weeks more. You almost laugh.",
+   "tts": "[relieved] Forty gallons, sitting in the back room. You open the drain valve. Clean water. Weeks more. [soft laugh] You almost laugh.",
+   "after": 0.3
+  },
+  {
+   "key": "x03_c5_04",
+   "src": "c5_04",
+   "speaker": "nar",
+   "text": "And that's the mistake. To reach the valve, you dragged the shelves away from the back door. You never put them back.",
+   "tts": "[dark, slow] And that's the mistake. To reach the valve, you dragged the shelves away from the back door. [pause] You never put them back.",
+   "after": 0.3
+  },
+  {
+   "key": "x04_c5_05",
+   "src": "c5_05",
+   "speaker": "nar",
+   "text": "3 a.m. The back door clicks open. The latch was broken all along.",
+   "tts": "[whispering] Three A M. The back door clicks open. [pause] The latch was broken all along.",
+   "after": 0.3
+  },
+  {
+   "key": "x05_c5_06",
+   "src": "c5_06",
+   "speaker": "nar",
+   "text": "There's one of them inside. Between you and everything you own.",
+   "tts": "[tense] There's one of them inside. Between you... and everything you own.",
+   "after": 0.3
+  },
+  {
+   "key": "x06_c5_07",
+   "src": "c5_07",
+   "speaker": "nar",
+   "text": "You run for the strongest room you have. The walk-in cooler. You pull the door shut and hold it.",
+   "tts": "[urgent] You run for the strongest room you have. The walk in cooler. You pull the door shut... and hold it.",
+   "after": 0.3
+  },
+  {
+   "key": "x07_c5_08",
+   "src": "c5_08",
+   "speaker": "nar",
+   "text": "Now you're sealed in the dark, your breath turning to fog, listening to it scratch at the door.",
+   "tts": "[whispering] Now you're sealed in the dark... your breath turning to fog... listening to it scratch at the door.",
+   "after": 0.3
+  },
+  {
+   "key": "x08_c5_09",
+   "src": "c5_09",
+   "speaker": "nar",
+   "text": "On your belt is the cashier's handset. It's wired to the speakers outside, the ones that say 'pump four is ready.'",
+   "tts": "[tense, thinking] On your belt is the cashier's handset. It's wired to the speakers outside. The ones that say... pump four is ready.",
+   "after": 0.3
+  },
+  {
+   "key": "x09_c5_10",
+   "src": "c5_10",
+   "speaker": "nar",
+   "text": "You press the button, and you bang it against the wall.",
+   "tts": "[determined] You press the button... and you bang it against the wall.",
+   "after": 0.3
+  },
+  {
+   "key": "x10_c5_11",
+   "src": "c5_11",
+   "speaker": "nar",
+   "text": "It turns. It follows the sound, out the back door, into the rain. You sprint, slam the door, and bury it under every shelf you own.",
+   "tts": "[fast, intense] It turns. It follows the sound. Out the back door, into the rain. You sprint, slam the door... and bury it under every shelf you own.",
+   "after": 0.3
+  },
+  {
+   "key": "x11_c5_12",
+   "src": "c5_12",
+   "speaker": "nar",
+   "text": "You survived your mistake. But you just told the whole county exactly where you are.",
+   "tts": "[slow, ominous] You survived your mistake. But you just told the whole county... exactly where you are.",
+   "after": 0.3
+  },
+  {
+   "speaker": "nar",
+   "after": 0.25,
+   "key": "e2",
+   "text": "That was day nineteen. All thirty days are on my channel.",
+   "tts": "[softer, low] That was day nineteen. All thirty days are on my channel."
+  }
+ ]
+}

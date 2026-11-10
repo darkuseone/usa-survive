@@ -3,10 +3,10 @@
 
 
 // ------------------------------------------------------------------ свет: карта освещения (multiply) + свечения
-const LM = document.createElement('canvas'); LM.width = W; LM.height = H;
+const LM = document.createElement('canvas'); LM.width = PW; LM.height = PH;
 /* lights: fn рисует на карте света в текущих координатах камеры; amb — цвет темноты */
 function lightmap(amb, fn) {
-  const g = LM.getContext('2d'), prev = ctx, pS = S; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.fillStyle = amb; g.fillRect(0, 0, W, H);
+  const g = LM.getContext('2d'), prev = ctx, pS = S; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.fillStyle = amb; g.fillRect(0, 0, PW, PH);
   g.setTransform(prev.getTransform()); g.globalCompositeOperation = 'lighter'; ctx = g; fn(); ctx = prev; S = pS;
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(LM, 0, 0); ctx.restore();
 }
