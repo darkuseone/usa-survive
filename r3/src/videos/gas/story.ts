@@ -127,7 +127,7 @@ const SHOTS: ShotDef[] = [
     st: () => ({ sky: "day", lamps: 0, neon: false, shut: 1, dents: 0.6, slits: 1, shafts: 1, crowd: "pound", rain: 0, canopy: 0, clock: "6:31" }),
     cast: (t) => [joe(3.4, 0, -3.25, { mode: "sit", hug: true, expr: "fear", look: -0.5, blink: blink(t, 3) })] },
   { a: T.k12 - 0.05, name: "eyes", look: "dayExt", dof: 14, focus: [0.3, 1.55, 3.9],
-    keys: [[T.k12 - 0.05, 0.4, 1.75, 6.3, 0.3, 1.55, 3.9, 44], [T.sound - 0.3, 0.45, 1.75, 5.7, 0.3, 1.55, 3.9, 38]],
+    keys: [[T.k12 - 0.05, 0.45, 1.8, 7.6, 0.3, 1.32, 3.9, 44], [T.sound - 0.3, 0.5, 1.8, 7.0, 0.3, 1.36, 3.9, 40]],
     st: () => ({ sky: "day", lamps: 0, neon: false, shut: 1, dents: 1, bulge: 0.3, crowd: "pound", rain: 0, canopy: 0, clock: "2:15" }),
     cast: (t) => { const tilt = t > T.sound - 0.35 ? 14 * sm(pr(t, T.sound - 0.35, T.sound)) : 0;
       return [zom(0.3, 0, 3.9, { expr: "zom", look: Math.sin(t * 2.3) * 0.8, headTilt: 3 + tilt, reach: 0.6, phase: t * 0.2 }, { scale: 1.02 })]; },
