@@ -91,7 +91,7 @@ const SHOTS: ShotDef[] = [
     st: (t) => ({ ...night, door: 1 - pr(t, T.steel - 0.1, T.steel + 0.25), alarm: 1, lampK: 0.55, neon: t < T.crash, shut: sm(pr(t, T.steel, T.crash + 0.05)), flick: true, knock: [0.1, -0.2, kick(t, T.crash + 0.5, 0.4)] }),
     cast: (t) => [zom(0.1, SWK, 0.8, { pound: (t * 2.2) % 1, expr: "zom2" })] },
   { a: T.k07 - 0.1, name: "car", look: "nightExt", dof: 6, focus: (t) => { const zk = pr(t, T.k07 - 0.1, T.alarm - 0.15); return [lerp(-6.2, -8.55, zk), 1.5, lerp(14.6, 13.45, zk)]; },
-    keys: [[T.k07 - 0.1, -8.6, 0.45, 19.4, -9.6, 1.05, 13.0, 60], [T.alarm, -9.0, 0.5, 18.8, -9.6, 1.0, 13.0, 57], [T.k08 - 0.05, -9.2, 0.55, 18.5, -9.7, 1.0, 13.0, 56]],
+    keys: [[T.k07 - 0.1, -8.4, 0.55, 19.4, -9.3, 0.95, 13.0, 54], [T.alarm, -8.8, 0.6, 18.8, -9.4, 0.95, 13.0, 51], [T.k08 - 0.05, -9.0, 0.6, 18.5, -9.5, 0.95, 13.0, 50]],
     st: (t) => { const on = t > T.alarm - 0.15, bump = on ? Math.sin((t - T.alarm) * 22) * Math.exp(-(t - T.alarm + 0.15) * 3) : 0;
       return { sky: "night", lamps: 5, lampK: 0.15, neon: false, shut: 1, car: on, carBump: bump, rain: 0.8, canopy: 0.6, clock: "4:40" }; },
     cast: (t) => { const on = t > T.alarm - 0.15, zk = pr(t, T.k07 - 0.1, T.alarm - 0.15), x = lerp(-6.2, -8.55, zk), z = lerp(14.6, 13.45, zk);
