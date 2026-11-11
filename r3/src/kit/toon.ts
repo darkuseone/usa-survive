@@ -595,9 +595,11 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
     arms.push({ pts: [S, [tcx + side * (1.3 * T.a + 16 * u), S[1] - 0.2 * HH + 0.4 * d], [tcx + side * (1.35 * T.a + 22 * u), chin - 0.92 * HH + d]], front: false });
   } else if (opts.reach !== undefined) for (const side of [-1, 1]) { // зомби: руки-«клешни» подняты и разведены
     const S = sh(side), k = clamp(opts.reach, 0, 1), w = 0.05 * HH * Math.sin(two * (phase * 2 + (side > 0 ? 0.3 : 0)));
-    const h0 = hang(side, 0);
-    const E = lerp2(h0[1], [tcx + side * (1.2 * T.a + 12 * u), S[1] + 0.3 * HH], k), Hd = lerp2(h0[2], [tcx + side * (1.3 * T.a + 22 * u), S[1] - 0.16 * HH + w], k);
-    arms.push({ pts: [S, E, Hd], front: false, claw: k > 0.5 });
+    const h0 = hang(side, 0), back = !!opts.back;
+    // спереди: руки тянутся к зрителю (укорочены, кисти перед грудью); со спины — разведены в стороны
+    const E = lerp2(h0[1], back ? [tcx + side * (1.2 * T.a + 12 * u), S[1] + 0.3 * HH] : [tcx + side * (1.12 * T.a + 6 * u), S[1] + 0.2 * HH], k);
+    const Hd = lerp2(h0[2], back ? [tcx + side * (1.3 * T.a + 22 * u), S[1] - 0.16 * HH + w] : [tcx + side * (0.62 * T.a), S[1] + 0.12 * HH + w], k);
+    arms.push({ pts: [S, E, Hd], front: !back && k > 0.5, claw: k > 0.5 });
   } else if (up > 0) for (const side of [-1, 1]) { // обе руки вверх
     const S = sh(side), h0 = hang(side, 0);
     arms.push({ pts: [S, lerp2(h0[1], [tcx + side * (1.15 * T.a + 12 * u), S[1] - 0.25 * HH], up), lerp2(h0[2], [tcx + side * (1.3 * T.a + 24 * u), S[1] - 0.68 * HH], up)], front: false });
@@ -626,7 +628,7 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
   const drawArm = (a: Arm) => {
     p.stroke(curve(a.pts[0], a.pts[1], a.pts[2]), 5.2 * u, armCol);
     const [hx, hy] = a.pts[2];
-    if (a.claw) for (const j of [-1, 0, 1]) p.stroke([[hx, hy], [hx + j * 5.5 * u, hy - 10 * u + Math.abs(j) * 2.5 * u]], 2.6 * u);
+    if (a.claw) for (const j of [-1, 0, 1]) p.stroke([[hx, hy], [hx + j * 6 * u, hy - 11 * u + Math.abs(j) * 2.5 * u]], 3 * u);
     p.dot(hx, hy, 5.5 * u);
   };
   // behind the body: rifle, sword, arms

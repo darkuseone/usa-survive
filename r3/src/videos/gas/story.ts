@@ -63,10 +63,10 @@ const SHOTS: ShotDef[] = [
     keys: [[T.k04 - 0.05, 0, 3.2, 14, 0, 1.9, 0, 58], [T.k04 + 1.55, 0, 1.55, 6.6, 0, 1.6, 0, 58], [T.k04 + 2.7, 0, 1.55, 0.3, 1.2, 1.45, -2.2, 56], [T.chime - 0.4, 2.3, 1.55, -1.55, JN[0], 1.3, JN[1], 36]],
     st: (t) => ({ ...night, door: pr(t, T.k04 + 1.05, T.k04 + 1.85) }),
     cast: (t) => [joe(JN[0], 0, JN[1], { expr: "sleepy", look: 0.3, blink: blink(t, 1), headTilt: 4 * Math.sin(t * 1.3), facing: 1 })] },
-  { a: T.chime - 0.4, name: "door", look: "store", dof: 7, focus: (t) => { const k = eo(pr(t, T.chime - 0.4, T.walks + 0.5)); return [lerp(1.3, 0.1, k), 1.6, lerp(7.2, 0.8, k)]; },
-    keys: [[T.chime - 0.4, 3.3, 1.55, -3.3, 0.1, 1.4, 0.8, 50, 0], [T.not - 0.1, 3.05, 1.5, -3.2, 0.1, 1.4, 0.8, 28, 0.05]],
+  { a: T.chime - 0.4, name: "door", look: "store", dof: 7, focus: (t) => { const k = eo(pr(t, T.chime - 0.4, T.walks + 0.5)); return [lerp(1.3, -0.35, k), 1.6, lerp(7.2, 0.8, k)]; },
+    keys: [[T.chime - 0.4, 3.3, 1.55, -3.3, -0.1, 1.4, 0.8, 50, 0], [T.not - 0.1, 3.05, 1.5, -3.2, -0.25, 1.4, 0.8, 28, 0.05]],
     st: (t) => ({ ...night, door: pr(t, T.chime - 0.15, T.chime + 0.4), flick: t > T.walks }),
-    cast: (t) => { const k = pr(t, T.chime - 0.4, T.walks + 0.5), e = eo(k), x = lerp(1.3, 0.1, e), z = lerp(7.2, 0.8, e);
+    cast: (t) => { const k = pr(t, T.chime - 0.4, T.walks + 0.5), e = eo(k), x = lerp(1.3, -0.35, e), z = lerp(7.2, 0.8, e);
       return [zom(x, z < 1.75 ? SWK : 0, z, { mode: k < 1 ? "stroll" : "stand", phase: (t * 0.9) % 1, reach: 1, expr: k < 1 ? "zom" : "zom2", headTilt: 6 * Math.sin(t * 2) })]; } },
   { a: T.not - 0.1, name: "shock", look: "store", dof: 16, focus: [JN[0], 1.5, JN[1]],
     keys: [[T.not - 0.1, 2.0, 1.5, -1.0, JN[0], 1.28, JN[1], 42], [T.k06, 2.3, 1.5, -1.5, JN[0], 1.32, JN[1], 36]],
