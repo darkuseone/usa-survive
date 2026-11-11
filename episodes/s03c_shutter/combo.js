@@ -54,7 +54,7 @@ const SHOT3 = [
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); S = 1; push(PW / 2, 900, 1, -0.03); ransom('7 DAYS EARLIER', 0, 0, 110, 7040, { reveal: pr(u, 0.05, 0.35), pop: true, maxW: 960 }); pop(); txt('◀◀', 120, 300, 70, { font: "'Courier 10 Pitch'", weight: 700, col: '#fbf8f0' }); ctx.restore(); }],
   // 3. Одним планом: со стоянки между колонок, в раздвижную дверь, к Joe за кассой
   [T.k04 - 0.05, 'arrive', (t, u) => { const s = T.k04 - 0.05, a = stack3(t); stSet(t, { ...night, door: pr(t, s + 1.1, s + 1.9) }); hide(ST.z1);
-    dCam(t, [[s, 0, 3.2, 14, 0, 1.9, 0, 58], [s + 1.6, 0, 1.55, 6.6, 0, 1.6, 0, 58], [s + 2.75, 0, 1.55, 0.3, 1.2, 1.45, -2.2, 56], [T.chime - 0.4, 2.3, 1.55, -1.55, JN[0], 1.5, JN[1], 36]]);
+    dCam(t, [[s, 0, 3.2, 14, 0, 1.9, 0, 58], [s + 1.6, 0, 1.55, 6.6, 0, 1.6, 0, 58], [s + 2.75, 0, 1.55, 0.3, 1.2, 1.45, -2.2, 56], [T.chime - 0.4, 2.3, 1.55, -1.55, JN[0], 1.3, JN[1], 36]]);
     card3(ST.joe, jc({ t, flip: true, lk: [0.8, 0.1], mood: 'sleepy', arms: { l: [-150, 300, 'open'], r: [...a, 'fist'] } }), ...JN); R3();
     if (u < 2.2) vstamp('3:07 AM', t, T.k04 + 0.4, 520, 120, 501); }],
   // 4. Из-за кассы: дверь разъезжается, в проёме — он
@@ -63,7 +63,7 @@ const SHOT3 = [
     card3(ST.z1, zc({ t, legs: 'run', tilt: 0.15 + Math.sin(step(t, 8) * 3) * 0.05, arms: { l: [-150, 110, 'open'], r: [150, 90, 'open'] } }), lerp(1.3, 0.1, eo(zin)), z, { y: z < 1.75 ? SWK : 0 }); R3(); }],
   // 5. 2.5D: Joe за кассой — оцепенение, потом крик
   [T.not - 0.1, 'shock', (t, u) => { stSet(t, { ...night, door: 1, flick: true }); hide(ST.joe, ST.z1);
-    dCam(t, [[T.not - 0.1, 2.0, 1.5, -1.0, JN[0], 1.45, JN[1], 42], [T.k06, 2.3, 1.5, -1.5, JN[0], 1.5, JN[1], 36]]); R3({ blur: 5 });
+    dCam(t, [[T.not - 0.1, 2.0, 1.5, -1.0, JN[0], 1.28, JN[1], 42], [T.k06, 2.3, 1.5, -1.5, JN[0], 1.32, JN[1], 36]]); R3({ blur: 5 });
     const sc = t > T.gas - 0.05; dHero(JN[0], 0, JN[1], joe2({ t, mood: 'shock', scream: sc ? 1 : 0, mouthKind: sc ? '' : 'wavy', pupil: 0.55, eyeTilt: 0.7, pale: 0.6, tremble: sc ? 1 : 0.4, sweat: 1, lk: [-0.8, -0.1], arms: { l: [-180, 170, 'open'], r: [180, 150, 'open'] } }), { clipLine: CTR }); }],
   // 6. Макро: кулак по кнопке LOCKDOWN
   [T.k06 - 0.05, 'button', (t, u) => { const hit = T.slam + 0.25; stSet(t, { ...night, door: 1, alarm: t > hit ? 1 : 0, btnDown: t > hit && t < hit + 0.5, lit: 0.8 }); hide(ST.joe, ST.z1);
@@ -112,9 +112,9 @@ const SHOT3 = [
   [T.crawl - 0.1, 'hide', (t, u) => { const tl = pr(t, T.eleven - 0.3, T.k12 - 0.1); stSet(t, { sky: 'day', lit: 0, lampsOn: 0, neon: false, shut: 1, dents: 0.6, shafts: 1, shaftX: lerp(-1, 4, eio(tl)), shaftTX: 0.6, rain: 0, canopy: 0, crowd: 'pound', clock: '6:31' }); hide(ST.z1);
     dCam(t, [[T.crawl - 0.1, 5.75, 0.5, -3.25, 3.4, 0.55, -3.25, 54], [T.move, 5.4, 0.55, -3.25, 3.4, 0.62, -3.25, 48], [T.k12 - 0.1, 5.2, 0.6, -3.25, 3.4, 0.68, -3.25, 46]]);
     card3(ST.joe, jc({ t, legs: 'sit', mood: 'dread', lid: 0.2, lk: [-0.6, -0.2], eyeTilt: 0.4, arms: { l: [-120, 250, 'fist'], r: [120, 250, 'fist'] } }), 3.4, -3.25, { y: -0.42 }); R3();
-    vstamp('11 HOURS', t, T.eleven, 1060, 120, 2550);
+    vstamp('11 HOURS', t, T.eleven, 1520, 120, 2550);
     if (tl > 0) { const m = 6 * 60 + 31 + Math.floor(eio(tl) * 660), h = Math.floor(m / 60) % 24; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.font = "700 64px 'Courier 10 Pitch', monospace"; ctx.textAlign = 'center'; ctx.lineWidth = 10; ctx.strokeStyle = '#141010'; ctx.fillStyle = '#ffd21f';
-      const s = `${String(((h + 11) % 12) + 1).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; ctx.strokeText(s, PW / 2, 1200); ctx.fillText(s, PW / 2, 1200); ctx.restore(); } }],
+      const s = `${String(((h + 11) % 12) + 1).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; ctx.strokeText(s, PW / 2, 1660); ctx.fillText(s, PW / 2, 1660); ctx.restore(); } }],
   // 16. 2.5D, день: один оборачивается — мутные глаза не видят, голова наклоняется на звук
   [T.k12 - 0.05, 'eyes', (t, u) => { stSet(t, { sky: 'day', lit: 0, lampsOn: 0, neon: false, shut: 1, dents: 1, bulge: 0.3, crowd: 'pound', rain: 0, canopy: 0, clock: '2:15' }); hide(ST.joe, ST.z1);
     dCam(t, [[T.k12 - 0.05, 0.4, 1.75, 6.3, 0.3, 1.55, 3.9, 44], [T.sound - 0.3, 0.45, 1.75, 5.7, 0.3, 1.55, 3.9, 38]]); R3({ blur: 5 });
@@ -156,7 +156,7 @@ function shot3(t) { let i = 0; while (i < SHOT3.length - 1 && t >= SHOT3[i + 1][
 frame = function (t) {
   if (!SINIT) { if (!document.fonts.check("600 40px 'Osw'")) return; stBuild(); SINIT = true; }
   const i = shot3(t), [t0, nm, fn] = SHOT3[i], u = t - t0; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); S = 1; fn(t, u); ctx.restore();
-  if (i > 0 && u < 0.15 && !['rewind', 'end', 'door', 'shock', 'bolt2', 'peek', 'knock3', 'arrive'].includes(nm)) {             // «хлыст»: камера прилетает со смазом (направление чередуется)
+  if (i > 0 && u < 0.15 && !['rewind', 'end', 'door', 'shock', 'bolt2', 'peek', 'knock3', 'arrive', 'bend', 'panic', 'calm', 'cctv', 'eyes', 'breath'].includes(nm)) {             // «хлыст»: камера прилетает со смазом (направление чередуется)
     const k = 1 - u / 0.15, dir = i % 2 ? 1 : -1, sp = 140 * k * k; ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let j = 1; j <= 3; j++) { ctx.globalAlpha = 0.28 * k; ctx.drawImage(ctx.canvas, dir * sp * j / 3, 0); } ctx.restore(); }
 };
@@ -177,7 +177,7 @@ hudFrame = function (t) {
   if (!['rewind', 'end', 'cctv'].includes(nm)) { const [n, clk] = dayNow(t), key = n + clk; if (key !== LASTDAY) { DAYT = SHOT3[i][0]; LASTDAY = key; }
     push(PW - 158, 232, 0.86); push(-(W - 175), -138); dayTag(t, n, { clock: clk, stamp: t - DAYT < 1.4 ? DAYT + 0.1 : null }); pop(); pop(); }
   if (t < HOOK.until) { const a = 1 - pr(t, HOOK.until - 0.25, HOOK.until); HOOK.text.split('|').forEach((ln, j) => { push(PW / 2 - 20 + j * 40, 420 + j * 150, 0.9 + 0.1 * a, -0.035 + j * 0.03); ctx.globalAlpha = a; ransom(ln, 0, 0, 130, HOOK.seed + j * 17, { reveal: pr(t, 0.05 + j * 0.3, 0.4 + j * 0.3), pop: true, maxW: 900 }); ctx.globalAlpha = 1; pop(); }); }
-  T.kn.forEach((k, i) => { if (t < T.card) vstamp('KNOCK', t, k, 1130 + i * 150, 110, 2560, { x: PW / 2 - 140 + i * 140, life: 2 }); });
+  T.kn.forEach((k, i) => { if (t < T.card) vstamp('KNOCK', t, k, 1400 + i * 150, 110, 2560, { x: PW / 2 - 140 + i * 140, life: 2 }); });
   if (nm !== 'end') vSub3(t);
 };
 post = function (t, o) {                                               // свечение — в dRender (только источники); здесь — цвет, зерно, виньетка
