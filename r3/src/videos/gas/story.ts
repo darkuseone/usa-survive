@@ -17,11 +17,15 @@ const glide = (x: number) => { const u = clamp01(x); return u * u * u * (u * (u 
 const sm = (x: number) => { const u = clamp01(x); return u * u * (3 - 2 * u); };
 const kick = (t: number, t0: number, d = 0.35) => (t > t0 && t < t0 + d ? 1 - (t - t0) / d : 0);
 
+type Cam = { pos: V3; look: V3; fov: number; roll: number };
+/** оси камеры (вправо, вверх) для эффектов, привязанных к экрану */
+const camAxes = (c: Cam) => { const f = new THREE.Vector3(c.look[0] - c.pos[0], c.look[1] - c.pos[1], c.look[2] - c.pos[2]).normalize();
+  const r = new THREE.Vector3().crossVectors(f, new THREE.Vector3(0, 1, 0)).normalize(), u = new THREE.Vector3().crossVectors(r, f); return { f, r, u }; };
 /** ключ камеры: [время, позиция x y z, цель x y z, fov, крен] */
 type K = [number, number, number, number, number, number, number, number, number?];
 type ShotDef = {
   a: number; name: string; look: LookName | ((t: number, cam: V3) => Look); keys: K[]; st: (t: number) => St;
-  cast?: (t: number) => Put[]; fx?: (t: number) => FxPut[]; dof: number | ((t: number) => number); focus?: V3 | ((t: number) => V3);
+  cast?: (t: number) => Put[]; fx?: (t: number, cam: Cam) => FxPut[]; dof: number | ((t: number) => number); focus?: V3 | ((t: number) => V3);
   keyDir?: (t: number) => V3; linear?: boolean;
 };
 
@@ -76,9 +80,12 @@ const SHOTS: ShotDef[] = [
     look: (t) => (t < HIT ? LOOKS.store : LOOKS.alarm),
     keys: [[T.k06 - 0.05, 3.2, 1.66, -1.5, 3.6, 1.2, -2.25, 46], [T.steel - 0.1, 3.3, 1.56, -1.66, 3.6, 1.2, -2.25, 38]],
     st: (t) => ({ ...night, door: 1, alarm: t > HIT ? 1 : 0, btnDown: t > HIT && t < HIT + 0.5, lampK: 0.8 }),
-    fx: (t) => { const k = t < HIT ? eo(pr(t, HIT - 0.22, HIT)) : 1, bob = t > HIT ? 0.015 * kick(t, HIT, 0.2) : 0;
-      const x = lerp(3.98, 3.62, k), y = lerp(2.05, 1.475, k) - bob, z = lerp(-2.05, -2.15, k);
-      return [{ key: "fist", cw: 300, ch: 600, draw: fxFist, x, y, z, w: 0.2, h: 0.4, rot: lerp(0.45, 0.12, k) }, ...burst(t, HIT, 3.6, 1.32, -2.1, 0.7)]; } },
+    fx: (t, c) => { const k = t < HIT ? eo(pr(t, HIT - 0.22, HIT)) : 1, bob = t > HIT ? 0.02 * kick(t, HIT, 0.2) : 0, { f, r, u } = camAxes(c);
+      // костяшки (0.173 м ниже центра карточки) ложатся точно на верх кнопки; карточка чуть ближе к камере, чем кнопка
+      const rot = lerp(0.5, 0.1, k), tgt = new THREE.Vector3(3.6, 1.29, -2.25).addScaledVector(f, -0.1);
+      const P = tgt.clone().addScaledVector(r, -0.173 * Math.sin(rot) + 0.32 * (1 - k)).addScaledVector(u, 0.173 * Math.cos(rot) + 0.6 * (1 - k) - bob);
+      const b = new THREE.Vector3(3.6, 1.3, -2.25).addScaledVector(f, -0.15);
+      return [{ key: "fist", cw: 300, ch: 600, draw: fxFist, x: P.x, y: P.y, z: P.z, w: 0.2, h: 0.4, rot }, ...burst(t, HIT, b.x, b.y, b.z, 0.42, 0.22)]; } },
   { a: T.steel - 0.1, name: "crash", look: "alarm", dof: 4, focus: [0.3, 1.5, 0.6],
     keys: [[T.steel - 0.1, -0.8, 0.5, -3.4, 0.6, 1.9, 0.4, 64, 0], [T.crash, -0.7, 0.55, -3.2, 0.5, 1.7, 0.4, 60, 0.05], [T.k07 - 0.1, -0.6, 0.6, -3.0, 0.5, 1.75, 0.4, 58, 0]],
     st: (t) => ({ ...night, door: 1 - pr(t, T.steel - 0.1, T.steel + 0.25), alarm: 1, lampK: 0.55, neon: t < T.crash, shut: sm(pr(t, T.steel, T.crash + 0.05)), flick: true, knock: [0.1, -0.2, kick(t, T.crash + 0.5, 0.4)] }),
@@ -187,6 +194,6 @@ export const frameAt = (f: number): Frame & { dof: number; shot: number; name: s
   const t = f / FPS, i = shotAt(t), s = SHOTS[i], cam = camOf(s, t);
   const look = typeof s.look === "string" ? LOOKS[s.look] : s.look(t, cam.pos);
   const focus = s.focus ? (typeof s.focus === "function" ? s.focus(t) : s.focus) : cam.look;
-  return { t, st: s.st(t), look, key: keyOf(s, look, t), cam, focus, puts: s.cast ? s.cast(t) : [], fx: s.fx ? s.fx(t) : [],
+  return { t, st: s.st(t), look, key: keyOf(s, look, t), cam, focus, puts: s.cast ? s.cast(t) : [], fx: s.fx ? s.fx(t, cam) : [],
     dof: typeof s.dof === "function" ? s.dof(t) : s.dof, shot: i, name: s.name };
 };
