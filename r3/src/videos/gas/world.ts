@@ -23,7 +23,7 @@ export type St = {
 };
 /** персонаж в кадре */
 export type Put = { id: string; o: Outfit; x: number; y: number; z: number; side?: boolean; mirror?: boolean; fo?: FrontOpts; so?: SideOpts;
-  blob?: boolean; shadow?: boolean; scale?: number };
+  blob?: boolean; shadow?: boolean; scale?: number; maxTier?: number };
 /** эффект-карточка (повёрнута к камере или лежит на полу) */
 export type FxPut = { key: string; cw: number; ch: number; draw: (p: Pen) => void; x: number; y: number; z: number; w: number; h: number; rot?: number; soft?: boolean; flat?: boolean };
 export type Frame = { t: number; st: St; look: Look; key: THREE.Vector3; cam: { pos: V3; look: V3; fov: number; roll: number }; focus: V3; puts: Put[]; fx: FxPut[] };
@@ -93,7 +93,7 @@ export class GasWorld {
       const row = k < 14 ? 0 : k < 28 ? 1 : 2, i = k - row * 14, n = row < 2 ? 14 : 12, r = (j: number) => hh(600 + k, j);
       const home: [number, number] = [-3.6 + ((i + 0.5 + (r(1) - 0.5) * 0.5) * 7.6) / n + (row % 2) * 0.25, 1.15 + row * 0.82 + r(2) * 0.22];
       const want = home[0] * 1.5 + (r(3) - 0.5) * 2, lane = LANES.reduce((a, b) => (Math.abs(b - want) < Math.abs(a - want) ? b : a)) + (r(4) - 0.5) * 0.3;
-      this.crowd.push({ home, lane, far: [Math.max(-8.6, Math.min(20, lane * 1.4 + (r(5) - 0.5) * 5)), 14 + r(6) * 8], lag: r(7), v: k % 7, ph: r(8), o: zombieFit(k % 7) });
+      this.crowd.push({ home, lane, far: [Math.max(-8.6, Math.min(20, lane * 1.4 + (r(5) - 0.5) * 5)), 14 + r(6) * 8], lag: r(7), v: k % 7, ph: Math.round(r(8) * 6) / 6, o: zombieFit(k % 7) });
     }
   }
 
@@ -450,7 +450,8 @@ export class GasWorld {
     for (const p of puts) {
       const scl = p.scale ?? 1;
       if (!this.frustum.intersectsSphere(this.sph.set(this.v.set(p.x, p.y + 1, p.z), 1.8 * scl)) && !p.shadow) continue;
-      const d = cam.position.distanceTo(this.v.set(p.x, p.y + 1.3 * scl, p.z)) / scl, [w, h, k] = tier(d);
+      const d = cam.position.distanceTo(this.v.set(p.x, p.y + 1.3 * scl, p.z)) / scl;
+      let [w, h, k] = tier(d); if (p.maxTier && w > p.maxTier) [w, h, k] = tier(p.maxTier >= 960 ? 3 : p.maxTier >= 480 ? 6 : 20);
       const mirror = !!(p.side && p.mirror), light = lightA(mirror);
       const fo: FrontOpts = { ...(p.fo ?? {}), light, seed: (p.fo?.seed ?? 3) }, so: SideOpts = { ...(p.so ?? {}), light, seed: (p.so?.seed ?? 3) };
       const key = p.side ? `S|${p.id}|${fkey(so)}` : `F|${p.id}|${fkey(fo)}`;
@@ -512,17 +513,17 @@ export class GasWorld {
       let u = 0;
       if (cr === "gather") u = 1 - clamp01(ck * 1.35 - c.lag * 0.35);
       if (cr === "leave" || cr === "rewind") u = clamp01(ck * 1.4 - c.lag * 0.4);
-      const [x, z] = u > 0 ? this.path(c, u) : c.home, y = z < 1.75 ? SWK : 0, id = `z${c.v}`;
+      const [x, z] = u > 0 ? this.path(c, u) : c.home, y = z < 1.75 ? SWK : 0, id = `c${c.v}`;
       if (u <= 0) {
-        out.push({ id, o: c.o, x, y, z, fo: { mode: "stand", pound: q((t * 1.7 + c.ph) % 1, 8), expr: "zom", seed: 4 + c.v * 5 },
+        out.push({ id, o: c.o, x, y, z, maxTier: 480, fo: { mode: "stand", pound: q((t * 1.7 + c.ph) % 1, 6), expr: "zom", seed: 4 + c.v * 5 },
           so: { mode: "stand", expr: "zom", seed: 4 + c.v * 5 }, _face: [0, -1] } as Put & { _face: number[] });
         return;
       }
       const [x2, z2] = this.path(c, clamp01(u + (cr === "gather" ? -0.02 : 0.02)));
       const mx = x2 - x, mz = z2 - z, ml = Math.hypot(mx, mz) || 1;
       const face = cr === "rewind" ? [0, -1] : [mx / ml, mz / ml];
-      out.push({ id, o: c.o, x, y, z, fo: { mode: "stroll", phase: q((t * (cr === "rewind" ? -1.4 : 0.8) + c.ph) % 1 + 1, 12) % 1, reach: 1, expr: "zom", seed: 4 + c.v * 5 },
-        so: { mode: "march", phase: q((t * 0.8 + c.ph) % 1, 12), stride: 0.6, expr: "zom", seed: 4 + c.v * 5 }, side: false, mirror: false, _face: face } as Put & { _face: number[] });
+      out.push({ id, o: c.o, x, y, z, maxTier: 480, fo: { mode: "stroll", phase: q((t * (cr === "rewind" ? -1.4 : 0.8) + c.ph) % 1 + 1, 8) % 1, reach: 1, expr: "zom", seed: 4 + c.v * 5 },
+        so: { mode: "march", phase: q((t * 0.8 + c.ph) % 1, 8), stride: 0.6, expr: "zom", seed: 4 + c.v * 5 }, side: false, mirror: false, _face: face } as Put & { _face: number[] });
     });
     return out;
   }

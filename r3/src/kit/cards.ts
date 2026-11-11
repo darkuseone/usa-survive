@@ -14,32 +14,47 @@ const makeEntry = (w: number, h: number): Entry => {
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   return { cv, tex, w, h };
 };
+/** Пул канвасов персонажей. У автора рисунок выкидывается, как только пропал из кадра; для толпы из 40 зомби в разных
+ *  фазах это перерисовка и загрузка десятков текстур каждый кадр (~25 с/кадр на программном GL). Здесь — LRU-кэш
+ *  с бюджетом в мегапикселях: фазы шага/ударов повторяются, и через цикл всё берётся из кэша. */
 export class Pool {
-  private live = new Map<string, Entry>();
+  private live = new Map<string, Entry & { used: number }>();
   private free: Entry[] = [];
   private reqs: Req[] = [];
+  private tick = 0;
+  constructor(private budgetMP = 70) {}
   req(key: string, w: number, h: number, k: number, draw: (p: Pen) => void) {
     const r: Req = { key: `${w}x${h}|${key}`, w, h, k, draw };
     this.reqs.push(r);
     return r;
   }
+  private mp() { let s = 0; for (const e of this.live.values()) s += (e.w * e.h) / 1e6; return s; }
   flush() {
+    this.tick++;
     const want = new Map<string, Req[]>();
     for (const r of this.reqs) { const l = want.get(r.key); if (l) l.push(r); else want.set(r.key, [r]); }
-    for (const [key, e] of this.live) if (!want.has(key)) { this.live.delete(key); this.free.push(e); }
     for (const [key, rs] of want) {
       let e = this.live.get(key);
       if (!e) {
         const r = rs[0], i = this.free.findIndex((x) => x.w === r.w && x.h === r.h);
-        e = i >= 0 ? this.free.splice(i, 1)[0] : makeEntry(r.w, r.h);
-        const g = e.cv.getContext("2d")!;
-        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, e.w, e.h); g.setTransform(r.k, 0, 0, r.k, 0, 0);
+        const base = i >= 0 ? this.free.splice(i, 1)[0] : makeEntry(r.w, r.h);
+        const g = base.cv.getContext("2d")!;
+        g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, base.w, base.h); g.setTransform(r.k, 0, 0, r.k, 0, 0);
         r.draw(new Pen(g));
-        e.tex.needsUpdate = true;
+        base.tex.needsUpdate = true;
+        e = { ...base, used: this.tick };
         this.live.set(key, e);
       }
+      e.used = this.tick;
       for (const r of rs) r.tex = e.tex;
     }
+    // сверх бюджета: старые (не в этом кадре) — в свободные; свободных держим немного, остальные освобождаем
+    let mp = this.mp();
+    if (mp > this.budgetMP) {
+      const old = [...this.live.entries()].filter(([, e]) => e.used < this.tick).sort((a, b) => a[1].used - b[1].used);
+      for (const [key, e] of old) { if (mp <= this.budgetMP * 0.85) break; this.live.delete(key); mp -= (e.w * e.h) / 1e6; this.free.push(e); }
+    }
+    while (this.free.length > 24) this.free.shift()!.tex.dispose();
     this.reqs = [];
   }
 }
