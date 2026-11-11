@@ -24,10 +24,8 @@ const toggles = (): PostToggles => ({ ink: true, lens: true, bloom: true, grade:
 /** грейд канала: мягкая S-кривая, насыщенность в середине и светах, лёгкий холод в тенях, виньетка */
 const GRADE_GAS: GradeParams = { ky: [0, 0.085, 0.26, 0.56, 0.82, 0.94, 1], sat: [1.05, 1.16, 1.1], tintS: [0.025, -0.004], tintM: [0, 0], tintH: [-0.012, 0.008], vig: [0.24, 0.42] };
 const makeBloom = () => {
-  const b = new BloomEffect({ blendFunction: BlendFunction.ADD, intensity: 0.65, luminanceThreshold: 1.0, luminanceSmoothing: 0.25, mipmapBlur: true, levels: 6, radius: 0.65 });
-  const mip = b.mipmapBlurPass, setSize = mip.setSize.bind(mip);
-  mip.setSize = (w: number, h: number) => setSize(Math.round((1920 * w) / Math.max(h, 1)), 1920);
-  return b;
+  // цепочка размытия — в размере кадра (у автора она всегда 1080x1920: при 3D в 720p это лишние ~4 с на кадр)
+  return new BloomEffect({ blendFunction: BlendFunction.ADD, intensity: 0.65, luminanceThreshold: 1.0, luminanceSmoothing: 0.25, mipmapBlur: true, levels: 6, radius: 0.65 });
 };
 const fwd = new THREE.Vector3(), fpt = new THREE.Vector3();
 
