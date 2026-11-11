@@ -33,6 +33,8 @@ episodes/shorts/station3d.js  3D-заправка эп. 1 (улица, мага�
 episodes/s03c_shutter/  шортс в комбинированном стиле (эталон): 3D — пролёты, краны, толпа; 2.5D — крупные эмоции (размытый 3D-фон + герой в 2D)
 episodes/s0*_*/    шортсы 9:16 (script.json — реплики x*_<ключ эп. 1> + новые крючки/финалы, short.js — SEGS); ch_avatar, ch_banner — аватар и баннер канала
 assets/            fonts/, sfx/ (несколько сэмплов; остальное синтезируется)
+r3/               версия B шортсов на движке claude-animated-shorts (Remotion + three.js, MIT): src/kit — модули репозитория (двухтоновый свет, контур, DOF, грейд, персонажи-карточки + Joe и зомби в toon.ts),
+                   src/videos/gas — заправка и раскадровка S3; scripts/stills.mjs (кадры), cast_sheet.mjs (стенд героев), render_gas.sh (рендер + звук). Разбор — research/claude-animated-shorts.md
 reference/tom-nikita/  исходный проект как ОБРАЗЕЦ стиля: персонажи (chars.js), реквизит, сцены 4 серий, контакт-листы, скиллы. Только читать.
 research/          разбор каналов-образцов (создаётся скиллом channel-research)
 out/               готовое: <имя>.mp4 (в git не кладём — больше 100 МБ), _sheet.jpg, .srt, _thumb.png
