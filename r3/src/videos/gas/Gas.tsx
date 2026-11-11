@@ -18,8 +18,8 @@ import { T, WORDS } from "./data";
 
 export const GAS_FRAMES = TOTAL;
 /** переключатели для замеров и черновиков (inputProps `{ post: { msaa: 0, dpr: 0.667 } }`); dpr < 1 — 3D в меньшем разрешении, надписи остаются чёткими */
-type PostToggles = { ink: boolean; lens: boolean; bloom: boolean; grade: boolean; msaa: number; dpr: number };
-const toggles = (): PostToggles => ({ ink: true, lens: true, bloom: true, grade: true, msaa: 4, dpr: 1, ...((getInputProps() as { post?: Partial<PostToggles> }).post ?? {}) });
+type PostToggles = { ink: boolean; lens: boolean; bloom: boolean; grade: boolean; msaa: number; dpr: number; shadow: number };
+const toggles = (): PostToggles => ({ ink: true, lens: true, bloom: true, grade: true, msaa: 4, dpr: 1, shadow: 2048, ...((getInputProps() as { post?: Partial<PostToggles> }).post ?? {}) });
 
 /** грейд канала: мягкая S-кривая, насыщенность в середине и светах, лёгкий холод в тенях, виньетка */
 const GRADE_GAS: GradeParams = { ky: [0, 0.085, 0.26, 0.56, 0.82, 0.94, 1], sat: [1.05, 1.16, 1.1], tintS: [0.025, -0.004], tintM: [0, 0], tintH: [-0.012, 0.008], vig: [0.24, 0.42] };
@@ -34,8 +34,8 @@ const fwd = new THREE.Vector3(), fpt = new THREE.Vector3();
 const Inner: React.FC = () => {
   const f = useCurrentFrame();
   const { camera, scene } = useThree();
-  const world = useMemo(() => new GasWorld(), []);
   const on = useMemo(toggles, []);
+  const world = useMemo(() => new GasWorld(on.shadow), [on]);
   const fx = useMemo(() => ({
     ink: new InkPass(scene, camera as THREE.PerspectiveCamera),
     lens: new LensBlur({ maxCoC: 22, nearScale: 1.2 }),

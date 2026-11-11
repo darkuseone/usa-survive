@@ -66,7 +66,7 @@ export class GasWorld {
   private coolM!: THREE.MeshBasicMaterial; private traffic!: THREE.Sprite; private crowd: Crowd[] = [];
   private frustum = new THREE.Frustum(); private m4 = new THREE.Matrix4(); private sph = new THREE.Sphere(); private v = new THREE.Vector3();
 
-  constructor() {
+  constructor(shadowMap = 2048) {
     const R = this.root;
     // ---- небо, луна, ключевой свет ----
     this.skyMat = new THREE.ShaderMaterial({
@@ -85,7 +85,7 @@ export class GasWorld {
     this.moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: P.glowT(), color: col("#f4f0ff", 2.2), fog: false, depthWrite: false }));
     this.moon.position.set(-60, 70, 260); this.moon.scale.set(26, 26, 1); this.moon.layers.set(NOINK); R.add(this.moon);
     this.key = new THREE.DirectionalLight("#ffffff", 2);
-    this.key.castShadow = true; this.key.shadow.mapSize.set(2048, 2048);
+    this.key.castShadow = true; this.key.shadow.mapSize.set(shadowMap, shadowMap);
     R.add(this.key, this.key.target);
     this.buildGround(); this.buildFar(); this.buildShell(); this.buildFront(); this.buildInterior(); this.buildShutter(); this.buildCanopy(); this.buildCar(-10.6, 11.4, 0.25); this.buildFx();
     // ---- толпа: 40 мест у жалюзи в три ряда, проход к трассе через коридоры между колонками ----
