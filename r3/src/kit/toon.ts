@@ -715,8 +715,8 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
   const brim = !!o.hat && o.hat !== "hair" && o.hat !== "bonnet" && o.hat !== "cap";
   if (opts.back) { // затылок: волосы ниже, пара складок, без лица
     if (o.hat === "hair" && o.hair) p.clip(hp, () => p.poly([[300 - W, crown], [300 + W, crown], [300 + W, hc + 0.2 * HH], [300 + 0.2 * W, hc + 0.27 * HH], [300 - 0.1 * W, hc + 0.2 * HH], [300 - 0.3 * W, hc + 0.28 * HH], [300 - W, hc + 0.18 * HH]], o.hair!, 2 * u));
-    else if (!o.hat) for (const j of [-1, 1]) p.arc(300 + j * 3 * u, hc + 0.2 * HH + j * 2 * u, 14 * u, 4 * u, 20, 160, 2.2 * u);
     p.inkRing(hp, ow, thick);
+    if (!o.hat || o.hat === "hair") for (const j of [-1, 1]) p.ell(300 + j * 0.98 * H.a, hc + 0.06 * HH, 7 * u, 11 * u, skin, 2.6 * u); // уши
     if (o.hat === "beanie") hatOn(p, o, hp, H, 300, hc, light, seed, facing, false);
   } else faceFront(p, 300, hc, W, expr, facing, look, lid, brim, skin, o.moustache, o.build === "stout", { zombie: o.zombie, stubble: o.stubble });
   p.rot = null;
