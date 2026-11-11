@@ -352,9 +352,12 @@ const faceFront = (p: Pen, cx: number, cy: number, W: number, expr: Expr, facing
   const u = W / 100, F = FACE[expr], fx = cx + 7 * u * facing;
   const big = F.eye[0] === "shock" || F.eye[0] === "pin" || F.eye[0] === "milky" || F.eye[1] === "milky";
   const ex = (big ? 14.5 : 13) * u, ey = cy;
-  if (extra.stubble) { // щетина: мягкая тень по нижней трети лица
-    const g = p.g; g.save(); g.globalAlpha = 0.2;
-    p.ell(cx + 8 * u * facing, cy + 27 * u, 30 * u, 17 * u, extra.stubble, 0);
+  if (extra.stubble) { // щетина: лёгкая тень + точки по нижней трети лица
+    const g = p.g, sx = cx + 8 * u * facing, sy = cy + 27 * u; g.save(); g.globalAlpha = 0.1;
+    p.ell(sx, sy, 30 * u, 16 * u, extra.stubble, 0);
+    g.globalAlpha = 0.55;
+    for (let i = 0; i < 70; i++) { const a = rnd(7, i) * Math.PI * 2, r = Math.sqrt(rnd(8, i)); const x = sx + Math.cos(a) * r * 29 * u, y = sy + Math.sin(a) * r * 15 * u;
+      if (Math.abs(x - (cx + 8 * u * facing)) < 9 * u && Math.abs(y - (cy + 20 * u)) < 4 * u) continue; p.dot(x, y, 0.9 * u, extra.stubble); }
     g.restore();
   }
   if (extra.zombie) for (const side of [-1, 1]) { const g = p.g; g.save(); g.globalAlpha = 0.55; p.ell(fx + side * ex, ey + 2 * u, 15 * u, 14 * u, mul(skin, [0.72, 0.74, 0.8]), 0); g.restore(); }
