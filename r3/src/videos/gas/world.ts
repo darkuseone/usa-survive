@@ -412,8 +412,8 @@ export class GasWorld {
     this.shafts.forEach((m, i) => {
       m.visible = sh > 0 && (st.shut ?? 0) > 0.9; if (!m.visible) return;
       const x0 = -3 + i * 3 + 0.4 * Math.sin(t * 0.2 + i), a = V(x0, 2.2, 0.4), dirIn = F.key.clone().multiplyScalar(-1), b = a.clone().addScaledVector(dirIn, (2.2 / Math.max(0.2, -dirIn.y)) * 0.95);
-      this.beam(m, a, b, 2.4, cam.position);
-      (m.material as THREE.MeshBasicMaterial).color.setHex(st.slitCol ?? 0xffd8a0).multiplyScalar(0.18 * sh);
+      this.beam(m, a, b, 1.9, cam.position);
+      (m.material as THREE.MeshBasicMaterial).color.setHex(st.slitCol ?? 0xffd8a0).multiplyScalar(0.12 * sh);
     });
     // ---- пластина и болты ----
     const Pl = this.plate, [p1, p2] = st.pop ?? [1e9, 1e9], u1 = t - p1, u2 = t - p2, jit = (st.bulge ?? 0) * 0.004 * Math.sin(t * 47);
