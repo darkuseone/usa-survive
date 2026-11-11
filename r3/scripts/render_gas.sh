@@ -1,10 +1,10 @@
 #!/bin/bash
 # Полный рендер версии B кусками (готовые пропускаются) и сведение со звуком версии A.
-#   bash scripts/render_gas.sh            — 3D в 720p без MSAA (надписи 1080p), 3 вкладки
+#   bash scripts/render_gas.sh            — 3D в 540p без MSAA (надписи 1080p), 2 вкладки: ~10 с/кадр на 4 ядрах без GPU
 #   PROPS='{"post":{}}' bash scripts/render_gas.sh  — полное качество (≈75 с/кадр на 4 ядрах без GPU)
 set -e; cd "$(dirname "$0")/.."
 CH=${CHROME:-/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell}
-PROPS=${PROPS:-'{"post":{"dpr":0.6667,"msaa":0}}'}; CC=${CC:-3}; CH_LEN=${CHUNK:-400}
+PROPS=${PROPS:-'{"post":{"dpr":0.5,"msaa":0}}'}; CC=${CC:-2}; CH_LEN=${CHUNK:-400}
 TOTAL=$(node -e "console.log(Math.round(53.72*30))")
 mkdir -p out/gas/chunks
 for ((a=0; a<TOTAL; a+=CH_LEN)); do
