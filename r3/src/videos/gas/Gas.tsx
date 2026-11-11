@@ -115,7 +115,7 @@ const Overlay: React.FC<{ f: number }> = ({ f }) => {
   [T.pops + 0.05, T.another + 0.25].forEach((p, i) => els.push(<Word key={"pop" + i} s="POP!" x={W / 2 - 130 + i * 260} y={1010 + i * 150} size={110} t={t} t0={p} life={0.9} rot={i ? 6 : -6} col="#ffd21f" />));
   if (name === "panic") {
     const ph = t < T.scream - 0.05 ? 0 : t < T.run - 0.05 ? 1 : 2, t0 = [T.panic - 0.1, T.scream - 0.05, T.run - 0.05][ph];
-    els.push(<Word key="pw" s={["PANIC", "SCREAM", "RUN"][ph]} y={470} size={130} t={t} t0={t0} life={0.9} />, <RedX key="px" x={W / 2} y={900} k={pr(t, t0 + 0.35, t0 + 0.55)} />);
+    els.push(<Word key="pw" s={["PANIC", "SCREAM", "RUN"][ph]} y={470} size={130} t={t} t0={t0} life={0.9} />, <RedX key="px" x={W / 2} y={1150} r={120} k={pr(t, t0 + 0.35, t0 + 0.55)} />);
   }
   if (name === "hide") {
     els.push(<Word key="11h" s="11 HOURS" y={1520} size={120} t={t} t0={T.eleven} life={2.2} col="#ffd21f" />);
