@@ -408,10 +408,12 @@ export class GasWorld {
     const sB = this.quadAt(0.6, 0.3, lam("keepClosed", { map: P.sign("KEEP CLOSED", "#f2c230", "#1c1512", 256, 128, 46) }), -0.035, 1.55, -0.5, { ry: -Math.PI / 2 });
     this.root.remove(sB); doorB.add(sB);
     const doorC = new THREE.Group(); doorC.position.set(3.1, 0, -6.15); this.root.add(doorC);
-    this.mesh(new THREE.BoxGeometry(0.85, 2.1, 0.07), steel, 0.425, 1.05, 0, { parent: doorC });
+    // дверь с настоящим окошком 0,42 × 0,46 (по центру x 0,43, y 1,6): сквозь него виден коридор и зомби
+    for (const [w, h, x, y] of [[0.22, 2.1, 0.11, 1.05], [0.21, 2.1, 0.745, 1.05], [0.42, 1.37, 0.43, 0.685], [0.42, 0.27, 0.43, 1.965]] as const)
+      this.mesh(new THREE.BoxGeometry(w, h, 0.07), steel, x, y, 0, { parent: doorC });
     this.mesh(new THREE.BoxGeometry(0.06, 0.32, 0.1), lam("bar", {}), 0.75, 1.05, 0.06, { parent: doorC });
     this.mesh(new THREE.BoxGeometry(0.06, 0.32, 0.1), lam("bar", {}), 0.75, 1.05, -0.06, { parent: doorC });
-    const frost = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ color: "#dfefff", transparent: true, opacity: 0.38, depthWrite: false, side: THREE.DoubleSide }));
+    const frost = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.46), new THREE.MeshBasicMaterial({ color: "#dfefff", transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }));
     frost.position.set(0.43, 1.6, 0); frost.layers.set(NOINK); doorC.add(frost);
     // лампочка подсобки
     const bulb = glow("#fff0c8", 2.8); this.mesh(new THREE.SphereGeometry(0.06, 12, 8), bulb, 4.9, 3.3, -5.4, { cast: false });

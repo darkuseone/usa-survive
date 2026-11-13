@@ -18,7 +18,7 @@ const Overlay: React.FC<{ f: number }> = ({ f }) => {
   }
   els.push(<FactCard key="fema" t={t} t0={T.fema - 0.05} t1={T.heater + 0.75} head="READY.GOV" lines={["HIDDEN WATER SOURCE:", "YOUR WATER HEATER"]} src="Source: FEMA / Ready.gov — Water" y={470} />);
   els.push(<Word key="40" s="40 GAL" y={500} size={170} t={t} t0={T.forty} life={1.9} col="#ffd21f" />);
-  els.push(<Word key="weeks" s="WEEKS MORE" y={500} size={120} t={t} t0={T.clean + 0.7} life={1.4} />);
+  els.push(<Word key="weeks" s="WEEKS MORE" y={1560} size={120} t={t} t0={T.clean + 0.7} life={1.4} />);
   els.push(<Word key="never" s="NEVER PUT BACK" y={470} size={110} t={t} t0={T.never - 0.05} life={1.3} col="#ff5a4a" />);
   els.push(<Word key="3am" s="3:00 AM" y={520} size={130} t={t} t0={T.am3} life={1.6} />);
   els.push(<Word key="sound" s="SOUND" y={470} size={140} t={t} t0={T.sound - 0.05} life={1.3} col="#ffd21f" />);

@@ -99,6 +99,8 @@ export const makeStory = (shots: ShotDef[], kicks: [number, number][], dur: numb
   const ndc = (c: Cam, p: V3) => { pc.fov = c.fov; pc.position.set(...c.pos); pc.up.set(0, 1, 0); pc.lookAt(...c.look); pc.rotateZ(c.roll); pc.updateMatrixWorld(); pc.updateProjectionMatrix(); return pv.set(...p).project(pc).clone(); };
   const blurAt = (s: ShotDef, t: number, c: Cam): [number, number] => {
     if (t - 1 / FPS < s.a) return [0, 0];
+    // размытие только на быстрых переездах (хлыст, пролёт: d ≤ 0,5 с); при ведении героя он должен оставаться резким
+    if (s.beats && !s.beats.some((b) => (b.d ?? 0.8) <= 0.5 && t >= b.t - (b.d ?? 0.8) && t <= b.t + 1 / FPS)) return [0, 0];
     const p = camOf(s, t - 1 / FPS), a = ndc(c, c.look), b = ndc(p, c.look);
     const Wp = aspect < 1 ? 1080 : 1920, Hp = Wp / aspect;          // кадр в пикселях
     let px = ((a.x - b.x) / 2) * Wp * 0.6, py = ((a.y - b.y) / 2) * Hp * 0.6;   // сдвиг за выдержку 0,6 кадра
