@@ -24,8 +24,8 @@ for k, sh in enumerate(shots):
   ax = axs[k // cols][k % cols]; R = [d for d in D if d['shot'] == sh]
   for x, z, w, d_, lab in GAS:
     ax.add_patch(Rectangle((x - w / 2, z - d_ / 2), w, d_, fc='#c9c2b2', ec='#333', lw=0.6))
-    if lab: ax.text(x, z, lab, fontsize=6, ha='center', va='center', color='#555')
-  for x, z, r, lab in CIRC: ax.add_patch(Circle((x, z), r, fc='#e9e4d6', ec='#333', lw=0.6)); ax.text(x, z - r - 0.15, lab, fontsize=6, ha='center', color='#555', clip_on=True)
+    if lab: ax.text(x, z, lab, fontsize=6, ha='center', va='center', color='#555').set_clip_path(ax.patch)
+  for x, z, r, lab in CIRC: ax.add_patch(Circle((x, z), r, fc='#e9e4d6', ec='#333', lw=0.6))
   xs = [d['pos'][0] for d in R] + [d['look'][0] for d in R]; zs = [d['pos'][2] for d in R] + [d['look'][2] for d in R]
   ax.plot([d['pos'][0] for d in R], [d['pos'][2] for d in R], '-', color='#d8342c', lw=1.2)
   for i, d in enumerate(R):
@@ -37,6 +37,8 @@ for k, sh in enumerate(shots):
     ax.plot(p[0], p[2], 'o', color=c, ms=3); ax.text(p[0], p[2] + 0.12, f"{d['t']:.1f} y{p[1]:.1f}", fontsize=6, color=c)
     for pid, x, z in d['puts']: ax.plot(x, z, 's' if pid == 'joe' else '^', color='#f0801a' if pid == 'joe' else '#3a8a4a', ms=5, alpha=0.6)
   cx, cz = (min(xs) + max(xs)) / 2, (min(zs) + max(zs)) / 2; s = max(max(xs) - min(xs), max(zs) - min(zs)) / 2 + 2
-  ax.set_xlim(cx - s, cx + s); ax.set_ylim(cz + s, cz - s); ax.set_aspect('equal'); ax.set_title(f"{sh}  {R[0]['t']:.1f}–{R[-1]['t']:.1f} c", fontsize=10); ax.grid(alpha=0.2)
+  for x, z, lab in [(g[0], g[1], g[4]) for g in GAS] + [(c[0], c[1] - c[2] - 0.15, c[3]) for c in CIRC]:
+    if lab and abs(x - cx) < s and abs(z - cz) < s: ax.text(x, z, lab, fontsize=6, ha='center', va='center', color='#555').set_clip_path(ax.patch)
+  ax.set_xlim(cx - s, cx + s); ax.set_ylim(cz + s, cz - s); ax.set_aspect('equal', adjustable='box'); ax.set_title(f"{sh}  {R[0]['t']:.1f}–{R[-1]['t']:.1f} c", fontsize=10); ax.grid(alpha=0.2)
 for k in range(n, rows * cols): axs[k // cols][k % cols].axis('off')
 plt.tight_layout(); plt.savefig(a.out, dpi=70); print(a.out)
