@@ -152,3 +152,26 @@ export const crackT = () => ctex("g_crack", 256, 256, (g, r) => {
   for (let k = 0; k < 5; k++) { let x = 128, y = 128; const pts = [[x, y]], a0 = k * 1.26 + r(); for (let i = 0; i < 6; i++) { x += Math.cos(a0 + (r() - 0.5)) * 22; y += Math.sin(a0 + (r() - 0.5)) * 22; pts.push([x, y]); } ln(g, pts, 5 - k * 0.5, "#1c1512"); }
 });
 export const rep = (t: THREE.Texture, x: number, y: number) => { const c = t.clone(); c.wrapS = c.wrapT = THREE.RepeatWrapping; c.repeat.set(x, y); c.needsUpdate = true; return c; };
+/** пустые холодильники: голые полки, пара сиротливых бутылок, ценники */
+export const coolerEmpty = () => ctex("g_coolerEmpty", 256, 512, (g, r) => {
+  rect(g, 0, 0, 256, 512, "#9fd6e6");
+  for (let row = 0; row < 4; row++) {
+    const y0 = 30 + row * 118; rect(g, 0, y0 + 96, 256, 7, "#e9edf2");
+    for (let q = 0; q < 5; q++) rect(g, 20 + q * 46, y0 + 90, 26, 8, "#f2c230", 2);
+    if (row === 2) { g.fillStyle = "#e8453c"; g.fillRect(170, y0 + 40, 26, 56); g.lineWidth = 2; g.strokeStyle = INK; g.strokeRect(170, y0 + 40, 26, 56); }
+  }
+  g.fillStyle = "rgba(255,255,255,0.25)"; g.beginPath(); g.moveTo(30, 0); g.lineTo(90, 0); g.lineTo(20, 512); g.lineTo(-40, 512); g.fill();
+  g.lineWidth = 16; g.strokeStyle = "#59606a"; g.strokeRect(8, 8, 240, 496); g.lineWidth = 3; g.strokeStyle = INK; g.strokeRect(1, 1, 254, 510); g.strokeRect(16, 16, 224, 480);
+  rect(g, 214, 200, 10, 110, "#c9ccd1", 2);
+});
+/** нержавейка холодильной камеры: панели со швами, иней внизу */
+export const steelT = () => ctex("g_steel", 256, 256, (g, r) => {
+  rect(g, 0, 0, 256, 256, "#c9d2da"); speck(g, r, 256, 256, 900, ["rgba(255,255,255,0.35)", "rgba(80,90,110,0.18)"], 1, 3);
+  for (let x = 0; x < 256; x += 64) ln(g, [[x + 1, 0], [x + 1, 256]], 3, "rgba(60,70,90,0.6)");
+  for (let i = 0; i < 40; i++) { g.fillStyle = "rgba(255,255,255,0.5)"; g.fillRect(r() * 256, 220 + r() * 36, 3 + r() * 8, 2); }
+});
+/** наклейка бойлера: «40 GAL» */
+export const heaterLabel = () => ctex("g_heatLbl", 160, 220, (g) => {
+  rect(g, 0, 0, 160, 220, "#f4f1ea"); rect(g, 0, 0, 160, 50, "#2f6a6e"); text(g, "WATER HEATER", 80, 26, 22, "#fbfaf6");
+  text(g, "40", 80, 110, 90, "#c8342c"); text(g, "GALLONS", 80, 170, 30, "#1c1512"); g.lineWidth = 6; g.strokeStyle = INK; g.strokeRect(3, 3, 154, 214);
+});

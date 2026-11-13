@@ -1,5 +1,5 @@
 # Параллельный рендер версии B (r3, Remotion + three.js) на раннерах GitHub Actions.
-# Запуск: изменить и запушить r3/render-request.json (кадры, число задач, настройки качества).
+# Запуск: изменить и запушить r3/render-request.json (композиция, кадры, число задач, настройки качества).
 # Каждая задача рендерит свой кусок кадров (видео без звука); готовые куски пушатся в ветку render-out,
 # звук версии A подкладывается локально (tools: r3/scripts/collect_b.sh). Mixkit-звуки в git не попадают.
 name: render-b
@@ -39,8 +39,9 @@ jobs:
         run: |
           PROPS=$(python3 -c "import json; print(json.dumps(json.load(open('render-request.json'))['props']))")
           CC=$(python3 -c "import json; print(json.load(open('render-request.json')).get('concurrency', 2))")
+          COMP=$(python3 -c "import json; print(json.load(open('render-request.json')).get('composition', 'GasShort'))")
           mkdir -p out/ci && A=$(printf %04d ${{ matrix.a }})
-          npx remotion render src/index.ts GasShort out/ci/chunk_$A.mp4 --gl=swangle --concurrency=$CC --frames=${{ matrix.a }}-${{ matrix.b }} \
+          npx remotion render src/index.ts $COMP out/ci/chunk_$A.mp4 --gl=swangle --concurrency=$CC --frames=${{ matrix.a }}-${{ matrix.b }} \
             --codec=h264 --crf=16 --timeout=900000 --props="$PROPS" 2>&1 | grep -v "fallback to software" | tail -20
       - uses: actions/upload-artifact@v4
         with: { name: "chunk-${{ matrix.a }}", path: r3/out/ci/chunk_*.mp4, retention-days: 3 }

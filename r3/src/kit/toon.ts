@@ -494,7 +494,7 @@ const hatOn = (p: Pen, o: Outfit, hp: P2[], H: Blob, cx: number, hc: number, lig
 // ---------------- bodies ----------------
 export type Arms = [P2[], P2[]];
 /** held prop; for the hammer the number is the strike 0 (raised) .. 1 (struck) */
-export type Prop = null | "icecream" | "shako" | ["hammer", number];
+export type Prop = null | "icecream" | "shako" | ["hammer", number] | "bottle" | ["handset", number];
 
 const BUILD: Record<Build, { a: number; torso: number; legs: number; tw: number }> = {
   adult: { a: 118, torso: 1.1, legs: 1.4, tw: 0.8 },
@@ -615,6 +615,14 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
     } else if (wave !== undefined) {
       const S = sh(1);
       arms.push({ pts: [S, [tcx + 1.1 * T.a + 10 * u + 3 * u * wave, S[1] - 0.22 * HH], [tcx + 1.18 * T.a + 16 * u + 12 * u * wave, S[1] - 0.6 * HH]], front: false });
+    } else if (prop === "bottle") {                                     // пустая бутылка перед лицом
+      const S = sh(1);
+      arms.push({ pts: [S, [tcx + 1.1 * T.a + 6 * u, S[1] + 0.25 * HH], [tcx + 0.55 * T.a, S[1] - 0.12 * HH]], front: true });
+    } else if (Array.isArray(prop) && prop[0] === "handset") {          // трубка кассы: 0 — у пояса, 1 — поднята (бьёт о стену)
+      const S = sh(1), k = clamp(prop[1], 0, 1);
+      const E = lerp2([tcx + 1.15 * T.a + 6 * u, S[1] + 0.45 * HH], [tcx + 1.25 * T.a + 14 * u, S[1] - 0.1 * HH], k);
+      const Hd = lerp2([tcx + 0.85 * T.a, torsoBot - 0.18 * HH], [tcx + 1.35 * T.a + 22 * u, S[1] - 0.62 * HH], k);
+      arms.push({ pts: [S, E, Hd], front: true });
     } else if (prop === "icecream") {
       const S = sh(1);
       arms.push({ pts: [S, [tcx + 1.05 * T.a + 4 * u, S[1] + 0.45 * HH], [tcx + 0.5 * T.a, S[1] + 0.4 * HH]], front: true });
@@ -689,6 +697,24 @@ export const bodyFront = (p: Pen, o: Outfit, opts: FrontOpts) => {
     if (prop === "icecream") {
       p.poly([[hx - 8 * u, hy - 12 * u], [hx + 8 * u, hy - 12 * u], [hx, hy + 7 * u]], "#e0a35a", 1.8 * u);
       p.ell(hx, hy - 19 * u, 11 * u, 10 * u, "#f7c6d9", 2.2 * u);
+      p.dot(hx, hy, 5.5 * u);
+    } else if (prop === "bottle") {
+      const bp: P2[] = [[hx - 9 * u, hy - 4 * u], [hx + 9 * u, hy - 4 * u], [hx + 9 * u, hy - 38 * u], [hx + 5 * u, hy - 46 * u], [hx + 4 * u, hy - 54 * u],
+        [hx - 4 * u, hy - 54 * u], [hx - 5 * u, hy - 46 * u], [hx - 9 * u, hy - 38 * u]];
+      p.poly(bp, "#d6f0ff", 2.4 * u);
+      p.poly([[hx - 5 * u, hy - 54 * u], [hx + 5 * u, hy - 54 * u], [hx + 5 * u, hy - 60 * u], [hx - 5 * u, hy - 60 * u]], "#2f7fd8", 2 * u);
+      p.poly([[hx - 9 * u, hy - 24 * u], [hx + 9 * u, hy - 24 * u], [hx + 9 * u, hy - 14 * u], [hx - 9 * u, hy - 14 * u]], "#3d7fc4", 1.6 * u);
+      p.ell(hx + 1 * u, hy + 6 * u, 2.4 * u, 3.4 * u, "#8fd0ff", 1.4 * u);           // последняя капля
+      p.dot(hx, hy, 5.5 * u);
+    } else if (Array.isArray(prop) && prop[0] === "handset") {
+      const ang = rad(-20 + 60 * clamp(prop[1], 0, 1));
+      const Rh = (pts: P2[]) => rotPts(pts, ang, hx, hy);
+      p.poly(Rh([[hx - 6 * u, hy - 26 * u], [hx + 6 * u, hy - 26 * u], [hx + 6 * u, hy + 22 * u], [hx - 6 * u, hy + 22 * u]]), "#2a2c30", 2.2 * u);
+      p.poly(Rh([[hx - 9 * u, hy - 34 * u], [hx + 9 * u, hy - 34 * u], [hx + 9 * u, hy - 24 * u], [hx - 9 * u, hy - 24 * u]]), "#3a3d44", 2 * u);
+      p.poly(Rh([[hx - 9 * u, hy + 20 * u], [hx + 9 * u, hy + 20 * u], [hx + 9 * u, hy + 30 * u], [hx - 9 * u, hy + 30 * u]]), "#3a3d44", 2 * u);
+      p.ell(...Rh([[hx, hy - 6 * u]])[0], 3.2 * u, 3.2 * u, clamp(prop[1], 0, 1) > 0.5 ? "#ff4a3a" : "#7a2a2a", 1.2 * u);   // кнопка
+      const cord: P2[] = []; for (let i = 0; i <= 14; i++) cord.push([hx - 2 * u - i * 2.2 * u, hy + 30 * u + 6 * u * Math.sin(i * 1.7) + i * 1.5 * u]);
+      p.stroke(cord, 1.8 * u, "#2a2c30");
       p.dot(hx, hy, 5.5 * u);
     } else if (Array.isArray(prop)) {
       const ang = rad(-70 + 105 * clamp(prop[1], 0, 1));

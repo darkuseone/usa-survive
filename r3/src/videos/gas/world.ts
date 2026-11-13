@@ -20,6 +20,10 @@ export type St = {
   door?: number; shut?: number; bulge?: number; dents?: number; knock?: [number, number, number]; slits?: number; slitCol?: number; fig?: number;
   btnDown?: boolean; car?: boolean; carBump?: number; shafts?: number; pop?: [number, number]; rain?: number; clock?: string;
   crowd?: "pound" | "gather" | "leave" | "rewind"; crowdK?: number;
+  /** подсобка (шортс S2): empty — холодильники пустые; doorA — дверь из зала в подсобку, doorB — задняя дверь во двор, doorC — дверь
+   *  холодильной камеры (0 закрыта … 1 открыта); shelf — стеллаж 0 у задней двери … 1 оттащен; heater — струя из крана бойлера 0..1;
+   *  fill — уровень в ведре 0..1; bulb — лампочка подсобки 0..1; speaker — волны от громкоговорителя на колонке 0..1; coolLight — свет в камере */
+  empty?: boolean; doorA?: number; doorB?: number; doorC?: number; shelf?: number; heater?: number; fill?: number; bulb?: number; speaker?: number; coolLight?: number;
 };
 /** персонаж в кадре */
 export type Put = { id: string; o: Outfit; x: number; y: number; z: number; side?: boolean; mirror?: boolean; fo?: FrontOpts; so?: SideOpts;
@@ -63,7 +67,8 @@ export class GasWorld {
   private car!: THREE.Group; private carLights: { m: THREE.MeshBasicMaterial; c: THREE.Color }[] = []; private carHalo: THREE.Sprite[] = [];
   private alarmHalo: THREE.Sprite[] = []; private fig!: THREE.Mesh; private shafts: THREE.Mesh[] = [];
   private rain!: THREE.LineSegments; private rain0: number[][] = []; private dust!: THREE.Points; private dust0: number[][] = [];
-  private coolM!: THREE.MeshBasicMaterial; private traffic!: THREE.Sprite; private crowd: Crowd[] = [];
+  private coolM!: THREE.MeshBasicMaterial; private br!: { doorA: THREE.Group; doorB: THREE.Group; doorC: THREE.Group; shelf: THREE.Group; stream: THREE.Mesh;
+    water: THREE.Mesh; bulb: THREE.MeshBasicMaterial; bulbHalo: THREE.Sprite; coolLamp: THREE.MeshBasicMaterial; horn: THREE.Vector3; full: THREE.Texture; empty: THREE.Texture }; private traffic!: THREE.Sprite; private crowd: Crowd[] = [];
   private frustum = new THREE.Frustum(); private m4 = new THREE.Matrix4(); private sph = new THREE.Sphere(); private v = new THREE.Vector3();
 
   constructor(shadowMap = 2048) {
@@ -87,7 +92,7 @@ export class GasWorld {
     this.key = new THREE.DirectionalLight("#ffffff", 2);
     this.key.castShadow = true; this.key.shadow.mapSize.set(shadowMap, shadowMap);
     R.add(this.key, this.key.target);
-    this.buildGround(); this.buildFar(); this.buildShell(); this.buildFront(); this.buildInterior(); this.buildShutter(); this.buildCanopy(); this.buildCar(-10.6, 11.4, 0.25); this.buildFx();
+    this.buildGround(); this.buildFar(); this.buildShell(); this.buildFront(); this.buildInterior(); this.buildShutter(); this.buildCanopy(); this.buildCar(-10.6, 11.4, 0.25); this.buildBackRoom(); this.buildFx();
     // ---- толпа: 40 мест у жалюзи в три ряда, проход к трассе через коридоры между колонками ----
     for (let k = 0; k < 40; k++) {
       const row = k < 14 ? 0 : k < 28 ? 1 : 2, i = k - row * 14, n = row < 2 ? 14 : 12, r = (j: number) => hh(600 + k, j);
@@ -168,8 +173,9 @@ export class GasWorld {
   private buildShell() {
     const b = new Batch(), nb = new Batch();
     const sid = lam("siding", { map: P.rep(P.siding(), 4, 1.2) }), win = lam("wallIn", { map: P.rep(P.wallIn(), 4, 1) });
-    this.box(nb, 0, 1.85, -8.1, 14.4, 3.7, 0.2, sid, 0); this.box(nb, -7.1, 1.85, -4, 0.2, 3.7, 8.2, sid); this.box(nb, 7.1, 1.85, -4, 0.2, 3.7, 8.2, sid);
-    this.quadAt(14, 3.6, win, 0, 1.8, -7.99); this.quadAt(8, 3.6, win, -6.99, 1.8, -4, { ry: Math.PI / 2 }); this.quadAt(8, 3.6, win, 6.99, 1.8, -4, { ry: -Math.PI / 2 });
+    this.box(nb, 0, 1.85, -8.1, 14.4, 3.7, 0.2, sid, 0); this.box(nb, -7.1, 1.85, -4, 0.2, 3.7, 8.2, sid); this.box(nb, 7.1, 1.85, -7.05, 0.2, 3.7, 2.1, sid); this.box(nb, 7.1, 1.85, -2.45, 0.2, 3.7, 5.1, sid); this.box(nb, 7.1, 2.925, -5.5, 0.2, 1.55, 1.0, sid);
+    this.quadAt(14, 3.6, win, 0, 1.8, -7.99); this.quadAt(8, 3.6, win, -6.99, 1.8, -4, { ry: Math.PI / 2 }); this.quadAt(2, 3.6, win, 6.99, 1.8, -7, { ry: -Math.PI / 2 }); this.quadAt(5, 3.6, win, 6.99, 1.8, -2.5, { ry: -Math.PI / 2 });
+    this.quadAt(1, 1.45, win, 6.99, 2.875, -5.5, { ry: -Math.PI / 2 });
     this.quadAt(14, 8, lam("floor", { map: P.rep(P.floor(), 7, 4) }), 0, 0.012, -4, { rx: -Math.PI / 2 });
     this.quadAt(1.7, 1.0, lam("mat", { color: "#8a2a2a" }), 0, 0.02, -0.75, { rx: -Math.PI / 2 });
     this.quadAt(14, 8, lam("ceil", { map: P.rep(P.ceiling(), 14, 8) }), 0, 3.6, -4, { rx: Math.PI / 2 });
@@ -351,6 +357,78 @@ export class GasWorld {
     L("#fff2c0", -0.62, 0.74, 2.18); L("#fff2c0", 0.62, 0.74, 2.18); L("#ff3020", -0.65, 0.74, -2.18); L("#ff3020", 0.65, 0.74, -2.18); L("#ffa020", -0.86, 0.58, 2.18, 0.14); L("#ffa020", 0.86, 0.58, 2.18, 0.14);
     this.carHalo = [this.halo("#ffd070", x - 0.1 + 2.3 * Math.sin(ry), 0.8, z + 2.3 * Math.cos(ry), 3.2, 0), this.halo("#ff6040", x - 2.3 * Math.sin(ry), 0.8, z - 2.3 * Math.cos(ry), 2.4, 0)];
   }
+  /** подсобка x 2.4…7.0, z -8.0…-4.07: дверь A из зала (стена x 2.4, проём z -5.6…-4.7), бойлер в углу (6.5, -7.55) с краном, шлангом и
+   *  ведром, стеллаж (у задней двери или оттащен), задняя дверь B (x 7.1, z -6.0…-5.0) во двор, холодильная камера x 2.55…4.55, z -7.95…-6.15
+   *  (дверь C x 3.1…3.95), лампочка; снаружи — мусорный бак, фонарь над дверью; громкоговоритель на столбе навеса у колонки 4. */
+  private buildBackRoom() {
+    const b = new Batch(), win = lam("wallIn", {}), dark = lam("dark", {}), steel = lam("coolSteel", { map: P.steelT() });
+    const W = (x: number, z: number, w: number, d: number, h = 3.6, y0 = 0, m: THREE.Material = win) => this.box(b, x, y0 + h / 2, z, w, h, d, m);
+    W(2.4, -6.8, 0.14, 2.4); W(2.4, -4.385, 0.14, 0.63); W(2.4, -5.15, 0.14, 0.9, 1.45, 2.15);                     // стена зал | подсобка
+    this.quadAt(0.7, 0.24, lam("empA", { map: P.sign("EMPLOYEES ONLY", "#c8342c", "#fbf8f0", 256, 64, 30) }), 2.32, 2.4, -5.15, { ry: -Math.PI / 2 });
+    // холодильная камера (стены 0.08, крыша), проём двери C
+    const cw = (x: number, z: number, w: number, d: number, h = 2.6, y0 = 0) => this.box(b, x, y0 + h / 2, z, w, h, d, steel);
+    cw(2.55, -7.05, 0.08, 1.8); cw(4.55, -7.05, 0.08, 1.8); cw(3.55, -7.95, 2.08, 0.08); cw(2.825, -6.15, 0.55, 0.08); cw(4.25, -6.15, 0.6, 0.08);
+    cw(3.525, -6.15, 0.85, 0.08, 0.5, 2.1); this.box(b, 3.55, 2.64, -7.05, 2.1, 0.08, 1.88, steel);
+    for (const z of [-7.75, -7.2, -6.65]) for (const y of [0.35, 1.0, 1.65]) this.box(b, 2.85, y, z, 0.42, 0.04, 0.5, lam("rack", { color: "#9aa3ad" }));
+    const crate = lam("crate", { color: "#2f6fc4" }), milk = lam("milk", { color: "#f4f1ea" });
+    for (const [z, y] of [[-7.75, 0.37], [-7.2, 1.02], [-6.65, 0.37], [-7.75, 1.67]]) { this.box(b, 2.85, y + 0.14, z, 0.38, 0.26, 0.42, crate); this.box(b, 2.85, y + 0.33, z, 0.3, 0.12, 0.34, milk); }
+    const coolLamp = glow("#cfe8ff", 1.2); this.mesh(new THREE.BoxGeometry(0.5, 0.03, 0.12), coolLamp, 3.55, 2.58, -7.0, { cast: false });
+    // бойлер, кран, шланг, ведро, бутылки
+    const heat = lam("heater", { color: "#e9e4d6" }), brass = lam("brass", { color: "#c99a3a" });
+    this.mesh(new THREE.CylinderGeometry(0.32, 0.32, 1.5, 24), heat, 6.5, 0.8, -7.55);
+    this.mesh(new THREE.SphereGeometry(0.32, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2), heat, 6.5, 1.55, -7.55);
+    this.mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.06, 24), dark, 6.5, 0.05, -7.55);
+    for (const dx of [-0.12, 0.12]) this.mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.8, 8), brass, 6.5 + dx, 2.7, -7.55);
+    const lbl = this.quadAt(0.36, 0.5, lam("heatLbl", { map: P.heaterLabel() }), 6.5 - 0.325 * 0.6, 1.05, -7.55 + 0.325 * 0.8, { ry: Math.atan2(-0.6, 0.8) });
+    lbl.castShadow = false;
+    this.box(b, 6.29, 0.2, -7.27, 0.1, 0.1, 0.1, brass); this.mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 10), lam("valveRed", { color: "#d8342c" }), 6.24, 0.2, -7.22, { rx: Math.PI / 2 });
+    const hose = new THREE.CatmullRomCurve3([V(6.25, 0.18, -7.22), V(6.1, 0.05, -7.1), V(5.95, 0.08, -6.98), V(5.88, 0.36, -6.95)]);
+    this.mesh(new THREE.TubeGeometry(hose, 16, 0.025, 6), lam("hoseG", { color: "#3a8a4a" }), 0, 0, 0);
+    this.mesh(new THREE.CylinderGeometry(0.19, 0.16, 0.32, 18, 1, true), lam("bucket", { color: "#e8a032", side: THREE.DoubleSide }), 5.82, 0.16, -6.9);
+    const water = this.mesh(new THREE.CircleGeometry(0.17, 18), glow("#4fb4ff", 0.9), 5.82, 0.05, -6.9, { rx: -Math.PI / 2, cast: false });
+    const stream = this.mesh(new THREE.CylinderGeometry(0.018, 0.024, 1, 8), new THREE.MeshBasicMaterial({ color: col("#8fd6ff", 1.3), transparent: true, opacity: 0.85, depthWrite: false }), 5.86, 0.25, -6.93, { cast: false });
+    stream.layers.set(NOINK);
+    const bott = lam("bottleFull", { color: "#5ab0f0" });
+    for (let i = 0; i < 5; i++) this.mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.3, 10), bott, 5.35 + (i % 3) * 0.12, 0.15, -7.4 + Math.floor(i / 3) * 0.13);
+    // стеллаж (группа: двигается между задней дверью и серединой подсобки)
+    const shelf = new THREE.Group(); this.root.add(shelf);
+    const rk = lam("rackMetal", { color: "#7a828c" }), cb = lam("cbox", {});
+    for (const [x, z] of [[-0.6, -0.22], [0.6, -0.22], [-0.6, 0.22], [0.6, 0.22]]) this.mesh(new THREE.BoxGeometry(0.04, 1.9, 0.04), rk, x, 0.95, z, { parent: shelf });
+    for (const y of [0.15, 0.7, 1.25, 1.8]) this.mesh(new THREE.BoxGeometry(1.24, 0.03, 0.46), rk, 0, y, 0, { parent: shelf });
+    for (const [x, y, w] of [[-0.3, 0.33, 0.5], [0.3, 0.3, 0.45], [0, 0.88, 0.9], [-0.35, 1.42, 0.4], [0.25, 1.45, 0.5]]) this.mesh(new THREE.BoxGeometry(w, 0.3, 0.38), cb, x, y, 0, { parent: shelf });
+    // двери: A — из зала (петли z -4.7), B — задняя во двор (петли z -5.0), C — холодильная камера (петли x 3.1)
+    const doorM = lam("backDoor", { color: "#6b7480" });
+    const doorA = new THREE.Group(); doorA.position.set(2.4, 0, -4.7); this.root.add(doorA);
+    this.mesh(new THREE.BoxGeometry(0.05, 2.12, 0.88), lam("empDoor", {}), 0, 1.06, -0.45, { parent: doorA });
+    this.mesh(new THREE.BoxGeometry(0.04, 0.05, 0.14), lam("bar", {}), -0.05, 1.05, -0.78, { parent: doorA });
+    const doorB = new THREE.Group(); doorB.position.set(7.1, 0, -5.0); this.root.add(doorB);
+    this.mesh(new THREE.BoxGeometry(0.06, 2.12, 0.98), doorM, 0, 1.06, -0.5, { parent: doorB });
+    this.mesh(new THREE.BoxGeometry(0.08, 0.07, 0.8), lam("bar", {}), -0.06, 1.05, -0.5, { parent: doorB });
+    const sB = this.quadAt(0.6, 0.3, lam("keepClosed", { map: P.sign("KEEP CLOSED", "#f2c230", "#1c1512", 256, 128, 46) }), -0.035, 1.55, -0.5, { ry: -Math.PI / 2 });
+    this.root.remove(sB); doorB.add(sB);
+    const doorC = new THREE.Group(); doorC.position.set(3.1, 0, -6.15); this.root.add(doorC);
+    this.mesh(new THREE.BoxGeometry(0.85, 2.1, 0.07), steel, 0.425, 1.05, 0, { parent: doorC });
+    this.mesh(new THREE.BoxGeometry(0.06, 0.32, 0.1), lam("bar", {}), 0.75, 1.05, 0.06, { parent: doorC });
+    this.mesh(new THREE.BoxGeometry(0.06, 0.32, 0.1), lam("bar", {}), 0.75, 1.05, -0.06, { parent: doorC });
+    const frost = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ color: "#dfefff", transparent: true, opacity: 0.38, depthWrite: false, side: THREE.DoubleSide }));
+    frost.position.set(0.43, 1.6, 0); frost.layers.set(NOINK); doorC.add(frost);
+    // лампочка подсобки
+    const bulb = glow("#fff0c8", 2.8); this.mesh(new THREE.SphereGeometry(0.06, 12, 8), bulb, 4.9, 3.3, -5.4, { cast: false });
+    this.box(b, 4.9, 3.46, -5.4, 0.01, 0.28, 0.01, dark);
+    const bulbHalo = this.halo("#ffe2a0", 4.9, 3.3, -5.4, 1.4, 0.5);
+    // двор за задней дверью: бак, поддон, фонарь над дверью (ночью)
+    this.box(b, 9.3, 0.65, -7.2, 1.8, 1.3, 1.0, lam("dumpster", { color: "#2f6a4a" }));
+    this.box(b, 8.6, 0.07, -4.3, 1.2, 0.14, 1.0, lam("pallet", { color: "#a07a4a" }));
+    this.box(b, 7.25, 2.55, -5.5, 0.16, 0.12, 0.34, dark);
+    const wl = this.mesh(new THREE.BoxGeometry(0.06, 0.06, 0.26), glow("#ffc070", 3), 7.3, 2.48, -5.5, { cast: false }); wl.layers.set(NOINK);
+    this.night.push(this.halo("#ffb060", 7.4, 2.45, -5.5, 2.6, 0.55), this.quadAt(2.2, 3.2, addM(P.glowT(), "#ffb060", 0.25), 8.3, 0.02, -5.5, { rx: -Math.PI / 2, noInk: true }));
+    // громкоговоритель на столбе навеса (x 5, z 6.5) — «pump four is ready»
+    this.mesh(new THREE.CylinderGeometry(0.06, 0.24, 0.42, 14, 1, true), lam("horn", { color: "#d9d4c4", side: THREE.DoubleSide }), 4.62, 3.7, 6.5, { rz: Math.PI / 2 });
+    this.box(b, 4.8, 3.7, 6.5, 0.1, 0.18, 0.12, dark);
+    b.build(this.root);
+    this.br = { doorA, doorB, doorC, shelf, stream, water, bulb, bulbHalo, coolLamp, horn: V(4.4, 3.7, 6.5), full: P.cooler(), empty: P.coolerEmpty() };
+  }
+
   private buildFx() {
     // дождь (линии) и пыль в лучах (точки), без контура
     const N = 2600, pos = new Float32Array(N * 6);
@@ -433,6 +511,16 @@ export class GasWorld {
     this.carLights.forEach(({ m, c }) => m.color.copy(c).multiplyScalar(0.35 + 3.0 * ca));
     this.carHalo.forEach((h) => { h.visible = ca > 0.1; h.material.opacity = 0.55 * ca; });
     this.car.rotation.z = (st.carBump ?? 0) * 0.025;
+    // ---- подсобка ----
+    const B_ = this.br;
+    this.coolM.map = st.empty ? B_.empty : B_.full;
+    B_.doorA.rotation.y = -1.5 * sm(st.doorA ?? 0); B_.doorB.rotation.y = -1.35 * sm(st.doorB ?? 0); B_.doorC.rotation.y = -1.45 * sm(st.doorC ?? 0);
+    const sk = sm(st.shelf ?? 1); B_.shelf.position.set(lerp(6.8, 5.35, sk), 0, lerp(-5.5, -4.5, sk)); B_.shelf.rotation.y = lerp(Math.PI / 2, 0, sk);
+    const hf = st.heater ?? 0, wl_ = st.fill ?? 0;
+    B_.stream.visible = hf > 0.02; B_.stream.scale.set(0.6 + 0.6 * hf, 0.2 + 0.1 * hf, 0.6 + 0.6 * hf); B_.stream.position.y = 0.1 + 0.14 + wl_ * 0.12;
+    B_.water.visible = wl_ > 0.02; B_.water.position.y = 0.03 + 0.28 * wl_;
+    const bl = st.bulb ?? 1; B_.bulb.color.set("#fff0c8").multiplyScalar(0.2 + 2.6 * bl); B_.bulbHalo.visible = bl > 0.1; B_.bulbHalo.material.opacity = 0.5 * bl;
+    B_.coolLamp.color.set("#cfe8ff").multiplyScalar(0.15 + 1.2 * (st.coolLight ?? 0.6));
     // ---- дождь, пыль ----
     const ra = st.rain ?? 1; this.rain.visible = ra > 0;
     if (ra > 0) { (this.rain.material as THREE.LineBasicMaterial).opacity = 0.4 * ra; const p = this.rain.geometry.attributes.position.array as Float32Array;

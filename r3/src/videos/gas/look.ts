@@ -48,6 +48,12 @@ export const LOOKS = {
   /** ночь внутри без ламп: лунный свет сквозь щели */
   moonIn: { ...base, az: 0, el: 30, dir: [0.2, 0.5, 1], lit: [0.78, 0.98, 1.65], shade: [0.1, 0.11, 0.25], charTint: [0.82, 0.9, 1.06], charShade: 0.5,
     sky: NIGHT_SKY, fog: "#0c1024", fogNear: 20, fogFar: 120, stars: 1, moon: true },
+  /** подсобка ночью: свет только с улицы через заднюю дверь (+x), холодный, тени глубокие, но не в ноль */
+  backNight: { ...base, az: 0, el: 25, dir: [1, 0.38, -0.08], lit: [0.9, 1.04, 1.55], shade: [0.15, 0.16, 0.3], lift: [0.04, 0.04, 0.09], charTint: [0.84, 0.92, 1.08], charShade: 0.6,
+    sky: NIGHT_SKY, fog: "#0c1024", fogNear: 20, fogFar: 120, stars: 1, moon: true },
+  /** внутри холодильной камеры: голубой холодный свет лампы сверху */
+  coolerIn: { ...base, az: 165, el: 68, lit: [0.85, 1.05, 1.35], shade: [0.22, 0.28, 0.44], lift: [0.03, 0.05, 0.1], charTint: [0.86, 0.95, 1.1], charShade: 0.78,
+    sky: NIGHT_SKY, fog: "#0c1024", fogNear: 20, fogFar: 120, stars: 0, moon: false },
 } satisfies Record<string, Look>;
 export type LookName = keyof typeof LOOKS;
 
