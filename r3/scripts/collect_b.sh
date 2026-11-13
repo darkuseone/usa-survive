@@ -13,6 +13,6 @@ git archive origin/render-out | tar -x -C r3/out/ci
 mapfile -t CH < <(ls r3/out/ci/chunk_*.mp4 | sort); N=${#CH[@]}
 IN=(); F=""; for i in "${!CH[@]}"; do IN+=(-i "${CH[$i]}"); F+="[$i:v]"; done
 ffmpeg -y -v error "${IN[@]}" -i build/$EP/audio.wav -filter_complex "${F}concat=n=$N:v=1:a=0[v]" -map "[v]" -map $N:a \
-  -c:v libx264 -crf 17 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart out/$NAME.mp4
+  -c:v libx264 -crf 17 -preset medium -pix_fmt yuv420p -af alimiter=limit=0.8:attack=2:release=50:level=false -c:a aac -b:a 256k -shortest -movflags +faststart out/$NAME.mp4
 ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames,width,height:format=duration -of compact out/$NAME.mp4
 if [ -n "$FRAMES" ]; then N2=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 out/$NAME.mp4); [ "$N2" = "$FRAMES" ] || { echo "ОШИБКА: кадров $N2, ожидалось $FRAMES"; exit 1; }; fi
