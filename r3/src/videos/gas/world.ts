@@ -23,7 +23,7 @@ export type St = {
   /** подсобка (шортс S2): empty — холодильники пустые; doorA — дверь из зала в подсобку, doorB — задняя дверь во двор, doorC — дверь
    *  холодильной камеры (0 закрыта … 1 открыта); shelf — стеллаж 0 у задней двери … 1 оттащен; heater — струя из крана бойлера 0..1;
    *  fill — уровень в ведре 0..1; bulb — лампочка подсобки 0..1; speaker — волны от громкоговорителя на колонке 0..1; coolLight — свет в камере */
-  empty?: boolean; doorA?: number; doorB?: number; doorC?: number; shelf?: number; heater?: number; fill?: number; bulb?: number; speaker?: number; coolLight?: number;
+  empty?: boolean; valve?: number; doorA?: number; doorB?: number; doorC?: number; shelf?: number; heater?: number; fill?: number; bulb?: number; speaker?: number; coolLight?: number;
 };
 /** персонаж в кадре */
 export type Put = { id: string; o: Outfit; x: number; y: number; z: number; side?: boolean; mirror?: boolean; fo?: FrontOpts; so?: SideOpts;
@@ -67,7 +67,7 @@ export class GasWorld {
   private car!: THREE.Group; private carLights: { m: THREE.MeshBasicMaterial; c: THREE.Color }[] = []; private carHalo: THREE.Sprite[] = [];
   private alarmHalo: THREE.Sprite[] = []; private fig!: THREE.Mesh; private shafts: THREE.Mesh[] = [];
   private rain!: THREE.LineSegments; private rain0: number[][] = []; private dust!: THREE.Points; private dust0: number[][] = [];
-  private coolM!: THREE.MeshBasicMaterial; private br!: { doorA: THREE.Group; doorB: THREE.Group; doorC: THREE.Group; shelf: THREE.Group; stream: THREE.Mesh;
+  private coolM!: THREE.MeshBasicMaterial; private br!: { valve: THREE.Mesh; doorA: THREE.Group; doorB: THREE.Group; doorC: THREE.Group; shelf: THREE.Group; stream: THREE.Mesh;
     water: THREE.Mesh; bulb: THREE.MeshBasicMaterial; bulbHalo: THREE.Sprite; coolLamp: THREE.MeshBasicMaterial; horn: THREE.Vector3; full: THREE.Texture; empty: THREE.Texture }; private traffic!: THREE.Sprite; private crowd: Crowd[] = [];
   private frustum = new THREE.Frustum(); private m4 = new THREE.Matrix4(); private sph = new THREE.Sphere(); private v = new THREE.Vector3();
 
@@ -381,7 +381,8 @@ export class GasWorld {
     for (const dx of [-0.12, 0.12]) this.mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.8, 8), brass, 6.5 + dx, 2.7, -7.55);
     const lbl = this.quadAt(0.36, 0.5, lam("heatLbl", { map: P.heaterLabel() }), 6.5 - 0.325 * 0.6, 1.05, -7.55 + 0.325 * 0.8, { ry: Math.atan2(-0.6, 0.8) });
     lbl.castShadow = false;
-    this.box(b, 6.29, 0.2, -7.27, 0.1, 0.1, 0.1, brass); this.mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 10), lam("valveRed", { color: "#d8342c" }), 6.24, 0.2, -7.22, { rx: Math.PI / 2 });
+    this.box(b, 6.29, 0.2, -7.27, 0.1, 0.1, 0.1, brass); const valve = this.mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 10), lam("valveRed", { color: "#d8342c" }), 6.24, 0.2, -7.22, { rx: Math.PI / 2 });
+    this.box(b, 6.24, 0.2, -7.2, 0.012, 0.09, 0.012, dark);   // ручка крана (видно, что он повернулся)
     const hose = new THREE.CatmullRomCurve3([V(6.25, 0.18, -7.22), V(6.1, 0.05, -7.1), V(5.95, 0.08, -6.98), V(5.88, 0.36, -6.95)]);
     this.mesh(new THREE.TubeGeometry(hose, 16, 0.025, 6), lam("hoseG", { color: "#3a8a4a" }), 0, 0, 0);
     this.mesh(new THREE.CylinderGeometry(0.19, 0.16, 0.32, 18, 1, true), lam("bucket", { color: "#e8a032", side: THREE.DoubleSide }), 5.82, 0.16, -6.9);
@@ -426,7 +427,7 @@ export class GasWorld {
     this.mesh(new THREE.CylinderGeometry(0.06, 0.24, 0.42, 14, 1, true), lam("horn", { color: "#d9d4c4", side: THREE.DoubleSide }), 4.62, 3.7, 6.5, { rz: Math.PI / 2 });
     this.box(b, 4.8, 3.7, 6.5, 0.1, 0.18, 0.12, dark);
     b.build(this.root);
-    this.br = { doorA, doorB, doorC, shelf, stream, water, bulb, bulbHalo, coolLamp, horn: V(4.4, 3.7, 6.5), full: P.cooler(), empty: P.coolerEmpty() };
+    this.br = { valve, doorA, doorB, doorC, shelf, stream, water, bulb, bulbHalo, coolLamp, horn: V(4.4, 3.7, 6.5), full: P.cooler(), empty: P.coolerEmpty() };
   }
 
   private buildFx() {
@@ -516,6 +517,7 @@ export class GasWorld {
     this.coolM.map = st.empty ? B_.empty : B_.full;
     B_.doorA.rotation.y = -1.5 * sm(st.doorA ?? 0); B_.doorB.rotation.y = -1.35 * sm(st.doorB ?? 0); B_.doorC.rotation.y = -1.45 * sm(st.doorC ?? 0);
     const sk = sm(st.shelf ?? 1); B_.shelf.position.set(lerp(6.8, 5.35, sk), 0, lerp(-5.5, -4.5, sk)); B_.shelf.rotation.y = lerp(Math.PI / 2, 0, sk);
+    B_.valve.rotation.set(Math.PI / 2, -1.6 * (st.valve ?? 0), 0);
     const hf = st.heater ?? 0, wl_ = st.fill ?? 0;
     B_.stream.visible = hf > 0.02; B_.stream.scale.set(0.6 + 0.6 * hf, 0.2 + 0.1 * hf, 0.6 + 0.6 * hf); B_.stream.position.y = 0.1 + 0.14 + wl_ * 0.12;
     B_.water.visible = wl_ > 0.02; B_.water.position.y = 0.03 + 0.28 * wl_;

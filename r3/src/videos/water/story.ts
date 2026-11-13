@@ -1,32 +1,47 @@
-// Шортс S2 «The Water That Almost Got You Killed» в стиле B. Сюжет: день 19, бутылка пуста -> FEMA: вода в бойлере -> 40 галлонов в
-// подсобке, но ради них оттащил стеллаж от задней двери -> 3 часа ночи, дверь открывается -> зомби внутри -> Joe в холодильной
-// камере, пар изо рта, царапает дверь -> трубка кассы связана с громкоговорителями -> «они охотятся на звук» -> стук в трубку,
-// громкоговоритель ревёт -> зомби уходит во двор, Joe захлопывает дверь и заваливает стеллажом -> но тебя услышала вся округа.
-// Камера по желанию владельца 13.11 «больше непрерывной»: три длинных проезда (4,6–22 с через дверь подсобки к бойлеру и назад к
-// двери; 22–30,8 с от задней двери к Joe и в камеру; 46–52 с за зомби до двора), остальные склейки — только при смене места.
+// Шортс S2 «The Water That Almost Got You Killed» в стиле B, версия 2 (13.11.2026): грамматика камеры образца @ricksclips3000
+// по замечанию владельца «камера скучная, нужно непрерывно и чтобы каждые несколько секунд что-то происходило»:
+//  - бит каждые ~1,5–2,5 с: камера за ~0,8 с переезжает в новый кадр (smootherstep) и держит его с медленным наездом;
+//  - место меняется движением: камера идёт за Joe через дверь, влетает в дверь камеры и сквозь окошко, кран, «хлыст» с размытием;
+//  - в каждом бите герой что-то делает: трясёт пустую бутылку, идёт, открывает дверь, крутит кран, оттаскивает стеллаж…;
+//  - задняя дверь открывается полностью, прежде чем через неё пройдёт зомби (раньше он проходил сквозь створку).
+// Склеек нет: 4 «хлыста» с размытием (смена времени и места) и 2 пролёта сквозь дверь/окно.
 import { LINES, WORDS, DUR } from "./data";
 import { LOOKS, mixLook } from "../gas/look";
-import { JOE, zombieFit, fxBurst, fxWaves, FrontOpts, Pen } from "../../kit/toon";
-import { Put, FxPut, St, SWK, V3 } from "../gas/world";
-import { makeStory, ShotDef, pr, lerp, eo, sm, kick, FPS } from "../../kit/shots";
+import { JOE, zombieFit, fxBurst, fxWaves, FrontOpts, Pen, Expr } from "../../kit/toon";
+import { Put, FxPut, St, V3 } from "../gas/world";
+import { makeStory, ShotDef, pr, lerp, sm, FPS } from "../../kit/shots";
 
 const L0 = (k: string) => LINES[k][0], L1 = (k: string) => LINES[k][1];
 /** начало слова: первое слово реплики k, совпавшее с re */
 export const Wd = (k: string, re: RegExp) => { const w = WORDS.find((x) => x[3] === k && re.test(x[0])); if (!w) throw new Error(`слово ${re} в ${k}`); return w[1]; };
 export const T = {
-  hook: 0, bottle: Wd("k02", /^bottle/), fema: Wd("k03", /^FEMA/), heater: Wd("k03", /^heater/), forty: Wd("k04", /^Forty/), valve: Wd("k04", /^drain/),
-  clean: Wd("k04", /^Clean/), dragged: Wd("k05", /^dragged/), never: Wd("k05", /^never/), am3: L0("k06"), clicks: Wd("k06", /^clicks/), inside: Wd("k07", /^inside/),
-  run: Wd("k08", /^run/), shut: Wd("k08", /^shut/), fog: Wd("k09", /^fog/), scratch: Wd("k09", /^scratching/), belt: Wd("k10", /^belt/), speakers: Wd("k10", /^speakers/),
-  sound: Wd("k11", /^sound/), loudest: Wd("k11", /^loudest/), four: Wd("k11", /^four/), press: Wd("k12", /^press/), bang: Wd("k12", /^bang/), wall: Wd("k12", /^wall/),
-  turns: Wd("k13", /^turns/), out: Wd("k13", /^out/), rain: Wd("k13", /^rain/), slam: Wd("k13", /^slam/), bury: Wd("k13", /^bury/), county: Wd("k14", /^county/),
-  end: L1("k14"),
+  killed: Wd("k01", /^killed/), day: L0("k02"), last: Wd("k02", /^last/), bottle: Wd("k02", /^bottle/), fema: Wd("k03", /^FEMA/), every: Wd("k03", /^every/),
+  heater: Wd("k03", /^heater/), forty: Wd("k04", /^Forty/), open: Wd("k04", /^open/), valve: Wd("k04", /^drain/), clean: Wd("k04", /^Clean/), weeks: Wd("k04", /^Weeks/),
+  reach: Wd("k05", /^reach/), dragged: Wd("k05", /^dragged/), never: Wd("k05", /^never/), am3: L0("k06"), clicks: Wd("k06", /^clicks/), one: L0("k07"),
+  inside: Wd("k07", /^inside/), between: Wd("k07", /^Between/), run: Wd("k08", /^run/), cooler: Wd("k08", /^cooler/), shut: Wd("k08", /^shut/),
+  dark: L0("k09"), fog: Wd("k09", /^fog/), scratch: Wd("k09", /^scratching/), belt: Wd("k10", /^belt/), handset: Wd("k10", /^handset/),
+  speakers: Wd("k10", /^speakers/), sound: Wd("k11", /^sound/), loudest: Wd("k11", /^loudest/), four: Wd("k11", /^four/), press: Wd("k12", /^press/),
+  bang: Wd("k12", /^bang/), wall: Wd("k12", /^wall/), turns: Wd("k13", /^turns/), out: Wd("k13", /^out/), rain: Wd("k13", /^rain/), slam: Wd("k13", /^slam/),
+  bury: Wd("k13", /^bury/), own: L1("k13"), survived: Wd("k14", /^survived/), county: Wd("k14", /^county/), end: L1("k14"),
 };
+// смены места («хлысты» и пролёты) — границы планов
+export const S = { day: 4.62, cool: 30.9, spk: 38.0, bang: 43.9, out: 46.2, cnt: 52.25, end: T.end + 0.05, night: 21.95 };
+
 const Z1 = zombieFit(2);
-const joe = (x: number, y: number, z: number, fo: FrontOpts, o: Partial<Put> = {}): Put => ({ id: "joe", o: JOE, x, y, z, fo: { mode: "stand", seed: 3, ...fo }, ...o });
-const zom = (x: number, y: number, z: number, fo: FrontOpts, o: Partial<Put> = {}): Put => ({ id: "z1", o: Z1, x, y, z, fo: { mode: "stand", expr: "zom", seed: 11, ...fo }, ...o });
-const zside = (x: number, z: number, t: number, mirror = false): Put => ({ id: "z1", o: Z1, x, y: 0, z, side: true, mirror, so: { mode: "march", phase: (t * 0.9) % 1, stride: 0.6, expr: "zom", seed: 11 } });
-const jside = (x: number, z: number, t: number, mirror = false): Put => ({ id: "joe", o: JOE, x, y: 0, z, side: true, mirror, so: { mode: "march", phase: (t * 1.8) % 1, stride: 1.2, expr: "scream", seed: 3 } });
-const blink = (t: number, s = 0) => { const p = (t + s * 0.37) % 2.3; return p < 4 / FPS ? [0.5, 1, 1, 0.5][Math.floor(p * FPS)] : 0; };
+const joe = (x: number, z: number, fo: FrontOpts, o: Partial<Put> = {}): Put => ({ id: "joe", o: JOE, x, y: 0, z, fo: { mode: "stand", seed: 3, ...fo }, ...o });
+const zom = (x: number, z: number, fo: FrontOpts, o: Partial<Put> = {}): Put => ({ id: "z1", o: Z1, x, y: 0, z, fo: { mode: "stand", expr: "zom", seed: 11, ...fo }, ...o });
+const q = (v: number, n = 20) => Math.round(v * n) / n;
+/** шаг сбоку: mirror — идёт к -x; back — пятится (тащит стеллаж) */
+const jwalk = (x: number, z: number, t: number, mirror: boolean, expr: Expr = "nervous", run = false, back = false): Put => ({ id: "joe", o: JOE, x, y: 0, z, side: true, mirror,
+  so: { mode: "march", phase: q(((((back ? -1 : 1) * t * (run ? 2.3 : 1.7)) % 1) + 1) % 1), stride: run ? 1.3 : 0.85, expr, seed: 3 } });
+const zwalk = (x: number, z: number, t: number, mirror: boolean): Put => ({ id: "z1", o: Z1, x, y: 0, z, side: true, mirror, so: { mode: "march", phase: q((t * 0.9) % 1), stride: 0.6, expr: "zom", seed: 11 } });
+/** точка на ломаной pts в доле u 0..1 (по длине) */
+const along = (pts: [number, number][], u: number): [number, number] => {
+  const seg = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
+  let d = Math.max(0, Math.min(1, u)) * tot, i = 0; while (i < seg.length - 1 && d > seg[i]) { d -= seg[i]; i++; }
+  const k = seg[i] ? d / seg[i] : 0; return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k)];
+};
+const blink = (t: number, s = 0) => { const p = (t + s * 0.37) % 2.1; return p < 4 / FPS ? [0.5, 1, 1, 0.5][Math.floor(p * FPS)] : 0; };
 const waves = (t: number, t0: number, x: number, y: number, z: number, s: number, d = 0.9): FxPut[] => {
   const u = (t - t0) / d; if (u < 0) return [];
   const uq = Math.round((u % 1) * 20) / 20; return [{ key: `waves${uq}`, cw: 500, ch: 500, draw: (p) => fxWaves(p, uq), x, y, z, w: s, h: s, soft: true }];
@@ -35,105 +50,193 @@ const burst = (t: number, t0: number, x: number, y: number, z: number, s: number
   const u = (t - t0) / d; if (u < 0 || u >= 1) return [];
   const uq = Math.round(u * 15) / 15; return [{ key: `burst${uq}`, cw: 500, ch: 500, draw: (p) => fxBurst(p, uq), x, y, z, w: s, h: s }];
 };
-/** облачко пара изо рта (мягкая карточка): puff 0..1 — фаза выдоха */
 const fogPuff = (p: Pen, u: number) => {
   const g = p.g;
   for (let i = 0; i < 6; i++) { const a = (1 - u) * 0.55; g.globalAlpha = a * (0.6 + 0.4 * Math.sin(i * 2.1)); p.ell(150 + i * 26 * u + 18 * Math.sin(i), 150 - i * 10 * u, 40 + 60 * u, 30 + 40 * u, "#eef6ff", 0); }
   g.globalAlpha = 1;
 };
 const breath = (t: number, x: number, y: number, z: number): FxPut[] => {
-  const u = ((t * 0.7) % 1); const uq = Math.round(u * 12) / 12;
-  return [{ key: `fog${uq}`, cw: 300, ch: 300, draw: (p) => fogPuff(p, uq), x: x + 0.2 * uq, y: y + 0.05 + 0.15 * uq, z: z + 0.15, w: 0.55, h: 0.55, soft: true }];
+  const uq = Math.round(((t * 0.7) % 1) * 12) / 12;
+  return [{ key: `fog${uq}`, cw: 300, ch: 300, draw: (p) => fogPuff(p, uq), x: x - 0.15 * uq, y: y + 0.05 + 0.15 * uq, z: z - 0.12, w: 0.55, h: 0.55, soft: true }];
 };
-const HORN: V3 = [4.4, 3.7, 6.5];
-const DAY: St = { sky: "day", lamps: 5, lampK: 0.75, neon: false, shut: 1, empty: true, doorA: 0, doorB: 0, doorC: 0, shelf: 1, heater: 0, fill: 0, bulb: 1, rain: 0, clock: "2:10", coolLight: 0.6 };
-const NIGHT: St = { sky: "night", lamps: 0, neon: false, shut: 1, empty: true, doorA: 0, doorB: 0, doorC: 0, shelf: 1, heater: 0, fill: 0.85, bulb: 0, rain: 1, clock: "3:00", coolLight: 0.7, exit: 1 };
-const JOE_HIDE: V3 = [3.5, 0, -6.55];
 
-const SHOTS: ShotDef[] = [
-  // 0. Крючок (из будущего): 3 часа ночи, вода ещё течёт в ведро, камера скользит от ведра к задней двери — она приоткрывается
-  { a: 0, name: "hook", look: "backNight", dof: 6, focus: [6.6, 1.2, -5.5], spline: true,
-    keys: [[0, 5.0, 0.7, -5.55, 5.85, 0.2, -6.9, 46], [2.4, 5.1, 1.0, -5.35, 6.3, 0.9, -7.4, 44], [4.4, 5.0, 1.35, -5.15, 7.1, 1.15, -5.55, 44]],
-    st: (t) => ({ ...NIGHT, heater: 0.6, fill: 0.5, doorB: 0.12 + 0.45 * sm(pr(t, 1.6, 3.6)) }),
-    cast: (t) => (t > 1.6 ? [zom(7.6, 0, -5.85, { expr: "zom2", reach: 0.8, phase: t * 0.4 }, { blob: false })] : []) },
-  // 1. Один проезд 4,6–22 с: пустые холодильники -> Joe с пустой бутылкой -> дверь подсобки -> бойлер, кран, вода -> назад к задней двери
-  { a: L0("k02") - 0.1, name: "oner1", spline: true, focus: (t) => (t < T.fema ? [0.3, 1.4, -7.25] : t < T.forty ? [4.5, 1.2, -6.4] : t < L0("k05") ? [5.0, 1.0, -7.1] : [7.05, 1.2, -5.5]),
-    dof: (t) => (t < T.fema ? 12 : t < T.forty ? 4 : t < L0("k05") ? 9 : 7),
-    look: (t, c) => mixLook(LOOKS.store, LOOKS.warmIn, pr(c[0], 1.6, 3.2)),
-    keys: [[L0("k02") - 0.1, 0.55, 1.45, -4.9, 0.3, 1.3, -7.3, 44], [T.bottle, 0.45, 1.4, -5.6, 0.3, 1.25, -7.3, 38], [L0("k03") + 0.6, 0.9, 1.5, -5.3, 2.4, 1.4, -5.15, 46],
-      [T.fema + 1.0, 1.6, 1.5, -5.15, 4.5, 1.2, -5.5, 46], [T.heater - 0.1, 3.6, 1.5, -5.0, 6.3, 1.0, -7.2, 46], [T.forty + 0.3, 4.0, 1.45, -4.6, 5.5, 0.9, -7.2, 46],
-      [T.valve + 0.3, 6.3, 0.8, -6.0, 5.85, 0.2, -6.95, 42], [T.clean + 0.6, 4.85, 1.4, -5.5, 5.0, 1.3, -7.1, 42], [L0("k05") + 0.6, 4.7, 1.55, -5.2, 7.1, 1.15, -5.5, 46],
-      [T.never, 4.75, 1.55, -5.2, 7.1, 1.2, -5.5, 40], [L1("k05") + 0.2, 4.8, 1.55, -5.2, 7.1, 1.2, -5.5, 38]],
-    st: (t) => ({ ...DAY, doorA: pr(t, T.fema + 0.2, T.fema + 1.0), shelf: t < L0("k05") ? 1 : sm(pr(t, T.dragged - 0.1, T.dragged + 0.9)), heater: pr(t, T.valve + 0.1, T.valve + 0.4), fill: 0.85 * pr(t, T.valve + 0.2, L1("k05") + 2) }),
-    cast: (t) => {
-      const out: Put[] = [];
-      if (t < T.fema + 0.9) out.push(joe(0.3, 0, -7.25, { prop: "bottle", expr: t < T.bottle + 0.6 ? "sleepy" : "nervous", look: 0.2, blink: blink(t), headTilt: 4 * Math.sin(t * 6) }));
-      if (t > T.fema + 0.9) out.push(joe(5.0, 0, -7.1, { expr: t < T.clean ? "nervous" : t < L0("k05") ? "relief_open" : "relief", look: t < T.clean ? 0.6 : 0.1, blink: blink(t, 2) }));
-      return out;
-    } },
-  // 2. Один проезд 22–30,8 с: 3 часа ночи, щёлкает задняя дверь -> зомби внутри, Joe у холодильной камеры -> бежит внутрь, захлопывает
-  { a: L0("k06") - 0.15, name: "oner2", look: "backNight", spline: true, focus: (t) => (t < T.inside - 0.2 ? [7.1, 1.15, -5.5] : t < L0("k08") ? [3.9, 1.35, -5.7] : [3.5, 1.3, -6.2]),
-    dof: (t) => (t < T.inside ? 9 : 5),
-    keys: [[L0("k06") - 0.15, 2.65, 1.6, -4.95, 7.1, 1.15, -5.5, 30], [T.clicks + 0.3, 2.65, 1.6, -4.95, 7.1, 1.15, -5.5, 26], [T.inside - 0.3, 2.7, 1.6, -4.95, 6.4, 1.2, -5.45, 40],
-      [T.inside + 0.5, 2.7, 1.6, -4.95, 3.9, 1.35, -5.7, 46], [L1("k07"), 2.7, 1.6, -4.95, 3.9, 1.35, -5.7, 42], [T.run + 0.5, 3.45, 1.55, -4.6, 3.5, 1.2, -6.6, 46], [L1("k08") + 0.1, 3.5, 1.5, -4.55, 3.5, 1.25, -6.3, 40]],
-    st: (t) => ({ ...NIGHT, doorB: lerp(0, 0.18, pr(t, T.clicks - 0.05, T.clicks + 0.2)) + 0.45 * sm(pr(t, T.clicks + 0.5, T.inside)),
-      doorC: pr(t, T.run - 0.05, T.run + 0.25) * (1 - pr(t, T.shut - 0.35, T.shut - 0.1)) }),
-    cast: (t) => {
-      const out: Put[] = [];
-      const zin = pr(t, T.clicks + 0.4, T.inside + 0.2);
-      const zr = pr(t, T.run, L1("k08"));
-      if (t > T.clicks + 0.1) out.push(zin < 1 ? zside(lerp(7.7, 6.2, eo(zin)), -5.45, t, true) : zr > 0 ? zside(lerp(6.2, 4.7, zr), -5.5, t, true) : zom(6.2, 0, -5.45, { expr: "zom2", reach: 1, phase: t * 0.5 }));
-      const r = pr(t, T.run - 0.05, T.shut - 0.4);
-      if (r <= 0) out.push(joe(3.9, 0, -5.7, { expr: t < T.inside ? "sleepy" : "fear", look: 0.8, blink: blink(t, 1), headTilt: t > T.inside ? 3 * Math.sin(t * 9) : 0 }));
-      else if (r < 1) out.push(joe(lerp(3.9, 3.5, r), 0, lerp(-5.7, -6.6, r), { back: true, mode: "march", phase: (t * 2.2) % 1, lift: 80, expr: "scream" }));
-      return out;
-    } },
-  // 3. Внутри камеры: темно, иней, пар изо рта, за мутным окошком царапается тень -> вниз к трубке на поясе
-  { a: L0("k09") - 0.1, name: "cooler", look: "coolerIn", focus: [3.5, 1.45, -6.55], dof: 14, spline: true,
-    keys: [[L0("k09") - 0.1, 4.3, 1.62, -7.8, 3.5, 1.42, -6.45, 46], [L1("k09"), 4.15, 1.55, -7.55, 3.5, 1.45, -6.45, 40], [T.belt + 0.5, 4.35, 1.3, -7.85, 3.6, 1.1, -6.55, 46],
-      [T.speakers, 4.35, 1.28, -7.85, 3.6, 1.05, -6.55, 44]],
-    st: (t) => ({ ...NIGHT, coolLight: 0.6 + 0.08 * Math.sin(t * 13) }),
-    cast: (t) => [joe(...JOE_HIDE, { expr: t < T.belt ? "fear" : "resolve", look: t < T.scratch ? -0.6 : 0.6, blink: blink(t, 3), prop: t > T.belt - 0.3 ? ["handset", 0] : undefined, headTilt: 2 * Math.sin(t * 8) }, { blob: false }),
-      ...(t > T.scratch - 0.5 ? [zom(3.55, 0, -5.8, { pound: (t * 2.4) % 1, expr: "zom2" }, { blob: false })] : [])],
-    fx: (t) => (t < T.belt ? breath(t, 3.5, 1.62, -6.55) : []) },
-  // 4. Громкоговоритель на столбе навеса под дождём -> кран вверх над станцией: «самое громкое на милю — колонка 4»
-  { a: T.speakers - 0.05, name: "speaker", look: "nightExt", focus: HORN, dof: (t) => (t < T.sound ? 10 : 0), spline: true,
-    keys: [[T.speakers - 0.05, 3.55, 3.35, 7.7, 4.55, 3.7, 6.5, 40], [T.sound, 3.3, 3.5, 9.6, 4.4, 3.6, 6.5, 44], [T.loudest - 0.2, 3.0, 3.7, 12.6, 3.6, 3.0, 6.5, 50],
-      [T.four - 0.3, 2.6, 4.3, 14.6, 2.0, 2.0, 5.0, 52], [L1("k11") + 0.1, 2.0, 9.5, 19.5, 0.5, 1.2, 3.0, 54]],
-    st: () => ({ ...NIGHT, lamps: 0, canopy: 0.8, rain: 1, speaker: 0 }),
-    fx: (t) => (t > T.loudest ? waves(t, T.loudest, ...HORN, 3.5 + 6 * pr(t, T.loudest, L1("k11")), 1.1) : []) },
-  // 5. В камере: кнопка, удар трубкой о стену
-  { a: L0("k12") - 0.1, name: "bang", look: "coolerIn", focus: [3.5, 1.45, -6.55], dof: 14,
-    keys: [[L0("k12") - 0.1, 4.2, 1.55, -7.6, 3.45, 1.5, -6.5, 42], [T.wall + 0.4, 4.15, 1.55, -7.5, 3.45, 1.55, -6.5, 38]],
+const HORN: V3 = [4.4, 3.7, 6.5];
+const JH: [number, number] = [3.95, -6.62];          // Joe в камере справа от двери: окошко двери (x 3.53) остаётся видно
+const DAY: St = { sky: "day", lamps: 5, lampK: 0.75, neon: false, shut: 1, empty: true, doorA: 0, doorB: 0, doorC: 0, shelf: 0, heater: 0, fill: 0, bulb: 1, rain: 0, clock: "2:10", coolLight: 0.6 };
+const NIGHT: St = { sky: "night", lamps: 0, neon: false, shut: 1, empty: true, doorA: 0, doorB: 0, doorC: 0, shelf: 1, heater: 0.6, fill: 0.85, bulb: 0, rain: 1, clock: "3:00", coolLight: 0.7, exit: 1 };
+/** стеллаж: k 0 — у задней двери, 1 — оттащен (как в world.ts, со сглаживанием) */
+const shelfAt = (k: number): [number, number] => { const s = sm(k); return [lerp(6.8, 5.35, s), lerp(-5.5, -4.5, s)]; };
+const P = (x: number, y: number, z: number): V3 => [x, y, z];
+
+// ---------- Joe днём: бутылка -> к двери подсобки -> бойлер -> к задней двери -> оттаскивает стеллаж ----------
+const W1: [number, number][] = [[0.3, -7.25], [1.3, -6.1], [2.05, -5.15]];
+const W2: [number, number][] = [[2.05, -5.15], [3.4, -5.2], [4.4, -6.3], [5.0, -7.1]];
+const W3: [number, number][] = [[5.0, -7.1], [5.5, -6.2], [6.0, -5.5]];
+const tW1: [number, number] = [8.55, 10.0], tW2: [number, number] = [10.35, 12.35], tW3: [number, number] = [17.3, 18.35], tDrag: [number, number] = [T.dragged, T.dragged + 1.45];
+const joeDay = (t: number): Put | null => {
+  if (t < tW1[0]) return joe(0.3, -7.25, { prop: "bottle", expr: t < T.last ? "sleepy" : t < T.fema ? "nervous" : "shock", look: t < T.fema ? 0.15 : 0.85, blink: blink(t),
+    headTilt: t > T.bottle && t < T.fema ? 6 * Math.sin(t * 9) : 0 });
+  if (t < tW1[1]) { const [x, z] = along(W1, pr(t, ...tW1)); return jwalk(x, z, t, false, "resolve"); }
+  if (t < tW2[0]) return joe(2.05, -5.15, { expr: "resolve", look: 0.8, blink: blink(t) });
+  if (t < tW2[1]) { const [x, z] = along(W2, pr(t, ...tW2)); return jwalk(x, z, t, false, "nervous"); }
+  if (t < tW3[0]) return joe(5.0, -7.1, { expr: t < T.clean ? "nervous" : t < T.weeks ? "relief_open" : "laugh", look: t < T.clean ? 0.7 : 0.05, blink: blink(t, 2),
+    headTilt: t > T.weeks ? 5 * Math.sin(t * 11) : 0 });
+  if (t < tDrag[0]) { const [x, z] = along(W3, pr(t, ...tW3)); return jwalk(x, z, t, false, "relief"); }
+  if (t < tDrag[1] + 0.4) { const [sx, sz] = shelfAt(pr(t, ...tDrag)); return jwalk(sx - 0.8, sz, t, false, "resolve", false, true); }
+  return null;
+};
+// ---------- ночь: спит у камеры -> просыпается -> бежит в камеру ----------
+const JS: [number, number] = [4.1, -5.35];
+const tRun: [number, number] = [T.run + 0.05, T.run + 1.0];
+const joeNight = (t: number): Put | null => {
+  if (t < T.between) return joe(...JS, { mode: "sit", hug: true, expr: "sleepy", blink: 1 });
+  if (t < tRun[0]) return joe(...JS, { mode: "sit", hug: true, expr: "fear", look: 0.85, blink: blink(t, 1), headTilt: 3 * Math.sin(t * 13) });
+  if (t < tRun[1]) { const u = pr(t, ...tRun); return joe(lerp(JS[0], 3.52, u), lerp(JS[1], -6.7, u), { back: true, mode: "march", phase: q((t * 2.3) % 1), lift: 80, expr: "scream" }); }
+  return null;
+};
+// зомби ночью: входит в полностью открытую дверь, идёт к Joe
+const tDoorB: [number, number] = [T.clicks + 0.1, T.clicks + 1.0], tZin: [number, number] = [T.one - 0.2, T.inside + 0.4];
+const zomNight = (t: number): Put | null => {
+  if (t < tZin[0]) return null;
+  if (t < tZin[1]) return zwalk(lerp(8.4, 6.3, pr(t, ...tZin)), -5.5, t, true);
+  if (t < tRun[0]) return zom(6.3, -5.5, { expr: "zom2", reach: 1, phase: t * 0.5 });
+  return zwalk(lerp(6.3, 4.6, pr(t, tRun[0], S.cool)), -5.5, t, true);
+};
+// после удара трубкой: зомби у окошка поворачивается и уходит на звук через открытую дверь; Joe выбегает, хлопает дверью, задвигает стеллаж
+const ZW: [number, number][] = [[3.65, -5.2], [6.2, -5.45], [7.1, -5.5], [9.3, -5.5]];
+const tZout: [number, number] = [T.turns + 0.5, T.rain + 0.5];
+const tJout: [number, number] = [T.rain - 0.25, T.slam], tJback: [number, number] = [T.slam + 0.15, T.bury], tPush: [number, number] = [T.bury, T.own - 0.3];
+const JO: [number, number][] = [[3.5, -6.35], [5.6, -6.05], [6.6, -5.4]];
+const zomOut = (t: number): Put | null => {
+  if (t < tZout[0]) return zom(3.65, -5.2, { expr: t < T.turns ? "zom2" : "zomO", pound: t < T.turns ? (t * 2.4) % 1 : undefined, back: t > T.turns + 0.25 });
+  if (t < tZout[1]) { const [x, z] = along(ZW, pr(t, ...tZout)); return zwalk(x, z, t, false); }
+  return null;
+};
+const joeOut = (t: number): Put | null => {
+  if (t < tJout[0]) return null;
+  if (t < tJout[1]) { const [x, z] = along(JO, pr(t, ...tJout)); return jwalk(x, z, t, false, "scream", true); }
+  if (t < tJback[0]) return joe(6.6, -5.4, { expr: "scream", look: 0.6 });
+  if (t < tJback[1]) return jwalk(lerp(6.6, 4.55, pr(t, ...tJback)), lerp(-5.4, -4.5, pr(t, ...tJback)), t, true, "resolve", true);
+  if (t < tPush[1]) { const [sx, sz] = shelfAt(1 - pr(t, ...tPush)); return jwalk(sx - 0.8, sz, t, false, "resolve"); }
+  return joe(6.0, -5.95, { expr: "relief", look: 0.3, blink: blink(t, 4), headTilt: 2 * Math.sin(t * 3) });
+};
+/** цель камеры, которая ведёт героя */
+const tracking = (f: (t: number) => Put | null, y: number, fb: V3) => (t: number): V3 => { const p = f(t); return p ? [p.x, y, p.z] : fb; };
+
+export const SHOTS: ShotDef[] = [
+  // 0–4,6: крючок из будущего. Вода льётся в ведро -> бойлер «40 GALLONS» -> задняя дверь приоткрывается, в щели зомби -> наезд на лицо -> хлыст
+  { a: 0, name: "hook", look: "backNight", dof: (t) => (t < 3.6 ? 7 : 10), push: 0.003,
+    beats: [
+      { t: 0, pos: P(5.15, 0.55, -5.85), look: P(5.85, 0.2, -6.9), fov: 44 },
+      { t: 1.85, d: 1.5, pos: P(5.0, 1.05, -5.4), look: P(6.4, 0.95, -7.45), fov: 44 },
+      { t: 3.45, d: 1.45, pos: P(5.1, 1.3, -5.2), look: P(7.1, 1.15, -5.6), fov: 42 },
+      { t: T.killed + 0.05, d: 0.45, pos: P(5.6, 1.45, -5.4), look: P(7.6, 1.5, -5.85), fov: 30, roll: 0.06 },
+      { t: S.day, d: 0.3, pos: P(5.6, 1.45, -5.4), look: P(7.5, 1.45, -5.0), fov: 32, roll: 0.06 },
+    ],
+    st: (t) => ({ ...NIGHT, doorB: 0.75 * sm(pr(t, 2.5, 3.7)), fill: lerp(0.35, 0.6, pr(t, 0, 4.6)) }),
+    cast: (t) => (t > 2.6 ? [zom(7.65, -5.85, { expr: "zom2", reach: 0.8, phase: t * 0.4 }, { blob: false })] : []) },
+
+  // 4,6–30,9: один непрерывный план. День 19: Joe и пустая бутылка -> идёт к двери подсобки, камера за ним сквозь дверь -> бойлер ->
+  // кран -> «чистая вода» -> оттаскивает стеллаж от задней двери -> голая дверь, на том же кадре день гаснет в ночь -> щелчок, дверь
+  // открывается настежь -> отъезд: входит зомби, Joe спит у камеры -> лицо Joe -> бежит в камеру -> камера влетает в закрытую дверь.
+  { a: S.day, name: "day", push: 0.0025,
+    look: (t, c) => (t < 21.3 ? mixLook(LOOKS.store, LOOKS.warmIn, pr(c[0], 1.6, 3.2)) : mixLook(LOOKS.warmIn, LOOKS.backNight, pr(t, 21.3, 22.3))),
+    dof: (t) => (t < 8 ? 10 : t < 12 ? 6 : t < 17.3 ? 9 : t < 25 ? 6 : 9),
+    beats: [
+      { t: S.day, pos: P(0.7, 1.4, -4.7), look: P(-0.5, 1.3, -7.2), fov: 44 },
+      { t: T.day + 0.32, d: 0.32, pos: P(0.7, 1.4, -4.7), look: P(0.3, 1.3, -7.25), fov: 44 },
+      { t: T.bottle, d: 0.8, pos: P(0.45, 1.35, -5.75), look: P(0.3, 1.2, -7.25), fov: 40 },
+      { t: T.fema + 0.5, d: 1.1, pos: P(0.55, 1.5, -4.5), look: P(0.6, 1.3, -7.0), fov: 46 },
+      { t: tW1[0] + 0.9, d: 0.9, pos: P(0.4, 1.5, -4.15), look: tracking(joeDay, 1.25, P(2.05, 1.25, -5.15)), fov: 46 },
+      { t: tW2[0] + 0.85, d: 1.2, pos: P(1.85, 1.5, -4.95), look: tracking(joeDay, 1.2, P(3.4, 1.2, -5.2)), fov: 46 },
+      { t: T.heater + 0.55, d: 0.85, pos: P(3.6, 1.5, -5.0), look: P(6.2, 1.0, -7.3), fov: 44 },
+      { t: T.forty + 0.7, d: 0.7, pos: P(5.4, 1.3, -5.9), look: P(6.35, 1.05, -7.4), fov: 40 },
+      { t: T.valve + 0.05, d: 1.15, pos: P(6.3, 0.8, -6.0), look: P(6.05, 0.22, -7.05), fov: 42 },
+      { t: T.clean + 0.6, d: 1.15, pos: P(4.85, 1.4, -5.5), look: P(5.0, 1.3, -7.1), fov: 42 },
+      { t: T.dragged + 0.2, d: 1.5, pos: P(3.6, 1.6, -5.6), look: P(6.4, 1.1, -5.3), fov: 46 },
+      { t: T.never, d: 0.8, pos: P(5.0, 1.45, -5.45), look: P(7.1, 1.2, -5.5), fov: 40 },
+      { t: T.clicks + 0.05, d: 0.25, pos: P(5.0, 1.45, -5.45), look: P(7.1, 1.18, -5.52), fov: 32 },
+      { t: T.inside + 0.3, d: 1.3, pos: P(2.75, 1.4, -5.25), look: P(6.3, 1.2, -5.5), fov: 42 },
+      { t: T.between + 0.55, d: 0.6, pos: P(3.05, 1.0, -5.3), look: P(4.2, 1.05, -5.42), fov: 42 },
+      { t: T.run + 0.65, d: 0.7, pos: P(3.45, 1.55, -4.6), look: P(3.5, 1.2, -6.6), fov: 46 },
+      { t: S.cool, d: 0.35, pos: P(3.5, 1.5, -5.95), look: P(3.5, 1.4, -6.6), fov: 40 },
+    ],
+    st: (t) => t < S.night
+      ? { ...DAY, doorA: sm(pr(t, tW1[1] - 0.25, tW1[1] + 0.35)), valve: pr(t, T.open, T.valve + 0.2), heater: pr(t, T.valve, T.valve + 0.3), fill: 0.85 * pr(t, T.valve + 0.1, 22),
+          shelf: pr(t, ...tDrag), bulb: t > 21.3 ? (Math.floor(t * 14) % 3 ? 0.3 : 1) : 1, lampK: lerp(0.75, 0.2, pr(t, 21.3, S.night)) }
+      : { ...NIGHT, doorB: sm(pr(t, ...tDoorB)), doorC: pr(t, tRun[0] - 0.1, tRun[0] + 0.25) * (1 - pr(t, T.shut - 0.3, T.shut)), rain: pr(t, S.night, 22.4) },
+    cast: (t) => (t < S.night ? [joeDay(t)] : [joeNight(t), zomNight(t)]).filter((p): p is Put => !!p) },
+
+  // 30,9–38: в камере. Камера изнутри от двери отъезжает к Joe -> пар изо рта -> за окошком скребётся тень -> трубка на поясе -> хлыст вверх
+  { a: S.cool, name: "cooler", look: "coolerIn", dof: (t) => (t < T.scratch - 0.3 ? 12 : t < T.belt ? 8 : 12), push: 0.0028,
+    beats: [
+      { t: S.cool, pos: P(3.85, 1.5, -6.32), look: P(3.55, 1.5, -5.6), fov: 46 },
+      { t: S.cool + 1.0, d: 1.0, pos: P(4.3, 1.6, -7.8), look: P(JH[0], 1.4, JH[1]), fov: 46 },
+      { t: T.fog - 0.2, d: 0.7, pos: P(4.15, 1.62, -7.35), look: P(JH[0], 1.58, JH[1]), fov: 38 },
+      { t: T.scratch + 0.25, d: 0.6, pos: P(4.3, 1.68, -7.6), look: P(3.6, 1.66, -6.15), fov: 34 },
+      { t: T.belt + 0.4, d: 0.9, pos: P(4.35, 1.3, -7.85), look: P(JH[0], 1.1, JH[1]), fov: 46 },
+      { t: T.speakers - 0.42, d: 0.6, pos: P(4.35, 1.3, -7.85), look: P(JH[0], 1.25, JH[1]), fov: 40 },
+      { t: S.spk, d: 0.35, pos: P(4.35, 1.3, -7.85), look: P(JH[0], 3.0, JH[1] + 0.2), fov: 40 },
+    ],
+    st: (t) => ({ ...NIGHT, coolLight: 0.55 + 0.1 * Math.sin(t * 13) }),
+    cast: (t) => [joe(...JH, { expr: t < T.belt ? "fear" : "resolve", look: t < T.scratch ? 0.2 : t < T.belt ? -0.8 : 0.4, blink: blink(t, 3),
+        prop: t > T.belt + 0.4 ? ["handset", lerp(0, 0.35, pr(t, T.handset, T.handset + 0.4))] : undefined, headTilt: t < T.belt ? 3 * Math.sin(t * 17) : 0 }, { blob: false }),
+      ...(t > T.scratch - 0.6 ? [zom(3.55, -5.8, { pound: (t * 2.4) % 1, expr: "zom2" }, { blob: false })] : [])],
+    fx: (t) => (t < T.belt ? breath(t, JH[0], 1.62, JH[1]) : []) },
+
+  // 38–43,9: снаружи. Влёт снизу к громкоговорителю под дождём -> кран назад и вверх над станцией, из темноты идут фигуры -> хлыст вниз
+  { a: S.spk, name: "speaker", look: "nightExt", focus: HORN, dof: (t) => (t < T.sound ? 9 : 0), push: 0.002,
+    beats: [
+      { t: S.spk, pos: P(3.55, 3.35, 7.7), look: P(4.55, 2.2, 6.5), fov: 40 },
+      { t: S.spk + 0.35, d: 0.35, pos: P(3.55, 3.35, 7.7), look: P(4.55, 3.7, 6.5), fov: 40 },
+      { t: T.sound + 0.4, d: 2.0, pos: P(3.0, 4.6, 13.0), look: P(3.0, 2.6, 5.5), fov: 46 },
+      { t: T.four, d: 1.4, pos: P(2.0, 9.5, 19.5), look: P(1.5, 1.2, 4.0), fov: 52 },
+      { t: S.bang, d: 0.35, pos: P(2.0, 9.5, 19.5), look: P(1.5, -3, 7.0), fov: 52 },
+    ],
+    st: (t) => ({ ...NIGHT, lamps: 0, canopy: 0.8, rain: 1, crowd: "gather", crowdK: 0.04 + 0.04 * pr(t, T.sound, S.bang) }),
+    fx: (t) => (t > T.loudest ? waves(t, T.loudest, ...HORN, 3.5 + 6 * pr(t, T.loudest, S.bang), 1.1) : []) },
+
+  // 43,9–46,2: в камере. Влёт сверху -> кнопка -> BANG (рывок наезда) -> BANG -> мимо Joe к окошку -> сквозь окошко наружу
+  { a: S.bang, name: "bang", look: "coolerIn", focus: [JH[0], 1.5, JH[1]], dof: 10, push: 0.003,
+    beats: [
+      { t: S.bang, pos: P(4.25, 1.55, -7.6), look: P(3.9, 2.8, -6.5), fov: 42 },
+      { t: S.bang + 0.35, d: 0.35, pos: P(4.25, 1.55, -7.6), look: P(3.9, 1.45, -6.55), fov: 42 },
+      { t: T.bang + 0.02, d: 0.12, pos: P(4.25, 1.55, -7.6), look: P(3.95, 1.55, -6.6), fov: 34, roll: -0.05 },
+      { t: T.wall + 0.02, d: 0.12, pos: P(4.25, 1.55, -7.6), look: P(4.0, 1.6, -6.6), fov: 30, roll: 0.05 },
+      { t: S.out - 0.2, d: 0.25, pos: P(3.3, 1.6, -7.0), look: P(3.53, 1.6, -6.15), fov: 40 },
+      { t: S.out, d: 0.2, pos: P(3.53, 1.6, -6.22), look: P(3.55, 1.6, -5.0), fov: 40 },
+    ],
     st: () => ({ ...NIGHT }),
-    cast: (t) => [joe(...JOE_HIDE, { expr: t < T.bang ? "resolve" : "scream", prop: ["handset", t < T.bang - 0.15 ? 0.3 : 1], look: 0.3 }, { blob: false })],
-    fx: (t) => [...burst(t, T.bang + 0.05, 3.2, 1.7, -6.5, 0.6), ...burst(t, T.wall + 0.05, 3.2, 1.7, -6.5, 0.6), ...(t < T.bang ? breath(t, 3.5, 1.62, -6.55) : [])] },
-  // 6. Громкоговоритель ревёт (короткая вставка)
-  { a: T.wall + 0.25, name: "blast", look: "nightExt", focus: HORN, dof: 8,
-    keys: [[T.wall + 0.25, 3.7, 3.4, 8.2, 4.5, 3.7, 6.5, 44], [L0("k13") - 0.05, 3.6, 3.45, 8.0, 4.5, 3.7, 6.5, 38]],
-    st: () => ({ ...NIGHT, canopy: 0.8 }), fx: (t) => [...waves(t, T.wall + 0.25, ...HORN, 2.6, 0.5), ...waves(t, T.wall + 0.5, ...HORN, 1.6, 0.5)] },
-  // 7. Один проезд 46–52 с: зомби поворачивается и уходит на звук во двор -> Joe выскакивает, захлопывает дверь, задвигает стеллаж
-  { a: L0("k13") - 0.05, name: "oner3", look: "backNight", spline: true, focus: (t) => (t < T.out ? [3.6, 1.4, -5.85] : t < T.slam ? [7.4, 1.3, -5.5] : [6.4, 1.3, -5.6]), dof: 6,
-    keys: [[L0("k13") - 0.05, 2.75, 1.7, -4.6, 3.55, 1.3, -5.8, 46], [T.out, 2.7, 1.7, -4.75, 6.0, 1.25, -5.6, 44], [T.rain + 0.2, 2.7, 1.7, -4.85, 7.3, 1.2, -5.5, 34],
-      [T.bury, 2.75, 1.65, -4.9, 6.9, 1.1, -5.5, 42], [L1("k13") + 0.2, 2.8, 1.65, -4.9, 6.85, 1.1, -5.5, 44]],
-    st: (t) => ({ ...NIGHT, doorB: 0.55 * (1 - sm(pr(t, T.slam - 0.12, T.slam + 0.05))), doorC: pr(t, T.rain - 0.7, T.rain - 0.4), shelf: 1 - sm(pr(t, T.bury - 0.1, L1("k13") - 0.3)) }),
-    cast: (t) => {
-      const out: Put[] = [];
-      const zt = pr(t, T.turns + 0.2, T.rain + 0.4);
-      if (t < T.turns + 0.2) out.push(zom(3.55, 0, -5.8, { pound: (t * 2.4) % 1, expr: "zom2" }));
-      else if (zt < 1) out.push(zside(lerp(3.7, 9.0, zt), lerp(-5.75, -5.6, zt), t, false));
-      const jr = pr(t, T.rain - 0.35, T.slam - 0.1);
-      if (jr > 0 && jr < 1) out.push(jside(lerp(3.5, 6.6, eo(jr)), lerp(-6.3, -5.5, jr), t));
-      else if (jr >= 1) out.push(joe(lerp(6.6, 6.2, pr(t, T.slam, T.bury)), 0, lerp(-5.5, -6.05, pr(t, T.slam, T.bury)), { expr: t < T.bury ? "scream" : "relief", look: 0.8 }));
-      return out;
-    } },
-  // 8. Кран над станцией под дождём: из темноты со всех сторон к свету идут фигуры — «ты сказал всей округе, где ты»
-  { a: L0("k14") - 0.1, name: "county", look: "nightExt", dof: 0, spline: true,
-    keys: [[L0("k14") - 0.1, -4.5, 6.5, 19.5, 0, 1.5, 2.0, 52], [T.county, -7.5, 11.5, 27.0, 0, 0.8, 6.0, 54], [T.end + 0.6, -9.0, 14.0, 31.0, 0, 0.5, 8.0, 54]],
-    st: (t) => ({ ...NIGHT, lamps: 2, lampK: 0.4, canopy: 1, crowd: "gather", crowdK: 0.12 + 0.3 * pr(t, L0("k14"), T.end), speaker: 0 }),
-    fx: (t) => (t < T.county ? waves(t, L0("k14"), ...HORN, 7, 1.4) : []) },
-  { a: T.end + 0.05, name: "end", look: "nightExt", dof: 0, keys: [[T.end, -9.0, 14.0, 31.0, 0, 0.5, 8.0, 54]], st: () => ({ ...NIGHT }) },
+    cast: (t) => [joe(...JH, { expr: t < T.bang ? "resolve" : "scream", prop: ["handset", t < T.press + 0.3 ? 0.35 : 1], look: 0.3, blink: blink(t, 5) }, { blob: false }),
+      zom(3.55, -5.8, { pound: (t * 2.4) % 1, expr: "zom2" }, { blob: false })],
+    fx: (t) => [...burst(t, T.bang + 0.05, 4.35, 1.85, -6.4, 0.6), ...burst(t, T.wall + 0.05, 4.35, 1.85, -6.4, 0.6)] },
+
+  // 46,2–52,25: за окошком. Зомби оборачивается и уходит на звук через открытую дверь в дождь (камера ведёт его) -> Joe выбегает,
+  // хлопает дверью -> задвигает стеллаж -> облегчение -> хлыст вверх
+  { a: S.out, name: "out", look: "backNight", dof: (t) => (t < T.out ? 7 : 5), push: 0.0025,
+    beats: [
+      { t: S.out, pos: P(3.53, 1.6, -6.05), look: P(3.62, 1.55, -4.6), fov: 42 },
+      { t: T.out + 0.5, d: 1.5, pos: P(3.6, 1.65, -5.95), look: tracking(zomOut, 1.3, P(7.6, 1.3, -5.5)), fov: 40 },
+      { t: T.slam - 0.15, d: 0.65, pos: P(5.2, 1.6, -5.0), look: P(7.2, 1.2, -5.5), fov: 44 },
+      { t: T.bury + 0.35, d: 0.8, pos: P(4.0, 1.6, -5.25), look: P(6.6, 1.1, -5.3), fov: 46 },
+      { t: T.own - 0.35, d: 0.5, pos: P(4.6, 1.5, -5.6), look: P(6.0, 1.3, -5.9), fov: 40 },
+      { t: S.cnt, d: 0.35, pos: P(4.6, 1.5, -5.6), look: P(6.0, 3.4, -5.9), fov: 40 },
+    ],
+    st: (t) => ({ ...NIGHT, doorB: 1 - sm(pr(t, T.slam - 0.02, T.slam + 0.14)), doorC: pr(t, tJout[0] - 0.2, tJout[0] + 0.1), shelf: 1 - pr(t, ...tPush) }),
+    cast: (t) => [zomOut(t), joeOut(t)].filter((p): p is Put => !!p) },
+
+  // 52,25–56,5: кран над станцией под дождём: из темноты со всех сторон к свету идут фигуры
+  { a: S.cnt, name: "county", look: "nightExt", dof: 0, push: 0.0015,
+    beats: [
+      { t: S.cnt, pos: P(-4.5, 6.5, 19.5), look: P(0, 4.2, 2.0), fov: 52 },
+      { t: S.cnt + 0.35, d: 0.35, pos: P(-4.5, 6.5, 19.5), look: P(0, 1.5, 2.0), fov: 52 },
+      { t: T.county, d: 2.5, pos: P(-7.5, 11.5, 27.0), look: P(0, 0.8, 6.0), fov: 54 },
+      { t: T.end + 0.4, d: 1.2, pos: P(-9.0, 14.0, 31.0), look: P(0, 0.5, 8.0), fov: 54 },
+    ],
+    st: (t) => ({ ...NIGHT, lamps: 2, lampK: 0.4, canopy: 1, crowd: "gather", crowdK: 0.12 + 0.3 * pr(t, S.cnt, T.end), speaker: 0 }),
+    fx: (t) => waves(t, S.cnt, ...HORN, 7, 1.4) },
+  { a: S.end, name: "end", look: "nightExt", dof: 0, beats: [{ t: S.end, pos: P(-9.0, 14.0, 31.0), look: P(0, 0.5, 8.0), fov: 54 }], st: () => ({ ...NIGHT }) },
 ];
 
-const KICKS: [number, number][] = [[T.clicks, 0.8], [T.shut - 0.05, 1.2], [T.bang + 0.05, 1.0], [T.wall + 0.05, 1.1], [T.wall + 0.25, 0.9], [T.slam, 1.4]];
+const KICKS: [number, number][] = [[T.killed, 0.9], [T.clicks, 0.9], [T.shut - 0.02, 1.2], [T.bang + 0.05, 1.0], [T.wall + 0.05, 1.1], [T.slam, 1.4]];
 export const STORY = makeStory(SHOTS, KICKS, DUR);

@@ -2,8 +2,8 @@
 import React from "react";
 import { GasWorld } from "../gas/world";
 import { makeShort } from "../../kit/short";
-import { Word, RedX, DayTag, FactCard, Captions, EndCard, W } from "../../kit/overlay";
-import { STORY, T } from "./story";
+import { Word, DayTag, FactCard, Captions, EndCard, W } from "../../kit/overlay";
+import { STORY, T, S } from "./story";
 import { WORDS } from "./data";
 
 export const WATER_FRAMES = STORY.TOTAL;
@@ -26,7 +26,7 @@ const Overlay: React.FC<{ f: number }> = ({ f }) => {
   [T.bang + 0.05, T.wall + 0.05].forEach((b, i) => els.push(<Word key={"bang" + i} s="BANG!" x={W / 2 - 120 + i * 240} y={520 + i * 120} size={120} t={t} t0={b} life={0.8} rot={i ? 6 : -6} col="#ffd21f" />));
   els.push(<Word key="slam" s="SLAM!" y={500} size={140} t={t} t0={T.slam} life={0.9} />);
   if (name !== "end") {
-    const night = t < 4.6 || t >= T.am3 - 0.2;
+    const night = t < S.day || t >= S.night;
     els.push(<DayTag key="day" n={19} clock={night ? "03:00 AM" : "02:10 PM"} />);
     els.push(<Captions key="sub" t={t} words={WORDS} />);
   } else els.push(<EndCard key="end" u={u} t={t} t0={a0} l1="WHO ELSE" l2="HEARD IT?" />);
