@@ -1,1 +1,1 @@
-{ "composition": "WaterShort", "frames": 1785, "jobs": 20, "concurrency": 2, "ranges": [[90, 134], [135, 179], [630, 674], [675, 719]], "props": { "post": { "dpr": 1, "msaa": 4 } } }
+{ "composition": "WaterShort", "frames": 1785, "jobs": 20, "concurrency": 2, "ranges": [[0, 44], [45, 89], [90, 134], [135, 179], [630, 674], [675, 719]], "props": { "post": { "dpr": 1, "msaa": 4 } } }
