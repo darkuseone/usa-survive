@@ -544,7 +544,11 @@ export class GasWorld {
       const fo: FrontOpts = { ...(p.fo ?? {}), light, seed: (p.fo?.seed ?? 3) }, so: SideOpts = { ...(p.so ?? {}), light, seed: (p.so?.seed ?? 3) };
       const key = p.side ? `S|${p.id}|${fkey(so)}` : `F|${p.id}|${fkey(fo)}`;
       const a = this.actor(ai++);
-      a.r = this.pool.req(key, w, h, k, (pen) => (p.side ? bodySide(pen, p.o, so) : bodyFront(pen, p.o, fo)));
+      a.r = this.pool.req(key, w, h, k, (pen) => {
+        // сбой рисунка одной карточки (нечисловой градиент) не должен ронять весь кадр: пишем в лог, карточка остаётся пустой
+        try { if (p.side) bodySide(pen, p.o, so); else bodyFront(pen, p.o, fo); }
+        catch (e) { console.error("card draw failed", p.id, key, JSON.stringify({ w, h, k, d }), String(e).slice(0, 120)); }
+      });
       a.mesh.visible = true; a.mesh.position.set(p.x, p.y, p.z);
       a.mesh.rotation.set(0, Math.atan2(cam.position.x - p.x, cam.position.z - p.z), 0);
       a.mesh.scale.set(mirror ? -scl : scl, scl, scl); a.mesh.castShadow = p.shadow ?? true;

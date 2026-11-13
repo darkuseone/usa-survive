@@ -41,8 +41,10 @@ export const makeStory = (shots: ShotDef[], kicks: [number, number][], dur: numb
   const kickAt = (t: number) => { let a = 0; for (const [t0, g] of kicks) { const n = Math.floor((t - t0) * FPS + 1e-6); if (n >= 0 && n < 7) a += g * (n % 2 ? -1 : 1) * (1 - n / 7) ** 1.5; } return a; };
   const camOf = (s: ShotDef, t: number): Cam => {
     const K = s.keys; let vals: number[];
-    if (K.length < 2 || t <= K[0][0]) vals = K[0].slice(1).map((v) => (v ?? 0) as number);
-    else if (t >= K[K.length - 1][0]) vals = K[K.length - 1].slice(1).map((v) => (v ?? 0) as number);
+    // все 8 значений (x y z, цель x y z, fov, крен): у ключа без крена slice давал 7, крен = undefined -> матрица камеры NaN -> падение кадра
+    const all = (k: K) => [1, 2, 3, 4, 5, 6, 7, 8].map((c) => (k[c] ?? 0) as number);
+    if (K.length < 2 || t <= K[0][0]) vals = all(K[0]);
+    else if (t >= K[K.length - 1][0]) vals = all(K[K.length - 1]);
     else if (s.spline && K.length > 2) {
       // время плана -> время ключей: разгон и торможение только на краях (~0,7 с), в середине ключи проходятся по своим временам
       const t0 = K[0][0], t1 = K[K.length - 1][0], span = t1 - t0, q = Math.min(0.25, 0.7 / span), x = clamp01((t - t0) / span);
