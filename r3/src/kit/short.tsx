@@ -45,7 +45,7 @@ export const makeShort = (spec: Spec): React.FC => {
       tone: new ToneMappingEffect({ mode: ToneMappingMode.NEUTRAL }),
       grade: new GradeEffect(spec.grade ?? GRADE_CHANNEL, 1),
     }), [camera, scene]);
-    useEffect(() => () => fx.ink.dispose(), [fx]);
+    useEffect(() => () => { try { (fx.ink as { dispose?: () => void }).dispose?.(); } catch { /* уже освобождён */ } }, [fx]);
     const post = useMemo(() => (
       <EffectComposer multisampling={on.msaa}>
         {[on.ink && <primitive key="ink" object={fx.ink} dispose={null} />, on.lens && <primitive key="pre" object={fx.lens.pre} dispose={null} />,

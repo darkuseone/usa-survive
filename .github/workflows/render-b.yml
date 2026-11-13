@@ -20,7 +20,8 @@ jobs:
           python3 - >> "$GITHUB_OUTPUT" <<'PY'
           import json
           r = json.load(open('r3/render-request.json')); tot, n = r['frames'], r['jobs']; step = -(-tot // n)
-          print('matrix=' + json.dumps({'include': [{'a': a, 'b': min(tot - 1, a + step - 1)} for a in range(0, tot, step)]}))
+          inc = [{'a': a, 'b': b} for a, b in r['ranges']] if r.get('ranges') else [{'a': a, 'b': min(tot - 1, a + step - 1)} for a in range(0, tot, step)]
+          print('matrix=' + json.dumps({'include': inc}))
           PY
   render:
     needs: plan
@@ -40,11 +41,15 @@ jobs:
           PROPS=$(python3 -c "import json; print(json.dumps(json.load(open('render-request.json'))['props']))")
           CC=$(python3 -c "import json; print(json.load(open('render-request.json')).get('concurrency', 2))")
           COMP=$(python3 -c "import json; print(json.load(open('render-request.json')).get('composition', 'GasShort'))")
-          mkdir -p out/ci && A=$(printf %04d ${{ matrix.a }})
-          npx remotion render src/index.ts $COMP out/ci/chunk_$A.mp4 --gl=swangle --concurrency=$CC --frames=${{ matrix.a }}-${{ matrix.b }} \
-            --codec=h264 --crf=16 --timeout=900000 --props="$PROPS" 2>&1 | grep -v "fallback to software" | tail -20
+          mkdir -p out/ci && A=$(printf %04d ${{ matrix.a }}) && set -o pipefail
+          # до 3 попыток: редкие падения SwiftShader/WebGL на раннере; без файла задача падает (раньше кусок терялся молча)
+          for try in 1 2 3; do
+            npx remotion render src/index.ts $COMP out/ci/chunk_$A.mp4 --gl=swangle --concurrency=$CC --frames=${{ matrix.a }}-${{ matrix.b }} \
+              --codec=h264 --crf=16 --timeout=900000 --props="$PROPS" 2>&1 | grep -v "fallback to software" | tail -60 && break || echo "попытка $try не удалась"
+          done
+          test -s out/ci/chunk_$A.mp4
       - uses: actions/upload-artifact@v4
-        with: { name: "chunk-${{ matrix.a }}", path: r3/out/ci/chunk_*.mp4, retention-days: 3 }
+        with: { name: "chunk-${{ matrix.a }}", path: r3/out/ci/chunk_*.mp4, retention-days: 3, if-no-files-found: error }
   collect:
     needs: render
     if: always()
