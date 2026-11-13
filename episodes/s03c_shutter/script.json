@@ -1,0 +1,123 @@
+{
+ "title": "40 Zombies vs One Steel Shutter (3D cut)",
+ "lang": "en",
+ "model": "eleven_v4",
+ "fps": 24,
+ "tempo": {
+  "nar": 1.1
+ },
+ "voices": {
+  "nar": {
+   "voice_id": "C1npRmjB19a6yNkEucvx",
+   "settings": {
+    "stability": 0.42,
+    "similarity_boost": 0.8,
+    "style": 0.35,
+    "speed": 1.15
+   }
+  }
+ },
+ "head": 0.1,
+ "tail": 3.0,
+ "gap": 0.15,
+ "lines": [
+  {
+   "key": "k01",
+   "speaker": "nar",
+   "text": "Forty zombies are leaning on the only door you have.",
+   "tts": "[urgent, low] Forty zombies are leaning on the only door you have.",
+   "after": 0.12
+  },
+  {
+   "key": "k02",
+   "speaker": "nar",
+   "text": "And the steel is starting to bend.",
+   "tts": "[tense] And the steel is starting to bend.",
+   "after": 0.25
+  },
+  {
+   "key": "k03",
+   "speaker": "nar",
+   "text": "Seven days earlier.",
+   "tts": "[quiet] Seven days earlier.",
+   "after": 0.2
+  },
+  {
+   "key": "k04",
+   "speaker": "nar",
+   "text": "It's 3:07 a.m. You're alone on the night shift at a highway gas station.",
+   "tts": "[calm, low] It's three oh seven A M. You're alone on the night shift at a highway gas station.",
+   "after": 0.12
+  },
+  {
+   "key": "k05",
+   "speaker": "nar",
+   "text": "The door chime rings... and whatever walks in is not here for gas.",
+   "tts": "[ominous] The door chime rings... and whatever walks in is not here for gas.",
+   "after": 0.15
+  },
+  {
+   "key": "k06",
+   "speaker": "nar",
+   "text": "You slam the lockdown button. Steel shutters crash down.",
+   "tts": "[urgent] You slam the lockdown button. Steel shutters crash down.",
+   "after": 0.25
+  },
+  {
+   "key": "k07",
+   "speaker": "nar",
+   "text": "Day seven. A car alarm screams in the parking lot.",
+   "tts": "[tense] Day seven. A car alarm screams in the parking lot.",
+   "after": 0.12
+  },
+  {
+   "key": "k08",
+   "speaker": "nar",
+   "text": "By sunrise, forty of them are pressed against your shutter.",
+   "tts": "[ominous] By sunrise, forty of them are pressed against your shutter.",
+   "after": 0.12
+  },
+  {
+   "key": "k09",
+   "speaker": "nar",
+   "text": "Six thousand pounds on one sheet of steel. One bolt pops. Then another.",
+   "tts": "[tense] Six thousand pounds on one sheet of steel. One bolt pops. Then another.",
+   "after": 0.15
+  },
+  {
+   "key": "k10",
+   "speaker": "nar",
+   "text": "Most people panic. They scream. They run.",
+   "tts": "[fast] Most people panic. They scream. They run.",
+   "after": 0.1
+  },
+  {
+   "key": "k11",
+   "speaker": "nar",
+   "text": "You do the opposite. Shoes off. Lights off. You crawl behind the counter... and you don't move. For eleven hours.",
+   "tts": "[calm, low] You do the opposite. Shoes off. Lights off. You crawl behind the counter... and you don't move. For eleven hours.",
+   "after": 0.15
+  },
+  {
+   "key": "k12",
+   "speaker": "nar",
+   "text": "You see, they don't hunt with their eyes. They hunt by sound. And forty of them can't find what they can't hear.",
+   "tts": "[low, intrigued] You see, they don't hunt with their eyes. They hunt by sound. And forty of them can't find what they can't hear.",
+   "after": 0.15
+  },
+  {
+   "key": "k13",
+   "speaker": "nar",
+   "text": "By nightfall, they drift away... one by one.",
+   "tts": "[quiet] By nightfall, they drift away... one by one.",
+   "after": 0.2
+  },
+  {
+   "key": "k14",
+   "speaker": "nar",
+   "text": "Then, on the night of Day 12... someone knocks.",
+   "tts": "[whispers] Then, on the night of day twelve... someone knocks.",
+   "after": 0.1
+  }
+ ]
+}

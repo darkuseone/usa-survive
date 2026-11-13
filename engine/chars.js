@@ -8,13 +8,18 @@
 const PC0 = { skin: '#f6d6c2', skinD: '#e9b9a0', hair: '#4b2d20', hairL: '#6e4330', top: '#6f7a3e', topD: '#535d2b', pants: '#3d5c8f', shoe: '#f1efe9', stub: '#8a6a58', line: '#1c1512' };
 let PC = PC0;
 
+function leanPush(o) {                                          // наклон корпуса вокруг ступней (сидя — вокруг сиденья); lean > 0 — голова уходит ВПРАВО на экране, даже при flip
+  const py = o.legs === 'sit' ? 345 : 508, a = (o.lean || 0) * (o.flip ? -1 : 1); push(0, 0, 1, 0); ctx.translate(0, py); ctx.rotate(a); ctx.translate(0, -py);
+}
 function person(o) {
   PC = { ...PC0, ...(o.pal || {}) };
   const t = o.t ?? 0, s = o.s ?? 1;
   push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1);
-  push(0, 0, 1, o.lean || 0);
-  const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personBody(o); pop();
-  const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52); push(jh[0], jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
+  if (!o.noShadow) ellP(0, o.legs === 'sit' ? 548 : 512, 112, 15, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.3, seed: 59 });   // контактная тень на полу
+  leanPush(o);
+  const jb = jig(51); push(jb[0], jb[1], 1, jb[2]); personLegs(o); personArms(o, 'back'); personBody(o); pop();
+  ellP(0, 108, 66, 15, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.2, seed: 58 });                                              // тень от головы на плечах
+  const dt = -0.14 * sm(((o.drink ?? 0) - 0.28) / 0.45); const jh = jig(52), tr = o.tremble ? Math.sin(step(o.t ?? 0, 24) * 61) * 3.5 * o.tremble : 0; push(jh[0] + tr, jh[1] + (o.bob ?? 0), 1, jh[2] + (o.tilt || 0) + dt + tr * 0.004); personHead({ ...o, lid: (o.drink ?? 0) > 0.3 ? 1 : o.lid }); pop();
   personArms(o);
   pop(); pop();
 }
@@ -27,8 +32,8 @@ function personLegs(o) {
       blobP([[sd * 18, 512], [sd * 96, 510], [sd * 106, 540], [sd * 14, 546]], PC.shoe, { seed: 168 + sd }); stroke([[sd * 14, 538], [sd * 104, 536]], '#c9c4b8', 4); });
     return;
   }
-  const run = o.legs === 'run', ph = Math.sin(step(o.t ?? 0) * 18);
-  [-1, 1].forEach(sd => { const sw = run ? ph * sd * 40 : 0;
+  const run = o.legs === 'run' || o.legs === 'walk', ph = Math.sin(step(o.t ?? 0) * (o.gait ?? (o.legs === 'walk' ? 9 : 18)));
+  [-1, 1].forEach(sd => { const sw = run ? ph * sd * (o.stride ?? (o.legs === 'walk' ? 26 : 40)) : 0;
     piece([[sd * 10, 318], [sd * 62, 318], [sd * 58 + sw, 486], [sd * 16 + sw, 486]], PC.pants, { seed: 60 + sd, step: 20, shade: () => {
       stroke([[sd * 36, 330], [sd * 37 + sw * 0.6, 470]], mix(PC.pants, '#ffffff', 0.25), 2.4, { a: 0.7 }); } });
     piece([[sd * 14 + sw, 466], [sd * 60 + sw, 466], [sd * 60 + sw, 486], [sd * 14 + sw, 486]], mix(PC.pants, '#000000', 0.18), { seed: 64 + sd, step: 10, lw: 2 });
@@ -41,7 +46,7 @@ function personBody(o) {
   const top = o.top || 'hoodie';
   rectP(-22, 84, 44, 30, PC.skinD, { seed: 69, lw: 2 });
   if (top === 'hoodie') piece(spline([[-70, 92], [0, 80], [70, 92], [62, 120], [-62, 120]], true, 6), PC.topD, { seed: 70 });
-  const body = [[-80, 104], [-52, 92], [52, 92], [80, 104], [100, 200], [104, 330], [-104, 330], [-100, 200]];
+  const body = spline([[-50, 90], [50, 90], [82, 100], [96, 124], [100, 200], [104, 330], [-104, 330], [-100, 200], [-96, 124], [-82, 100]], true, 5);   // скруглённые плечи
   piece(body, PC.top, { seed: 71, step: 18, shade: () => {
     piece([[40, 92], [104, 200], [104, 330], [60, 330]], PC.topD, { seed: 75, line: false, a: 0.45 });
     stroke([[-104, 318], [104, 318]], PC.topD, 5);
@@ -52,6 +57,7 @@ function personBody(o) {
   if (top === 'jacket') [-1, 1].forEach(sd => piece([[sd * 4, 90], [sd * 56, 88], [sd * 40, 140]], PC.topD, { seed: 78 + sd, lw: 2.2 }));   // воротник
   const sw = Math.sin(step(o.t ?? 0) * 1.4) * 3;
   if (top === 'hoodie') [-1, 1].forEach(sd => { stroke([[sd * 16, 104], [sd * 18 + sw, 160], [sd * 17 + sw, 196]], '#f4f1ea', 4); rectP(sd * 17 + sw - 5, 194, 10, 18, '#f4f1ea', { lw: 1.6, seed: 73 + sd }); });
+  if (o.vest) personVest(o.vest);
   if ((o.belly ?? 0) > 0) { const g = ctx.createRadialGradient(0, 260, 5, 0, 260, 120); g.addColorStop(0, hexA('#9cff6a', 0.55 * o.belly)); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(-130, 140, 260, 240);
     const ph = step(o.t ?? 0) * 3; for (let i = 0; i < 3; i++) { const a = ph + i * 2.1; stroke([[Math.cos(a) * 40 - 14, 250 + Math.sin(a) * 30], [Math.cos(a) * 40, 240 + Math.sin(a) * 30], [Math.cos(a) * 40 + 14, 250 + Math.sin(a) * 30]], '#2d6b16', 4, { a: o.belly }); } }
 }
@@ -67,10 +73,11 @@ function glassAt(cx, cy, rg, f, o = {}) {
   stroke([[-gw + 9, -gh / 2 + 10], [-gw + 14, gh / 2 - 12]], '#ffffff', 5, { a: 0.65 });
   pop();
 }
-function personArms(o) {
+function personArms(o, pass = 'front') {
   const A = o.arms || {}, dr = o.drink ?? 0;
   [['l', -1], ['r', 1]].forEach(([k, sd]) => {
-    let a = A[k] || [sd * 112, 300, 'open']; let [hx, hy, pose] = a; const sh = [sd * 80, 112];
+    const gw = (o.legs === 'walk' || o.legs === 'run') ? Math.sin(step(o.t ?? 0) * (o.gait ?? (o.legs === 'walk' ? 9 : 18))) * sd * (o.legs === 'walk' ? 26 : 40) : 0;
+    let a = A[k] || [sd * 112 - gw, 296, 'open']; let [hx, hy, pose] = a; const sh = [sd * 70, 122];
     let gl = null;
     if (pose === 'glass') {
       if (k === 'r' && dr > 0) {                                     // питьё: стакан к губам, наклон, голова запрокинута
@@ -84,7 +91,11 @@ function personArms(o) {
       } else gl = [hx + sd * 6, hy - 46, 0];
     }
     const el = [lerp(sh[0], hx, 0.5) + sd * 30, lerp(sh[1], hy, 0.5) + 22];
-    const tb = tube([sh, el, [hx, hy]], 50, 42); piece(tb.pts, PC.top, { raw: true, seed: 80 + sd, lw: 2.6 });
+    const tb = tube([sh, el, [hx, hy]], 50, 42);
+    if (pass === 'back') { piece(tb.pts, PC.top, { raw: true, seed: 80 + sd, lw: 2.6 }); return; }    // плечо крепится за туловищем — без углов
+    const fa = tube([el, [lerp(el[0], hx, 0.5), lerp(el[1], hy, 0.5)], [hx, hy]], 47, 42); piece(fa.pts, PC.top, { raw: true, seed: 84 + sd, lw: 2.6 });
+    dot(el[0], el[1], 5, mix(PC.top, '#000000', 0.35), 0.8);                                            // «гвоздик»-шарнир локтя, как у бумажной куклы
+
     if (gl) glassAt(gl[0], gl[1], gl[2], o.glass ?? 0.7, { licked: o.licked });
     const c0 = tb.axis[tb.axis.length - 3], ang = Math.atan2(hy - c0[1], hx - c0[0]);
     push(hx, hy, 1, ang - Math.PI / 2);
@@ -111,17 +122,21 @@ function personHead(o) {
     const r = rng(102); ctx.fillStyle = PC.stub; if (o.stubble) for (let i = 0; i < 90; i++) { const a = 0.2 + r() * 2.7, rr = 0.6 + r() * 0.4, x = Math.cos(a) * 84 * rr, y = 44 + Math.sin(a) * 72 * rr; if (y < 60) continue; ctx.globalAlpha = 0.55; ctx.fillRect(x, y, 2.4, 2.4); }   // щетина
     ctx.globalAlpha = 1; if (o.freckles) [[-54, 28], [-44, 36], [-62, 40], [52, 30], [42, 38], [62, 42], [-50, 46], [50, 48]].forEach(([x, y]) => dot(x, y, 3, '#d58a5e', 0.85));     // веснушки
     ellP(-60, 40, 18, 10, '#f2a99a', { line: false, a: 0.3, tex: false }); ellP(60, 40, 18, 10, '#f2a99a', { line: false, a: 0.3, tex: false });
+    if (o.pale) { ctx.fillStyle = `rgba(150,205,190,${0.38 * o.pale})`; ctx.fillRect(-120, -120, 240, 260); }                     // бледность от страха
   } });
   // глаза-овалы (как в «ЮП»), мешки, веки
   const bl = Math.max(blinkAt(t, 3), o.blink ?? 0); let lid = bl ? 1 : (o.lid ?? 0.12);
   if (mood === 'sleepy') lid = Math.max(lid, 0.5); if (mood === 'shock' || mood === 'dread') lid = bl ? 1 : 0; if (mood === 'eww' || mood === 'sick') lid = Math.max(lid, 0.45);
   const big = mood === 'shock' ? 1.15 : 1;
   [-1, 1].forEach(sd => {
-    const ex = sd * 28, ey = -10, rx = 28 * big, ry = 34 * big;
+    const eb = o.eyeBig === sd ? 1.24 : 1, ex = sd * 28, ey = -10, rx = 28 * big * eb, ry = 34 * big * eb;
     if (lid > 0.95) { stroke([[ex - 24, ey + 4], [ex, ey + 10], [ex + 24, ey + 4]], PC.line, 5); return; }
     piece(ellPts(ex, ey, rx, ry, 0, 32), '#fbfaf6', { seed: 110 + sd, lw: 2.8, tex: false, shade: () => {
-      const pr2 = mood === 'shock' || mood === 'dread' ? 5 : 7.5; dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c');
+      const pr2 = (mood === 'shock' || mood === 'dread' ? 5 : 7.5) * (o.pupil ?? 1); dot(ex + lk[0] * 13 - sd * 3, ey + 4 + lk[1] * 12, pr2, '#140f0c'); dot(ex + lk[0] * 13 - sd * 3 - 3, ey + 1 + lk[1] * 12, 2.4, '#ffffff', 0.9);
       if (lid > 0.02) { const ly = ey - ry + lid * ry * 2; piece([[ex - rx - 3, ey - ry - 4], [ex + rx + 3, ey - ry - 4], [ex + rx + 3, ly], [ex - rx - 3, ly]], PC.skin, { raw: true, line: false }); stroke([[ex - rx, ly], [ex + rx, ly]], PC.line, 4); }
+      const tl = o.eyeTilt ?? 0;                                        // косые веки: >0 тревога/страх (внутренние уголки вверх), <0 злость/решимость
+      if (tl) { const xi = ex - sd * rx, xo = ex + sd * rx, top = ey - ry - 6, yi = ey - ry + Math.max(0, -tl) * ry * 1.05 + Math.max(0, tl) * ry * 0.08, yo = ey - ry + Math.max(0, tl) * ry * 0.95 + Math.max(0, -tl) * ry * 0.1;
+        piece([[xi - sd * 4, top], [xo + sd * 4, top], [xo + sd * 4, yo], [xi - sd * 4, yi]], PC.skin, { raw: true, line: false }); stroke([[xi, yi], [xo, yo]], PC.line, 6); }
     } });
     stroke([[ex - 18, ey + ry + 8], [ex, ey + ry + 13], [ex + 18, ey + ry + 7]], '#b98974', 2.6, { a: 0.9 });              // мешки
   });
@@ -135,6 +150,12 @@ function personHead(o) {
   const m = o.m || { open: 0, round: 0 };
   if (mood === 'eww' && m.open < 0.06) { mouth(0, 64, 54, { open: 0.35, round: 0 }, { noTeeth: true }); piece(spline([[-8, 76], [10, 76], [8, 100], [-6, 100]], true, 5), '#e07a8a', { raw: true, lw: 2.2 }); }
   else if (mood === 'dread' && m.open < 0.06) mouth(0, 64, 46, { open: 0.0 }, { smile: -0.9 });
+  else if (o.scream) screamMouth(0, 62, 64, o.scream);
+  else if (o.mouthKind === 'clench') mouth(0, 62, 58, { open: 0 }, { clench: true });
+  else if (o.mouthKind === 'wavy') stroke([[-30, 66], [-18, 58], [-6, 68], [6, 58], [18, 68], [30, 60]], '#1c1512', 4.5, { smooth: true });
+  else if (o.mouthKind === 'grimace') { const P = [[-40, 54], [40, 54], [36, 80], [-36, 80]]; piece(P, '#2a0e0e', { raw: true, lw: 3 }); rectP(-36, 56, 72, 11, '#fbf7ef', { raw: true, line: false }); rectP(-32, 69, 64, 9, '#fbf7ef', { raw: true, line: false });
+    for (let i = -2; i <= 2; i++) stroke([[i * 13, 56], [i * 13, 78]], '#1c1512', 2); }
+  else if (o.mouthKind === 'puff') { [-1, 1].forEach(sd => { stroke([[sd * 40, 34], [sd * 64, 46], [sd * 46, 70]], PC.skinD, 3); ellP(sd * 58, 50, 16, 10, '#e88a7a', { line: false, a: 0.45, tex: false }); }); stroke([[-14, 66], [0, 63], [14, 66]], '#1c1512', 4.5); }
   else mouth(0, 62, 58, m, { smile: o.smile ?? (mood === 'dumb' ? 0.8 : 0), smirk: o.smirkN ?? 0 });
     hairdo(o.hair || 'short', o);
   if (o.beard) piece(spline([[-92, 30], [-70, 96], [-30, 128], [0, 134], [30, 128], [70, 96], [92, 30], [70, 70], [30, 92], [0, 88], [-30, 92], [-70, 70]], true, 6), PC.hair, { seed: 130, step: 10, edge: 1.1 });
@@ -150,6 +171,13 @@ function hairdo(kind, o) {
     [[[90, -96], [122, -100], [104, -74]], [[-88, -92], [-118, -94], [-100, -68]], [[-20, -146], [-6, -160], [10, -146]]].forEach((tp, q) => piece(tp, PC.hair, { seed: 124 + q, step: 8 }));
     piece(hair, PC.hair, { seed: 120, step: 12, edge: 1.2, shade: () => { piece([[-70, -120], [-10, -140], [40, -134], [10, -112], [-40, -104]], PC.hairL, { seed: 122, line: false, a: 0.8 }); [[-80, -110, -40, -80], [-20, -130, 10, -96], [40, -128, 60, -90], [90, -100, 100, -70]].forEach(v => stroke([[v[0], v[1]], [v[2], v[3]]], PC.hairL, 5)); } });
     return; }
+  if (kind === 'beanie') {                                           // вязаная шапка с отворотом (Joe)
+    const c = o.capCol || '#2f5961', cd = mix(c, '#000000', 0.22);
+    [-1, 1].forEach(sd => piece([[sd * 96, -40], [sd * 110, -40], [sd * 106, 10], [sd * 94, 6]], PC.hair, { seed: 134 + sd, lw: 1.8 }));   // виски
+    piece(spline([[-106, -40], [-100, -104], [-56, -146], [0, -156], [56, -146], [100, -104], [106, -40]], true, 6).concat([[106, -40], [-106, -40]]), c, { seed: 136, step: 14, shade: () => {
+      for (let x = -90; x <= 90; x += 22) stroke([[x * 0.9, -146 + Math.abs(x) * 0.25], [x, -60]], cd, 3, { a: 0.7 }); } });
+    piece([[-114, -66], [114, -66], [112, -26], [-112, -26]], mix(c, '#ffffff', 0.06), { seed: 137, step: 12, lw: 2.4, shade: () => { for (let x = -104; x <= 104; x += 13) stroke([[x, -62], [x, -30]], cd, 2.4, { a: 0.6 }); } });
+    return; }
   if (kind === 'cap' || kind === 'helmet') {
     const c = o.capCol || (kind === 'helmet' ? '#6b7a3a' : '#c8402c'), cd = mix(c, '#000000', 0.25);
     piece(spline([[-104, -28], [-100, -96], [-50, -138], [0, -146], [50, -138], [100, -96], [104, -28]], true, 6).concat([[104, -28], [-104, -28]]), c, { seed: 132, step: 14, shade: () => { stroke([[0, -144], [0, -34]], cd, 4); } });
@@ -160,4 +188,117 @@ function hairdo(kind, o) {
   // short: аккуратная короткая стрижка с пробором
   piece(spline([[-104, -6], [-108, -70], [-70, -124], [-10, -140], [56, -132], [100, -96], [108, -40], [104, -6], [92, -40], [70, -78], [20, -88], [-30, -82], [-80, -60], [-94, -30]], true, 6), PC.hair, { seed: 135, step: 12, edge: 1.0,
     shade: () => { stroke([[-30, -128], [-10, -90]], PC.hairL, 5); stroke([[20, -132], [50, -100]], PC.hairL, 4); } });
+}
+
+/* светоотражающая жилетка поверх верха: две полы, серебристые полосы, лямки через плечи (фирменная деталь Joe) */
+function personVest(col) {
+  const cd = mix(col, '#000000', 0.2), sil = '#e9ebe6';
+  [-1, 1].forEach(sd => {
+    const pts = [[sd * 30, 96], [sd * 74, 102], [sd * 98, 196], [sd * 104, 330], [sd * 26, 330], [sd * 24, 200]];
+    piece(pts, col, { seed: 140 + sd, step: 16, shade: () => {
+      piece([[sd * 60, 96], [sd * 110, 200], [sd * 110, 340], [sd * 80, 340]], cd, { line: false, a: sd > 0 ? 0.5 : 0.25, seed: 142 + sd });
+      [236, 286].forEach((y, q) => piece([[sd * 10, y], [sd * 116, y - 2], [sd * 116, y + 18], [sd * 10, y + 18]], sil, { seed: 144 + sd + q * 3, step: 12, lw: 1.6, shade: () => { stroke([[sd * 14, y + 6], [sd * 112, y + 4]], '#ffffff', 3, { a: 0.8 }); } }));
+      piece([[sd * 40, 92], [sd * 62, 94], [sd * 58, 236], [sd * 38, 236]], sil, { seed: 150 + sd, step: 12, lw: 1.6 });
+    } });
+  });
+  rectP(-32, 168, 22, 34, '#f4f1ea', { seed: 152, lw: 1.6 }); stroke([[-28, 178], [-14, 178]], '#3d5c8f', 3); stroke([[-28, 188], [-16, 188]], '#9a958a', 2);   // бейджик
+}
+
+/* ================================================================= ГЕРОИ КАНАЛА «Paper Survivors» */
+/* Joe — «каждый»: серое худи, оранжевая светоотражающая жилетка (узнаётся по цвету на обложке), бини цвета морской волны, щетина.
+   Аксессуары (скотч, фонарик) — после joe() в том же layer, в точке кисти. */
+const JOE = { pal: { top: '#7b828c', topD: '#5d636c', hair: '#5a3a26', hairL: '#7a5238', pants: '#3d4f6e', shoe: '#e9e4d8', skin: '#f2cfb4', skinD: '#dfae92', stub: '#7a5a48' },
+  hair: 'beanie', capCol: '#2f6a6e', top: 'hoodie', vest: '#f2731c', stubble: 1 };
+function idleOf(o, seed = 0) { const t = step(o.t ?? 0, 12), mv = o.legs === 'walk' || o.legs === 'run';
+  return { bob: (o.bob ?? 0) + (mv ? -Math.abs(Math.sin(t * (o.legs === 'walk' ? 9 : 18))) * 8 : Math.sin(t * 2.3 + seed) * 2.6),
+    tilt: (o.tilt ?? 0) + Math.sin(t * 0.9 + seed) * 0.035, lean: (o.lean ?? 0) + (mv ? 0 : Math.sin(t * 0.6 + seed) * 0.015) }; }
+function joe(o = {}) { person({ ...JOE, ...o, ...(o.still ? {} : idleOf(o)), pal: { ...JOE.pal, ...(o.pal || {}) } }); }
+
+/* зомби: серо-зелёная кожа, рваная футболка, тусклые глаза; руки вперёд-в стороны; ноги шаркают (run на малой амплитуде через t/2) */
+const ZPAL = [
+  { skin: '#93b86a', skinD: '#76994f', hair: '#3a362c', hairL: '#4c473a', top: '#6e5a48', topD: '#4f4033', pants: '#45485a', shoe: '#5a5048', stub: '#5c6650' },
+  { skin: '#a6c278', skinD: '#87a35c', hair: '#6a5a40', hairL: '#7c6a4c', top: '#5d6e7c', topD: '#45535e', pants: '#3e3a36', shoe: '#4a443c', stub: '#5c6650' },
+  { skin: '#88b07a', skinD: '#6c915e', hair: '#26221c', hairL: '#3a342a', top: '#8a3e34', topD: '#6a2e26', pants: '#2f3646', shoe: '#3a3632', stub: '#5c6650' }];
+function zombie(o = {}) {
+  const v = o.v ?? 0, t = o.t ?? 0, sway = Math.sin(step(t, 8) * 2.2 + v) * 0.05, gr = Math.max(0, Math.sin(step(t, 8) * 1.3 + v * 2)), jx = Math.sin(step(t, 8) * 3.1 + v) * 12;
+  person({ pal: ZPAL[v % ZPAL.length], hair: ['shaggy', 'bald', 'short'][v % 3], top: 'tee', mood: 'dread', lid: 0.38, lk: [0, 0.3], eyeBig: v % 2 ? 1 : -1,
+    m: gr > 0.45 ? { open: 0.25 + 0.6 * (gr - 0.45), round: 0.5 } : undefined, smile: -0.6,
+    arms: { l: [-150 + jx, 130 - jx * 0.5, 'open'], r: [150 + jx * 0.6, 110 + jx, 'open'] }, legs: 'stand', tilt: 0.12 + sway, lean: sway * 0.6, ...o, t: t * 0.5 });
+  zombieMarks(o);
+}
+/* приметы зомби поверх person(): тёмные круги у глаз, шов-царапина, рваный подол и дыры на одежде (та же геометрия, что у person) */
+function zombieMarks(o) {
+  const s = o.s ?? 1, tl = (o.tilt ?? 0.12);
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); leanPush(o);
+  piece([[-104, 318], [-80, 300], [-60, 334], [-34, 304], [-8, 338], [20, 306], [44, 336], [70, 302], [104, 318], [104, 340], [-104, 340]], '#2a2420', { raw: true, line: false, a: 0.55 });   // рваный подол
+  ellP(-40, 220, 18, 12, '#3a2e26', { seed: 700, line: false, a: 0.6 }); ellP(50, 170, 12, 16, '#3a2e26', { seed: 701, line: false, a: 0.6 });
+  push(0, 0, 1, tl); [-1, 1].forEach(sd => ellP(sd * 28, -4, 36, 42, '#3c4a2c', { seed: 702 + sd, line: false, a: 0.35, tex: false }));
+  stroke([[40, -80], [70, -50]], '#5a2a22', 4); for (let q = 0; q < 3; q++) stroke([[44 + q * 9, -58 - q * 9], [56 + q * 9, -70 - q * 9]], '#5a2a22', 3);
+  pop(); pop(); pop();
+}
+
+/* Ди — дальнобойщица (второстепенная героиня серии «заправка»): кепка дальнобойщика, хвост, клетчатая рубашка, без щетины */
+const DEE = { pal: { top: '#a8402e', topD: '#7e2c20', hair: '#3a2418', hairL: '#5a3a26', pants: '#34405a', shoe: '#5a4a3a', skin: '#e8b896', skinD: '#cf9a78' }, hair: 'cap', capCol: '#2f5d8a', top: 'jacket' };
+function dee(o = {}) {
+  const s = o.s ?? 1, sd = o.flip ? -1 : 1;
+  push(o.x, o.y, s, o.rot || 0, sd); piece(spline([[60, -40], [128, -10], [138, 80], [118, 150], [96, 90], [84, 20]], true, 6), DEE.pal.hair, { seed: 990, step: 12, edge: 1.2 }); pop();   // хвост за головой
+  person({ ...DEE, ...o, pal: { ...DEE.pal, ...(o.pal || {}) } });
+  push(o.x, o.y, s, o.rot || 0, sd); leanPush(o); push(0, 0, 1, o.tilt || 0);
+  [-1, 1].forEach(q => stroke([[q * 18, -44], [q * 34, -50]], '#1c1512', 3));                                  // ресницы-штрихи
+  pop(); pop(); pop();
+}
+/* мародёр: тёмная куртка, бандана на лице */
+function raider(o = {}) {
+  const s = o.s ?? 1; person({ pal: { top: '#3a3d42', topD: '#2a2c30', hair: '#2a2420', pants: '#2c2f36', shoe: '#2a2622', skin: '#d9a888', skinD: '#b8866a' }, hair: o.hair || 'buzz', top: 'jacket', mood: 'angry', ...o });
+  push(o.x, o.y, s, o.rot || 0, o.flip ? -1 : 1); leanPush(o); push(0, 0, 1, o.tilt || 0);
+  piece([[-96, 30], [96, 30], [84, 96], [40, 122], [0, 128], [-40, 122], [-84, 96]], o.band || '#8a2a24', { seed: 995, step: 10, shade: () => { for (let i = 0; i < 6; i++) dot(-60 + i * 24, 70, 4, '#f3ecd8', 0.8); } });
+  pop(); pop(); pop();
+}
+/* силуэт зомби для толпы вдали: дёшево (6 деталей), качается на двойках */
+/* зомби для толпы (голова −50, ступни +380 от точки (x, y); feetY = y + 380·s). o: back — вид со спины, pound — колотит руками вверх (по жалюзи), up — руки подняты,
+   walk — идёт (шаг шире), dim 0..1 — глубина/ночь (уводит цвета в синеву), lean. Вариативность от seed: рост, одежда, причёска, глаза, рот, раны. */
+function zMini(x, y, s, t, seed = 0, o = {}) {
+  const r = rng(seed * 7 + 3), P = ZPAL[seed % ZPAL.length], dim = o.dim ?? 0, C = c => dim ? mix(c, '#222a42', dim) : c;
+  const skin = C(mix(P.skin, '#c8f08a', 0.25)), skinD = mix(skin, '#000000', 0.2), top = C([P.top, '#5d6e7c', '#7a4a6a', '#4a6a4a', '#8a7a4a', '#3a4a6a', '#a0522d'][Math.floor(r() * 7)]), topD = mix(top, '#000000', 0.28),
+    pants = C([P.pants, '#3e3a36', '#2f3646', '#4a4238'][Math.floor(r() * 4)]), hair = C(['#3a362c', '#6a5a40', '#26221c', '#7a3a20', '#9a9a90'][Math.floor(r() * 5)]);
+  const hs = 0.9 + r() * 0.22, kind = Math.floor(r() * 5), mouthK = Math.floor(r() * 3), back = !!o.back, sp = o.walk ? 4.2 : 2.2, ph = Math.sin(step(t, 8) * sp + seed * 1.7), sw = Math.sin(step(t, 8) * (1.4 + r()) + seed) * 0.07,
+    pd = (o.pound || o.up) ? Math.max(0, Math.sin(step(t, 12) * (4.5 + r() * 3) + seed * 2.1)) : 0, st = o.walk ? 30 : 14, tiltH = (r() - 0.5) * 0.36;
+  push(x, y + 380 * s * (1 - hs), s * hs, sw + (o.lean || 0));
+  ellP(0, 384, 82, 12, 'rgba(8,8,14,1)', { line: false, tex: false, a: 0.32, seed: 979 });
+  [-1, 1].forEach(sd => { piece([[sd * 10, 200], [sd * 52, 200], [sd * 50 + ph * sd * st, 372], [sd * 16 + ph * sd * st, 372]], pants, { seed: 980 + sd, step: 20, lw: 2.2 });
+    blobP([[sd * 8 + ph * sd * st, 366], [sd * 60 + ph * sd * st, 364], [sd * 66 + ph * sd * st, 384], [sd * 6 + ph * sd * st, 386]], C('#3a3632'), { seed: 976 + sd, lw: 1.8 }); });
+  const armUp = (sd, lift) => { const hx = sd * (44 + 12 * r()), hy = -64 - 70 * lift - 26 * r(); piece(tube([[sd * 50, 50], [sd * 84, -6], [hx, hy]], 28, 24).pts, top, { raw: true, lw: 2.2 }); ellP(hx, hy - 8, 19, 21, skin, { seed: 981 + sd, lw: 2 });
+    for (let q = -1; q <= 1; q++) stroke([[hx + q * 9, hy - 22], [hx + q * 11, hy - 36]], skin, 7); };
+  const armFwd = sd => { const a = sd > 0 ? [[50, 50], [120, 80 + ph * 10], [175, 70 + r() * 30]] : [[-50, 50], [-115, 90 - ph * 10], [-170, 96 + r() * 26]]; piece(tube(a, 28, 24).pts, top, { raw: true, lw: 2.2 }); const e = a[2]; ellP(e[0] + sd * 7, e[1] + 3, 20, 18, skin, { seed: 984 + sd, lw: 2 }); };
+  if (o.pound || o.up) { armUp(-1, o.up ? 0.6 + 0.4 * pd : 1 - pd); armUp(1, o.up ? 1 - 0.4 * pd : pd); } else if (!back) armFwd(1);
+  piece([[-62, 30], [62, 30], [72, 228], [40, 210], [10, 236], [-24, 212], [-56, 234], [-72, 228]], top, { seed: 982, step: 18, lw: 2.4, shade: () => { piece([[20, 30], [72, 228], [40, 210]], topD, { raw: true, line: false, a: 0.6 });
+    if (r() > 0.4) ellP(-20 + r() * 30, 110 + r() * 60, 12, 16, '#2a2420', { seed: 983, line: false, a: 0.6 }); if (back) stroke([[0, 40], [2, 200]], topD, 3, { a: 0.5 }); if (r() > 0.6) piece([[-62, 30], [-30, 30], [-50, 110]], C('#6a2a24'), { raw: true, line: false, a: 0.55 }); } });
+  if (!(o.pound || o.up)) { if (back) { armFwd(1); armFwd(-1); } else armFwd(-1); }
+  push(0, -50, 1, (back ? 0 : 0.15) + sw + tiltH); ellP(0, 0, 54, 60, skin, { seed: 985, lw: 2.4, shade: () => { ellP(14, 22, 30, 20, skinD, { line: false, a: 0.5 }); } });
+  [-1, 1].forEach(sd => ellP(sd * 54, 6, 9, 14, skin, { seed: 974 + sd, lw: 1.8 }));
+  if (back) { if (kind === 1) { piece([[-40, -30], [0, -56], [40, -30], [30, 10], [-30, 10]], hair, { seed: 986, lw: 1.6, a: 0.8 }); stroke([[-10, 20], [14, 34]], '#5a2a22', 4); }
+    else piece(spline([[-56, 20], [-58, -30], [-30, -64], [0, -70], [30, -64], [58, -30], [56, 20], [40, kind === 3 ? 70 : 36], [0, kind === 3 ? 80 : 44], [-40, kind === 3 ? 70 : 36]], true, 6), hair, { seed: 986, step: 10, lw: 2 }); }
+  else {
+    if (kind === 0) piece([[-54, -16], [-40, -58], [0, -66], [40, -58], [54, -20], [30, -40], [0, -44], [-30, -38]], hair, { seed: 986, lw: 1.8 });
+    else if (kind === 2) piece(spline([[-60, 4], [-62, -40], [-30, -72], [10, -74], [50, -56], [62, -10], [44, -30], [16, -46], [-10, -34], [-36, -44], [-50, -20]], true, 5), hair, { seed: 986, step: 9, edge: 1.3, lw: 1.8 });
+    else if (kind === 3) { piece(spline([[-60, 60], [-64, -30], [-30, -68], [20, -68], [62, -30], [60, 60], [46, 10], [40, -30], [0, -44], [-40, -30], [-46, 10]], true, 5), hair, { seed: 986, step: 10, lw: 1.8 }); }
+    else if (kind === 4) { piece([[-58, -22], [58, -22], [50, -60], [0, -72], [-50, -60]], C('#5a2a2a'), { seed: 986, lw: 1.8 }); piece([[-10, -26], [84, -30], [90, -18], [-6, -14]], C('#3a1a1a'), { seed: 973, lw: 1.6 }); }
+    else { stroke([[-30, -50], [-10, -58]], '#ffffff', 4, { a: 0.3 }); stroke([[16, -52], [34, -36]], '#5a2a22', 4); }
+    const big = seed % 2 ? 1 : -1;
+    [-1, 1].forEach(sd => { const er = sd === big ? 1.25 : 0.95; ellP(sd * 21, -2, 19 * er, 21 * er, 'rgba(40,60,30,1)', { line: false, tex: false, a: 0.4 }); ellP(sd * 21, -2, 15 * er, 17 * er, '#f4f2dc', { seed: 987 + sd, lw: 2, tex: false }); dot(sd * 21 + 2, 2, sd === big ? 3.4 : 5, '#1c1512'); });
+    if (mouthK === 0) { ellP(0, 34, 16, 12 + 6 * Math.abs(ph), '#2a0e0e', { seed: 988, lw: 2 }); rectP(-10, 24, 20, 6, '#f4f2dc', { raw: true, line: false, tex: false }); }
+    else if (mouthK === 1) stroke([[-18, 36], [0, 28], [18, 38]], '#3a1414', 5); else { piece([[-20, 28], [20, 26], [16, 44], [-14, 42]], '#2a0e0e', { seed: 988, lw: 2 }); for (let q = -1; q <= 1; q++) rectP(q * 10 - 4, 27, 7, 7, '#f4f2dc', { raw: true, line: false, tex: false }); }
+    if (r() > 0.5) { stroke([[26, -40], [42, -24]], '#5a2a22', 3.4); stroke([[30, -28], [40, -38]], '#5a2a22', 2.6); }
+  }
+  pop(); pop();
+}
+function zSil(x, y, s, t, seed = 0, col = '#3a4636', o = {}) { if (/^rgba/.test(col)) return zShadow(x, y, s, t, seed, col); return zMini(x, y, s, t, seed, o); }
+function zShadow(x, y, s, t, seed, col) {
+  const r = rng(seed), sw = Math.sin(step(t, 8) * (1.5 + r()) + seed) * 0.08;
+  push(x, y, s, sw); piece([[-60, 0], [60, 0], [70, 220], [-70, 220]], col, { seed: 996 + seed % 7, line: false });
+  ellP(0, -50, 52, 60, col, { seed: 997 + seed % 5, line: false });
+  piece(tube([[50, 40], [120, 70], [170, 60 + r() * 30]], 26, 22).pts, col, { raw: true, line: false }); piece(tube([[-50, 40], [-110, 80], [-160, 90 + r() * 30]], 26, 22).pts, col, { raw: true, line: false });
+  piece([[-50, 210], [-10, 210], [-20, 380], [-56, 380]], col, { raw: true, line: false }); piece([[10, 210], [50, 210], [56, 380], [20, 380]], col, { raw: true, line: false });
+  if (r() > 0.5) { dot(-18, -54, 5, '#c8e6a0', 0.7); dot(18, -54, 5, '#c8e6a0', 0.7); }
+  pop();
 }

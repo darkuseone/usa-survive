@@ -1,0 +1,134 @@
+{
+ "title": "40 Zombies vs One Steel Shutter",
+ "lang": "en",
+ "model": "eleven_v4",
+ "fps": 24,
+ "tempo": {
+  "nar": 1.0
+ },
+ "voices": {
+  "nar": {
+   "voice_id": "C1npRmjB19a6yNkEucvx",
+   "settings": {
+    "stability": 0.42,
+    "similarity_boost": 0.8,
+    "style": 0.35,
+    "speed": 0.98
+   }
+  }
+ },
+ "head": 0.12,
+ "tail": 2.6,
+ "gap": 0.2,
+ "lines": [
+  {
+   "speaker": "nar",
+   "after": 0.3,
+   "key": "h3",
+   "text": "Forty zombies are leaning on the only door you have. And the steel is starting to bend.",
+   "tts": "[urgent, low] Forty zombies are leaning on the only door you have. And the steel is starting to bend."
+  },
+  {
+   "speaker": "nar",
+   "after": 0.35,
+   "key": "b3",
+   "text": "Seven days earlier.",
+   "tts": "[quiet] Seven days earlier."
+  },
+  {
+   "key": "x01_c0_01",
+   "src": "c0_01",
+   "speaker": "nar",
+   "text": "It's 3:07 a.m. You're alone on the night shift at a highway gas station.",
+   "tts": "[calm, low] It's three oh seven A M. You're alone on the night shift at a highway gas station.",
+   "after": 0.3
+  },
+  {
+   "key": "x02_c0_02",
+   "src": "c0_02",
+   "speaker": "nar",
+   "text": "Then the door chime rings... and whatever just walked in is not here for gas.",
+   "tts": "[tense, slow] Then the door chime rings... [pause] and whatever just walked in... is not here for gas.",
+   "after": 0.2
+  },
+  {
+   "key": "x03_c0_03",
+   "src": "c0_03",
+   "speaker": "nar",
+   "text": "You slam the lockdown button. Steel shutters crash down.",
+   "tts": "[urgent] You slam the lockdown button. Steel shutters crash down.",
+   "after": 0.3
+  },
+  {
+   "key": "x04_c0_04",
+   "src": "c0_04",
+   "speaker": "nar",
+   "text": "Day one. Twenty-nine to go.",
+   "tts": "[quiet, ominous] Day one. Twenty-nine to go.",
+   "after": 0.3
+  },
+  {
+   "key": "x05_c3_01",
+   "src": "c3_01",
+   "speaker": "nar",
+   "text": "Day seven. 4:40 a.m. A car alarm starts screaming in the parking lot.",
+   "tts": "[tense] Day seven. Four forty A M. A car alarm starts screaming in the parking lot.",
+   "after": 0.3
+  },
+  {
+   "key": "x06_c3_03",
+   "src": "c3_03",
+   "speaker": "nar",
+   "text": "By sunrise, there are forty of them pressed against your shutter.",
+   "tts": "[slow, dread] By sunrise, there are forty of them... pressed against your shutter.",
+   "after": 0.3
+  },
+  {
+   "key": "x07_c3_03b",
+   "src": "c3_03b",
+   "speaker": "nar",
+   "text": "Forty bodies. Six thousand pounds of weight against one sheet of steel. The shutter bends. One bolt pops. Then another.",
+   "tts": "[tense, building] Forty bodies. Six thousand pounds of weight, against one sheet of steel. The shutter bends. One bolt pops. [pause] Then another.",
+   "after": 0.3
+  },
+  {
+   "key": "x08_c3_04",
+   "src": "c3_04",
+   "speaker": "nar",
+   "text": "This is where most people make their first mistake. They panic. They make noise. They try to run.",
+   "tts": "[serious] This is where most people make their first mistake. They panic. They make noise. They try to run.",
+   "after": 0.3
+  },
+  {
+   "key": "x09_c3_05",
+   "src": "c3_05",
+   "speaker": "nar",
+   "text": "You do the opposite. Shoes off. Lights off. You crawl behind the counter, and you don't move. For eleven hours.",
+   "tts": "[whispering, intense] You do the opposite. Shoes off. Lights off. You crawl behind the counter... and you don't move. For eleven hours.",
+   "after": 0.3
+  },
+  {
+   "key": "x10_c3_06",
+   "src": "c3_06",
+   "speaker": "nar",
+   "text": "Rule of the night shift: silence is the only weapon that never runs out.",
+   "tts": "[firm, low] Rule of the night shift. Silence is the only weapon that never runs out.",
+   "after": 0.3
+  },
+  {
+   "key": "x11_c3_07",
+   "src": "c3_07",
+   "speaker": "nar",
+   "text": "By nightfall they drift away, one by one. And then, on the night of Day 12, someone knocks. Not a scratch. A knock. Three times.",
+   "tts": "[calm, then tense] By nightfall, they drift away, one by one. [pause] And then, on the night of day twelve... someone knocks. Not a scratch. A knock. [whispering] Three times.",
+   "after": 0.3
+  },
+  {
+   "speaker": "nar",
+   "after": 0.25,
+   "key": "e3",
+   "text": "Who's knocking? Find out in the full thirty days, on my channel.",
+   "tts": "[low, intrigued] Who's knocking? Find out in the full thirty days... on my channel."
+  }
+ ]
+}

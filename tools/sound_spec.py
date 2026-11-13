@@ -51,6 +51,7 @@ def main(ep):
         return base + (float(mm.group(2).replace(' ', '')) if mm.group(2) else 0)
     sfxdir = HF / 'assets/sfx'
     FILES = {k: load(sfxdir / f) for k, f in [('gurgle', 'stomach.mp3'), ('gulp', 'gulp.mp3'), ('door', 'door.mp3'), ('meow', 'cat_meow.mp3')]}
+    STEMS = {}
     V = load(HF / S['voice']) if S.get('voice') else np.zeros(int(DUR * SR)); V = V / (np.abs(V).max() + 1e-9) * 0.9; MUS, FX = Bus(DUR), Bus(DUR)
     prog = KEYS[S.get('key', 'E')]; root = prog[0][0]
     gb = 60 / 96
@@ -104,6 +105,19 @@ def main(ep):
             continue
         if name == 'hum': FX.add(hum(at(g) - t0, 0.12), t0); continue
         if name == 'riser': FX.add(riser(at(g) - t0, 0.35), t0); continue
+        if name.startswith('stem:'):                                                      # кусок готовой дорожки шумов другого эпизода: ["stem:build/e01_gas/fx_stem.wav", от, [с, по, громк.]]
+            if name not in STEMS: STEMS[name] = load(HF / name[5:])
+            a0, b0, gg = g; x = STEMS[name][int(a0 * SR):int(b0 * SR)].copy(); f = min(len(x) // 3, int(0.06 * SR))
+            if f > 0: x[:f] *= np.linspace(0, 1, f); x[-f:] *= np.linspace(1, 0, f)
+            FX.add(x, t0, gg); continue
+        if name.startswith('wav:'):                                                       # файл эпизода: ["wav:sfx/rain.wav", от, громк.] или ["wav:…", от, [до, громк.]]
+            x = load(HF / 'episodes' / ep / name[4:])
+            if x is None: print('  !! нет файла', name); continue
+            gg = g
+            if isinstance(g, list):
+                gg = g[1]; n1 = max(1, int((at(g[0]) - t0) * SR)); x = x[:n1].copy(); f = min(len(x) // 3, int(0.4 * SR))
+                if f > 0: x[:f] *= np.linspace(0, 1, f); x[-f:] *= np.linspace(1, 0, f)
+            FX.add(x, t0, gg); continue
         if name in FILES: x = FILES[name]; FX.add(x, t0, g) if x is not None else None; continue
         FX.add(LIB[name](g), t0)
     n = int(DUR * SR); v = np.zeros(n); v[:min(n, len(V))] = V[:n]; vk = os.environ.get('BLEEP') == '1'
@@ -115,6 +129,8 @@ def main(ep):
     w = int(0.05 * SR); e = np.sqrt(np.convolve(v ** 2, np.ones(w) / w, 'same')); e = np.convolve(e, np.ones(int(0.25 * SR)) / int(0.25 * SR), 'same')
     duck = 1 - 0.5 * np.clip(e / (e.max() * 0.35 + 1e-9), 0, 1); L0 = S.get('levels', {})
     mus = mus / (np.abs(mus).max() + 1e-9) * L0.get('music', 0.22) * duck; fx = fx / (np.abs(fx).max() + 1e-9) * L0.get('fx', 0.7)
+    if os.environ.get('STEM') == '1':                                                     # дорожка шумов без голоса — для шортсов из этого эпизода
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', '-c:a', 'pcm_f32le', str(HF / 'build' / ep / 'fx_stem.wav')], input=(fx / (np.abs(fx).max() + 1e-9)).astype(np.float32).tobytes(), check=True)
     st = stereo_reverb(mus, 1.2, 0.22, 1) + stereo_reverb(fx, 0.7, 0.12, 2) + np.stack([v, v], 1)
     meter = pyln.Meter(SR); L = meter.integrated_loudness(st)
     for nm, x, tg in (('музыка', stereo_reverb(mus, 1.2, 0.22, 1), '−14…−19'), ('шумы', stereo_reverb(fx, 0.7, 0.12, 2), '−11…−13')): print(f'  {nm}: {meter.integrated_loudness(x) - L:+.1f} LU (цель {tg})')

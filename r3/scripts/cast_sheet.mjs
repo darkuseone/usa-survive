@@ -1,0 +1,11 @@
+import { build } from "esbuild";
+import { createRequire } from "node:module";
+const { chromium } = createRequire(import.meta.url)(process.env.PW || "/opt/node22/lib/node_modules/playwright");
+import path from "node:path";
+const out = path.resolve("out/gas/cast_bundle.js");
+await build({ entryPoints: ["scripts/cast_sheet.ts"], bundle: true, outfile: out, format: "iife", logLevel: "error" });
+const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 2400, height: 1500 } });
+p.on("pageerror", (e) => console.log("ERR", e.message));
+await p.setContent("<html><body style='margin:0'></body></html>"); await p.addScriptTag({ path: out });
+await p.waitForFunction(() => window.done, null, { timeout: 20000 });
+await p.locator("canvas").screenshot({ path: "out/gas/cast.png" }); await b.close(); console.log("ok out/gas/cast.png");

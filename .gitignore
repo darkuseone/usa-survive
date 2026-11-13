@@ -5,3 +5,6 @@ tools/bin/
 __pycache__/
 out/*.mp4
 out/*.log
+assets/mixkit/
+r3/out/
+r3/public/gas/

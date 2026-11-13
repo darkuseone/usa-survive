@@ -1,0 +1,1 @@
+{ "composition": "WaterShort", "frames": 1785, "jobs": 20, "concurrency": 2, "rev": 4, "props": { "post": { "dpr": 1, "msaa": 4 } } }

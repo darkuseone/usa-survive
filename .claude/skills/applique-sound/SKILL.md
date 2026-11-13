@@ -26,6 +26,11 @@ description: Аудиодизайн «Аппликации» — голоса El
 - Шумы: `slam` (удар/штамп), `pop` (появление), `whoosh`, `click`, `paper`, `tear`, `scratch`, `buzzer`, `bubbles`, `thud`, `bell`, `blip`, `ticks` (от, до), `hum` (от, до), `riser` (от, до), **`siren`** (от, до — гражданская оборона), **`geiger`** (от, до — счётчик Гейгера), **`rumble`** (от, до — гул взрыва/обвала), `drips` (от, [до, громк.] — капель), сэмплы `door`, `gulp`, `gurgle`, `meow` (`assets/sfx`). Новый шум — функция в `tools/sound.py` + строка в `LIB`/обработчике `sound_spec.py`.
 - SFX на каждое действие в кадре; длинные подложки (`hum`, `drips`, ветер) — тихо, чтобы не утомлять за 8 минут.
 
+## Атмосфера и Earshot (Paper Survivors)
+- `tools/ambience.py <папка>` — синтез атмосферы: `amb_rain` (дождь), `amb_buzz` (лампы 60 Гц), `amb_drone`, `amb_groan1/2` (стон зомби), `amb_steps` (шарканье), `amb_rattle` (жалюзи катятся), `amb_bang` (удары в жалюзи), `amb_heart`, `amb_chime` (дверной «динь-дон»). Кладём в `episodes/<эп>/sfx/`.
+- **Earshot** (github.com/Leonxlnx/earshot, MIT): банк из 252 звуков кодом без моделей. Ставится без torch: `python3 -m venv es && es/bin/pip install numpy scipy soundfile soxr librosa pyloudnorm scikit-learn pillow matplotlib && es/bin/pip install --no-deps -e earshot`; `es/bin/earshot sfx list`, `es/bin/earshot sfx render impact/metal -o episodes/<эп>/sfx/es_metal.wav --sr 44100`. Полезные: `impact/metal` (жалюзи/удар), `fit/bell/small_bell`, `tap/glass`, `knock/double`, `toggle/latch` (кнопка), `glitch/dropout|stutter` (мигание ламп), `riser/dark`, `reverse_swell/dark` (перед испугом), `sub_drop/gritty`, `impact/deep` (удар заголовка), `whoosh_big/thump_deep`. `earshot measure build/<эп>/audio.wav` — LUFS/пик без моделей.
+- Файлы эпизода в `sound.json`: `["wav:sfx/amb_rain.wav", от, громк.]` или `["wav:…", от, [до, громк.]]` (обрезка с плавными краями).
+
 ## Уровни и мастер
 - `tools/make.sh <эп> sound` печатает: музыка **−16…−19 LU** (в длинном ролике тише, чем в шортах), шумы **−11…−13 LU**; мастер −15 LUFS, пик −1.2 dBFS (YouTube нормирует к −14). Не попало — крутить `levels` (`music`, `fx`) и пересобирать.
 - Голос нормирован по пику, музыка и шумы — от него: если голос стал ровнее (выравнивание), музыку обычно надо опустить.

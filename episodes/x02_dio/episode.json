@@ -1,0 +1,1 @@
+{"timeline": "episodes/e01_gas/out/timeline.json", "duration": 20, "size": [1920, 1080], "libs": ["engine/vendor/three.r180.js", "engine/chars.js", "episodes/e01_gas/set_store.js", "episodes/e01_gas/set2.js", "episodes/e01_gas/scenes.js", "episodes/e01_gas/fx3.js", "episodes/e01_gas/ch0.js"], "scripts": ["dio.js"]}

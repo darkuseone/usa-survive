@@ -1,0 +1,126 @@
+{
+ "title": "Would You Open the Door? (Zombie Outbreak, Day 12)",
+ "lang": "en",
+ "model": "eleven_v4",
+ "fps": 24,
+ "tempo": {
+  "nar": 1.0
+ },
+ "voices": {
+  "nar": {
+   "voice_id": "C1npRmjB19a6yNkEucvx",
+   "settings": {
+    "stability": 0.42,
+    "similarity_boost": 0.8,
+    "style": 0.35,
+    "speed": 0.98
+   }
+  }
+ },
+ "head": 0.12,
+ "tail": 2.6,
+ "gap": 0.2,
+ "lines": [
+  {
+   "speaker": "nar",
+   "after": 0.35,
+   "key": "h1",
+   "text": "Day 12 of the zombie outbreak. You're locked inside a gas station... and someone knocks.",
+   "tts": "[tense, low] Day twelve of the zombie outbreak. You're locked inside a gas station... and someone knocks."
+  },
+  {
+   "key": "x01_c4_01",
+   "src": "c4_01",
+   "speaker": "nar",
+   "text": "Every highway gas station has a night window: a steel drawer for passing cigarettes to customers after midnight.",
+   "tts": "[measured] Every highway gas station has a night window. A steel drawer, for passing cigarettes to customers after midnight.",
+   "after": 0.3
+  },
+  {
+   "key": "x02_c4_01b",
+   "src": "c4_01b",
+   "speaker": "nar",
+   "text": "The knock comes again. You crawl to the window, and you slide the drawer open one inch.",
+   "tts": "[whispering] The knock comes again. You crawl to the window... and you slide the drawer open... one inch.",
+   "after": 0.3
+  },
+  {
+   "key": "x03_c4_02",
+   "src": "c4_02",
+   "speaker": "nar",
+   "text": "Tonight, a voice comes through it. A woman. Trucker jacket. Hands up. 'Please. I'm not bitten.'",
+   "tts": "[tense] Tonight, a voice comes through it. A woman. Trucker jacket. Hands up. [desperate whisper] Please. I'm not bitten.",
+   "after": 0.3
+  },
+  {
+   "key": "x04_c4_03",
+   "src": "c4_03",
+   "speaker": "nar",
+   "text": "Her name is Dee. Her truck jackknifed a mile down the highway. And she has news.",
+   "tts": "[calm] Her name is Dee. Her truck jackknifed a mile down the highway. And she has news.",
+   "after": 0.3
+  },
+  {
+   "key": "x05_c4_04",
+   "src": "c4_04",
+   "speaker": "nar",
+   "text": "The radio says the National Guard will run an evacuation point at the county stadium. Eighteen days from now. Six miles away.",
+   "tts": "[hopeful, careful] The radio says the National Guard will run an evacuation point at the county stadium. Eighteen days from now. Six miles away.",
+   "after": 0.3
+  },
+  {
+   "key": "x06_c4_05",
+   "src": "c4_05",
+   "speaker": "nar",
+   "text": "Problem four isn't zombies. It's people. Open the door, and you get a partner... or someone who takes everything you have.",
+   "tts": "[serious, tense] Problem four isn't zombies. It's people. Open the door, and you get a partner... or someone who takes everything you have.",
+   "after": 0.3
+  },
+  {
+   "key": "x07_c4_06",
+   "src": "c4_06",
+   "speaker": "nar",
+   "text": "What would you do? Think about it. Because you don't open the door.",
+   "tts": "[low, direct] What would you do? [pause] Think about it. Because you don't open the door.",
+   "after": 0.3
+  },
+  {
+   "key": "x08_c4_07",
+   "src": "c4_07",
+   "speaker": "nar",
+   "text": "You slide two bottles of water through the drawer instead. She nods... and walks back into the rain.",
+   "tts": "[soft] You slide two bottles of water through the drawer instead. She nods... and walks back into the rain.",
+   "after": 0.3
+  },
+  {
+   "speaker": "nar",
+   "after": 0.3,
+   "key": "b1",
+   "text": "Twelve days later... headlights.",
+   "tts": "[quiet, ominous] Twelve days later... headlights."
+  },
+  {
+   "key": "x09_c6_02",
+   "src": "c6_02",
+   "speaker": "nar",
+   "text": "A pickup truck rolls in. Three men. Empty gas cans. And in the passenger seat... Dee.",
+   "tts": "[low] A pickup truck rolls in. Three men. Empty gas cans. And in the passenger seat... [pause] Dee.",
+   "after": 0.3
+  },
+  {
+   "key": "x10_c6_04",
+   "src": "c6_04",
+   "speaker": "nar",
+   "text": "They pound on the shutter. 'Open up, and nobody gets hurt.'",
+   "tts": "[tense] They pound on the shutter. [shouting, distant] Open up, and nobody gets hurt!",
+   "after": 0.3
+  },
+  {
+   "speaker": "nar",
+   "after": 0.25,
+   "key": "e1",
+   "text": "Was Dee their prisoner... or their guide? Would you have opened the door? All thirty days are on my channel.",
+   "tts": "[low, intrigued] Was Dee their prisoner... or their guide? Would you have opened the door? [softer] All thirty days are on my channel."
+  }
+ ]
+}
